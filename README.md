@@ -5,14 +5,17 @@
 ## PHP
 
 - php垃圾回收机制与生命周期
-- laravel框架的设计思想
+- Laravel框架的设计思想
 - 常见的设计模式以及项目中的应用
+- 一些前端小技巧
 
 ## Linux与shell
 
-- shell基本语法
+- [shell基本语法](docs/linux-basic.md)
+- linux三剑客
+- 常用命令
 - 命令行参数
-- 一种通用帮助文档方法
+- [shell小技巧](docs/shell-tips.md)
 - 
 
 ## python
