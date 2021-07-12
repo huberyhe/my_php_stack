@@ -12,3 +12,13 @@ openssl x509 -in cert.pem -noout -text
 >
 > [openssl 查看证书细节](https://www.cnblogs.com/shenlinken/p/9968274.html)
 
+## wireshark与tcpdump
+
+1、抓https的tls握手包
+
+```bash
+tcpdump -ni eth0 "tcp port 443 and (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16)"
+```
+
+
+参考：[仅使用tcpdump捕获ssl握手](https://www.thinbug.com/q/39624745)

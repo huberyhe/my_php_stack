@@ -37,5 +37,13 @@ git reset --hard  commit-id
 
 
 
-## 3、
+## 3、git客户端
+
+#### 3.1、[GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
+
+![screenshot of gh pr status](../imgs/84171218-327e7a80-aa40-11ea-8cd1-5177fc2d0e72.png)
+
+#### 3.2、[Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
+
+![image 1](../imgs/image1Win.jpg)
 

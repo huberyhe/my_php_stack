@@ -32,3 +32,20 @@ fi
 ```
 
 2、上级管道的输出作为下级
+
+3、EOF的用法
+
+```bash
+#!/bin/bash
+cat > /etc/security/limits.conf<< EOF
+#tsedb SETTING
+tsedb soft nproc 16384
+tsedb hard nproc 16384
+tsedb soft nofile 16384
+tsedb hard nofile 65536
+tsedb soft stack 10240
+tsedb hard stack 32768
+tsedb hard memlock 8000000
+tsedb soft memlock 8000000
+EOF
+```

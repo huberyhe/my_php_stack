@@ -18,10 +18,11 @@
 
 ## Linux与shell
 
-- [shell基本语法](docs/linux-basic.md)
+- [linux基本使用](docs/linux-basic.md)
 - linux三剑客
 - 常用命令
 - 命令行参数
+- [shell基础](docs/shell-basic.md)
 - [shell小技巧](docs/shell-tips.md)
 - [Bash 脚本教程 - 廖雪峰](https://wangdoc.com/bash/index.html)
 
@@ -30,7 +31,7 @@
 ## MySQL
 
 - [MySQL有哪些存储引擎，各自的优缺点，应用场景](https://juejin.im/post/6844903684912971783)
-- 
+- mysql常用命令
 
 ## Nginx
 
