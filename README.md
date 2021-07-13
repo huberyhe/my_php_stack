@@ -65,7 +65,7 @@
 
 ## git与svn
 
-- [git常用命令](./docs/git.cmd)
+- [git常用命令](./docs/git.md)
 
 ## 工具：提升效率利器
 
