@@ -2,7 +2,7 @@
 
 # Linux技巧
 
-## 1、yum update时忽略某些软件：
+## 1、yum update时忽略某些软件
 生产环境应避免升级linux内核和关键应用，例如之前遇到过docker与centos版本不兼容引发容器网络异常
 
 1.1、临时：
@@ -24,7 +24,7 @@ yum versionlock list
 
 ## 2、自解压文件：用于制作单文件升级包
 
-假设我们要制作一个名字叫`pkg_20210714.csu`的升级包，直接｀sh pkg_20210714.csu｀可以完成升级。这个文件本身是一个shell脚本，但尾部有包含升级所需的文件
+假设我们要制作一个名字叫`pkg_20210714.csu`的升级包，直接`sh pkg_20210714.csu`可以完成升级。这个文件本身是一个shell脚本，但尾部又包含升级所需的文件
 
 ```bash
 $ cat release/pkg_20210714.csu
@@ -128,3 +128,4 @@ $
 > 参考:
 >
 > [rsync 用法教程](https://www.ruanyifeng.com/blog/2020/08/rsync.html)
+
