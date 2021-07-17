@@ -2,6 +2,8 @@
 
 # 工具
 
+[TOC]
+
 openssl获取证书信息：
 
 ```bash

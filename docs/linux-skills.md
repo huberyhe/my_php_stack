@@ -2,6 +2,8 @@
 
 # Linux技巧
 
+[TOC]
+
 ## 1、yum update时忽略某些软件
 生产环境应避免升级linux内核和关键应用，例如之前遇到过docker与centos版本不兼容引发容器网络异常
 
@@ -128,4 +130,75 @@ $
 > 参考:
 >
 > [rsync 用法教程](https://www.ruanyifeng.com/blog/2020/08/rsync.html)
+
+## 7、代理设置
+
+wget可能没法直接下载github上的文件，可能需要代理
+
+- 设置系统全局使用代理：
+
+加入到`/etc/profile`或`~/.bashrc `或`~/.bash_profile `
+
+```bash
+export http_proxy="http://127.0.0.1:8118"
+export https_proxy="http://127.0.0.1:8118"
+```
+
+- 设置git使用代理：
+
+```bash
+git config --global http.proxy 'socks5://127.0.0.1:19820'
+git config --global https.proxy 'socks5://127.0.0.1:19820'
+```
+
+`git@github.com`类的url使用的是ssh协议，需要修改`ssh config`
+
+
+```bash
+ProxyCommand connect -H 127.0.0.1:19820 %h %p
+#ProxyCommand ncat --proxy-type http --proxy 127.0.0.1:8118 %h %p
+#ProxyCommand ncat --proxy-type socks5 --proxy 127.0.0.1:19820 %h %p
+```
+
+- 设置ssh临时使用代理：
+
+```bash
+ssh -T github -o ProxyCommand="ncat --proxy-type http --proxy 127.0.0.1:19820 %h %p"
+```
+
+- 设置apt使用代理：
+
+加入到`/etc/apt/apt.conf.d/10proxy`
+
+```bash
+Acquire::http::Proxy "http://user:pwd@127.0.0.1:8118";
+```
+
+
+- 设置wget使用代理：
+
+加入到`~/.wgetrc`
+
+```bash
+http_proxy=http://127.0.0.1:8118
+https_proxy=http://127.0.0.1:8118
+use_proxy = on
+wait = 30
+```
+
+临时代理：
+
+```
+wget -c -r -np -k -L -p -e "http_proxy=http://127.0.0.1:8118" http://www.subversion.org.cn/svnbook/1.4/
+```
+
+
+
+wget不支持socks5协议的代理，可以使用Privoxy转换成http代理，编辑添加配置：
+
+```
+forward-socks5 / 127.0.0.1:19820 .
+```
+
+Privoxy默认监听8118端口
 

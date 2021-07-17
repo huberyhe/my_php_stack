@@ -2,7 +2,9 @@
 
 # Docker技巧
 
-### 1、使用宿主机的系统状态
+[TOC]
+
+## 1、使用宿主机的系统状态
 
 参考`zabbix-agent`的容器启动方式：
 
@@ -14,7 +16,7 @@ docker run --name zabbix-agent -p 10050:10050 -v /wns/host/zabbix//zabbix_agentd
 - --pid=host：使用宿主机的进程命名空间
 - --privileged：获取宿主机root权限
 
-### 2、镜像加速
+## 2、镜像加速
 
 编辑配置文件`/etc/docker/daemon.json`，添加
 
@@ -29,7 +31,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
-### 3、普通用户使用docker
+## 3、普通用户使用docker
 
 把普通用户加到docker组即可
 
