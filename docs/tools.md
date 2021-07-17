@@ -4,7 +4,7 @@
 
 [TOC]
 
-openssl获取证书信息：
+## openssl获取证书信息：
 
 ```bash
 openssl x509 -in cert.pem -noout -text
