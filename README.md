@@ -21,10 +21,11 @@
 ## Linux与shell
 
 - [linux基本使用](docs/linux-basic.md)
-- [linux三剑客](./docs/shell-advanced-command.md)
+- [linux使用技巧](./docs/linux-skills.md)
 - 常用命令
 - 命令行参数
 - [shell基础](docs/shell-basic.md)
+- [shell高级命令使用-三剑客](./docs/shell-advanced-command.md)
 - [shell小技巧](docs/shell-tips.md)
 - [Bash 脚本教程 - 廖雪峰](https://wangdoc.com/bash/index.html)
 
