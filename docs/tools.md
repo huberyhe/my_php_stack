@@ -30,7 +30,7 @@ tcpdump -ni eth0 "tcp port 443 and (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16)"
 - http模式过滤：`http.request.method=="GET"`过滤GET请求
 - 连接符：`and`、`or`、`&&`、`||`
 
-3、http三次握手
+3、使用抓包工具理解http三次握手
 
 发送端发送一个SYN=1，ACK=0标志的数据包给接收端，请求进行连接；
 

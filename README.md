@@ -19,7 +19,7 @@
 ## Linux与shell
 
 - [linux基本使用](docs/linux-basic.md)
-- linux三剑客
+- [linux三剑客](./docs/shell-advanced-command.md)
 - 常用命令
 - 命令行参数
 - [shell基础](docs/shell-basic.md)

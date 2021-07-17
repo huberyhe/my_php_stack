@@ -4,6 +4,8 @@
 
 find、awk、sed、grep等
 
+[TOC]
+
 ## find查找文件
 
 `find   path   -option   [   -print ]   [ -exec   -ok   command ]   {} \;`
