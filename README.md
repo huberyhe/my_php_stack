@@ -73,4 +73,5 @@
 ## 工具：提升效率利器
 
 - [常用工具](./docs/tools.md)
+- [Windows下常用工具](./docs/win-tools.md)
 
