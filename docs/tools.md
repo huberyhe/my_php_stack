@@ -53,3 +53,68 @@ TCP的几次握手就是通过这样的ACK表现出来的。但SYN与FIN是不�
 > 参考：
 >
 > [Wireshark常用过滤使用方法](https://www.cnblogs.com/nmap/p/6291683.html)
+
+## rsync实现增量备份
+
+调用实例：增量备份家目录
+
+```bash
+#!/bin/bash
+
+# A script to perform incremental backups using rsync
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readonly SOURCE_DIR="${HOME}"
+readonly BACKUP_DIR="/mnt/data/backups"
+readonly DATETIME="$(date '+%Y-%m-%d_%H:%M:%S')"
+readonly BACKUP_PATH="${BACKUP_DIR}/${DATETIME}"
+readonly LATEST_LINK="${BACKUP_DIR}/latest"
+
+mkdir -p "${BACKUP_DIR}"
+
+rsync -av --delete \
+  "${SOURCE_DIR}/" \
+  --link-dest "${LATEST_LINK}" \
+  --exclude=".cache" \
+  "${BACKUP_PATH}"
+
+rm -rf "${LATEST_LINK}"
+ln -s "${BACKUP_PATH}" "${LATEST_LINK}"
+```
+
+上面脚本中，每一次同步都会生成一个新目录`${BACKUP_DIR}/${DATETIME}`，并将软链接`${BACKUP_DIR}/latest`指向这个目录。下一次备份时，就将`${BACKUP_DIR}/latest`作为基准目录，生成新的备份目录。最后，再将软链接`${BACKUP_DIR}/latest`指向新的备份目录。
+
+> 参考：[rsync 用法教程]([rsync 用法教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2020/08/rsync.html))
+
+## inotifywait文件修改自动处理
+
+linux下inotifywait命令可以监控文件变化，以做进一步处理
+
+1、首先安装：
+
+`yum install inotify-tools -y`
+
+2、调用实例：下面脚本可以监控上传的js文件并把文件拷贝到docker容器，让代码生效
+
+```bash
+#!/bin/sh
+
+CURPATH=`pwd`
+webui_dir=/root/hyc/spm__webui/js
+docker_webui_dir=vh_web:/spm/webui/SPM
+
+inotifywait -mr --timefmt '%d/%m/%y %H:%M' --format '%T %w %f' \
+-e close_write ${webui_dir} | while read date time dir file; do
+
+	FILECHANGE=${dir}${file}
+	# convert absolute path to relative
+	FILECHANGEREL=`echo "$FILECHANGE" | sed 's_'$CURPATH'/__'`
+
+	docker cp $FILECHANGE ${docker_webui_dir}${FILECHANGE:${#webui_dir}}
+	echo "At ${time} on ${date}, file $FILECHANGE was synced to docker"
+done
+```
+

@@ -38,5 +38,7 @@
 
 放上[Sourcetree官网](https://www.sourcetreeapp.com/)和[Fork官网](https://www.git-fork.com/)。Fork似乎需要科学上网才能进，而且是个人免费，商业收费
 
+## 9、HTTP调试抓包工具：Fiddler
 
+配合浏览器扩展SwitchyOmega可快速切换到Fiddler代理，相比Postman更适合高级玩家。
 
