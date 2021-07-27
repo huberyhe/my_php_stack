@@ -233,7 +233,71 @@ seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR,
 > 参考：
 >
 > [Linux awk 命令](https://www.runoob.com/linux/linux-comm-awk.html)
+>
+> [Linux：shell脚本基础（grep及正则表达式、后向引用、sed/awk基础篇）]([Linux：shell脚本基础（grep及正则表达式、后向引用、sed/awk基础篇）_码神岛 (misuland.com)](https://msd.misuland.com/pd/3255818066314925244))
 
 ## sed编辑文本
+
+```bash
+sed [-nefr] [动作]
+选项与参数：
+
+
+
+```
+
+### 1、选项与参数
+
+- -n ：使用安静(silent)模式。在一般 sed 的用法中，所有来自 STDIN 的数据一般都会被列出到终端上。但如果加上 -n 参数后，则只有经过sed 特殊处理的那一行(或者动作)才会被列出来。
+- -e ：直接在命令列模式上进行 sed 的动作编辑；
+- -f ：直接将 sed 的动作写在一个文件内， -f filename 则可以运行 filename 内的 sed 动作；
+- -r ：sed 的动作支持的是延伸型正规表示法的语法。(默认是基础正规表示法语法)
+- -i ：直接修改读取的文件内容，而不是输出到终端。
+
+### 2、动作
+
+动作说明： [n1[,n2]]function
+n1, n2 ：不见得会存在，一般代表『选择进行动作的行数』，举例来说，如果我的动作是需要在 10 到 20 行之间进行的，则『 10,20[动作行为] 』
+
+- 
+  a ：新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～
+- c ：取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
+- d ：删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
+- i ：插入， i 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)；
+- p ：列印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～
+- s ：取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！例如 1,20s/old/new/g 就是啦！
+
+### 3、实例
+
+#### 3.1 数据搜寻并执行命令
+
+搜索/etc/passwd,找到root对应的行，执行后面花括号中的一组命令，每个命令之间用分号分隔，这里把bash替换为blueshell，再输出这行：
+
+```
+nl /etc/passwd | sed -n '/root/{s/bash/blueshell/;p;q}'    
+1  root:x:0:0:root:/root:/bin/blueshell
+```
+
+#### 3.2 数据的搜寻并替换
+
+```bash
+sed 's/要被取代的字串/新的字串/g'
+```
+
+#### 3.3 多点编辑
+
+一条sed命令，删除/etc/passwd第三行到末尾的数据，并把bash替换为blueshell
+
+```
+nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
+1  root:x:0:0:root:/root:/bin/blueshell
+2  daemon:x:1:1:daemon:/usr/sbin:/bin/sh
+```
+
+
+
+> 参考：
+>
+> [Linux sed 命令]([Linux sed 命令 | 菜鸟教程 (runoob.com)](https://www.runoob.com/linux/linux-comm-sed.html))
 
 ## grep查找文本

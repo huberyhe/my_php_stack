@@ -184,6 +184,40 @@ str2=${str}${str1}
 
 ## 4、数组使用
 
+### 4.1、定义一个数组变量
+
+```bash
+array_name=(value1 value2 ... valuen)
+
+array_name[0]=value0
+array_name[1]=value1
+array_name[2]=value2
+```
+
+### 4.2、读取数组
+
+```bash
+${array_name[index]}
+```
+
+### 4.3、获取数组中所有元素
+
+```bash
+my_array=(A B "C" D)
+
+echo "数组的元素为: ${my_array[*]}"
+echo "数组的元素为: ${my_array[@]}"
+```
+
+### 4.4、获取数组长度
+
+```bash
+my_array=(A B "C" D)
+
+echo "数组元素个数为: ${#my_array[*]}"
+echo "数组元素个数为: ${#my_array[@]}"
+```
+
 ## 5、命令行输入
 
 ## 6、
