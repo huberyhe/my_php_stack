@@ -240,10 +240,6 @@ seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR,
 
 ```bash
 sed [-nefr] [动作]
-选项与参数：
-
-
-
 ```
 
 ### 1、选项与参数
@@ -301,3 +297,165 @@ nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
 > [Linux sed 命令]([Linux sed 命令 | 菜鸟教程 (runoob.com)](https://www.runoob.com/linux/linux-comm-sed.html))
 
 ## grep查找文本
+
+```bash
+grep [OPTION]... PATTERNS [FILE]...
+```
+
+grep全称是Global Regular Expression Print，表示全局正则表达式版本
+
+**egrep = grep -E：扩展的正则表达式** （除了**\< , \> , \b** 使用其他正则都可以去掉\）
+
+### 1、常用参数
+
+-  -A<显示行数>：除了显示符合范本样式的那一列之外，并显示该行之后的内容。
+-  -B<显示行数>：除了显示符合样式的那一行之外，并显示该行之前的内容。
+-  -C<显示行数>：除了显示符合样式的那一行之外，并显示该行之前后的内容。
+-  -c：统计匹配的行数
+-  **-e ：实现多个选项间的逻辑or 关系**
+-  **-E：扩展的正则表达式**
+-  -f FILE：从FILE获取PATTERN匹配
+-  -F ：相当于fgrep
+-  -i --ignore-case #忽略字符大小写的差别。
+-  -n：显示匹配的行号
+-  -o：仅显示匹配到的字符串
+-  -q： 静默模式，不输出任何信息
+-  -s：不显示错误信息。
+-  **-v：显示不被pattern 匹配到的行，相当于[^] 反向匹配**
+-  -w ：匹配 **整个单词**
+
+### 2、实例
+
+2.1 查找关键字，显示关键字所在行号
+
+```bash
+ $ grep -n "bash" /etc/passwd
+1:root:x:0:0:root:/root:/bin/bash
+```
+
+2.2 查找关键字，显示匹配到的行数
+
+```bash
+ $ grep -c "nologin" /etc/passwd
+27
+```
+
+2.3 查找关键字，列出包含关键字的文件名
+
+```bash
+grep -rl "bash" ./
+```
+
+2.4 查找多个关键字
+
+```bash
+ $ grep -e "root" -e "hubery" /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
+```
+
+或
+
+```bash
+ $ grep "bash\|zsh" /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
+```
+
+2.5 排除包含关键字的行
+
+```bash
+ $ grep -v "nologin" /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+sync:x:4:65534:sync:/bin:/bin/sync
+tss:x:106:111:TPM software stack,,,:/var/lib/tpm:/bin/false
+pollinate:x:111:1::/var/cache/pollinate:/bin/false
+hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
+```
+
+### 3、正则匹配
+
+```bash
+ $ grep "\(bash\|zsh\)" /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
+ $ grep -E "(bash|zsh)" /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
+```
+
+#### 3.1 匹配字符
+
+-  . 匹配任意单个字符，不能匹配空行
+-  [] 匹配指定范围内的任意单个字符
+-  [^] 取反
+-  [:alnum:] 或 [0-9a-zA-Z]
+-  [:alpha:] 或 [a-zA-Z]
+-  [:upper:] 或 [A-Z]
+-  [:lower:] 或 [a-z]
+-  [:blank:] 空白字符（空格和制表符）
+-  [:space:] 水平和垂直的空白字符（比[:blank:]包含的范围广）
+-  [:cntrl:] 不可打印的控制字符（退格、删除、警铃...）
+-  [:digit:] 十进制数字 或[0-9]
+-  [:xdigit:]十六进制数字
+-  [:graph:] 可打印的非空白字符
+-  [:print:] 可打印字符
+-  [:punct:] 标点符号
+
+#### 3.2 配置次数
+
+-  *****  匹配前面的字符任意次，**包括0次**，贪婪模式：尽可能长的匹配
+-  **.\*** 任意长度的任意字符，**不包括0次**
+-  **\?**  匹配其前面的字符**0 或 1次**
+-  **\+** 匹配其前面的字符**至少1次**
+-  \{n\}  匹配前面的字符n次
+-  \{m,n\}  匹配前面的字符至少m 次，至多n次
+-  \{,n\}  匹配前面的字符至多n次
+-  \{n,\}  匹配前面的字符至少n次
+
+#### 3.3 位置锚定：定位出现的位置
+
+-  ^  行首锚定，用于模式的最左侧
+-  $  行尾锚定，用于模式的最右侧
+-  ^PATTERN$，用于模式匹配整行
+-  ^$ 空行
+-  ^[[:space:]].*$  空白行
+-  \< 或 \b  词首锚定，用于单词模式的左侧
+-  \> 或 \b  词尾锚定；用于单词模式的右侧
+-  \<PATTERN\>
+
+#### 3.4 分组和后向引用
+
+① 分组：\(\) 将一个或多个字符捆绑在一起，当作一个整体进行处理
+
+　　分组括号中的模式匹配到的内容会被正则表达式引擎记录于内部的变量中，这些变量的命名方式为: \1, \2, \3, ...
+
+② 后向引用
+
+引用前面的分组括号中的模式所匹配字符，而非模式本身
+
+\1 表示从左侧起第一个左括号以及与之匹配右括号之间的模式所匹配到的字符
+
+\2 表示从左侧起第2个左括号以及与之匹配右括号之间的模式所匹配到的字符，以此类推
+
+\& 表示前面的分组中所有字符
+
+③ 流程分析如下：
+
+![img](../imgs/1216496-20190213090906435-1889784692.png)
+
+```bash
+ $ grep "\(He\).*\1" << EOF
+Hello world Hello world
+Hiiii world Hiiii world
+Hello world Heiii wwwww
+EOF
+Hello world Hello world
+Hello world Heiii wwwww
+```
+
+
+
+> 参考：
+>
+> [Linux文本三剑客超详细教程---grep、sed、awk](https://www.cnblogs.com/along21/p/10366886.html)

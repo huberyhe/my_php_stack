@@ -220,4 +220,138 @@ echo "数组元素个数为: ${#my_array[@]}"
 
 ## 5、命令行输入
 
+例如命令行：
+
+```bash
+./test.sh -f config.conf -v --prefix=/home
+```
+
+其中，-f是一个选项，需要一个参数，即config.conf；-v也是一个选项，不需要参数。
+
+--prefix是一个长选项，需要一个参数，使用等号连接（非必需）
+
+### 5.1、手工处理
+
+  \*  $0 ： ./test.sh,即命令本身，相当于C/C++中的argv[0]
+  \*  $1 ： -f,第一个参数.
+  \*  $2 ： config.conf
+  \*  $3, $4 ... ：类推。
+  \*  $# 参数的个数，不包括命令本身，上例中$#为4.
+  \*  $@ ：参数本身的列表，也不包括命令本身，如上例为 -f config.conf -v --prefix=/home
+  \*  $* ：和$@相同，但"$*" 和 "$@"(加引号)并不同，"$*"将所有的参数解释成一个字符串，而"$@"是一个参数数组。
+
+### 5.2、getopts，不支持长选项，但使用非常简单，满足大部分场景
+
+```bash
+#!/bin/bash
+
+while getopts "a:bc" arg #选项后面的冒号表示该选项需要参数
+do
+	case $arg in
+		a)
+			echo "a's arg:$OPTARG" #参数存在$OPTARG中
+			;;
+		b)
+			echo "b"
+			;;
+		c)
+			echo "c"
+			;;
+		?)  #当有不认识的选项的时候arg为?
+			echo "unkonw argument"
+			exit 1
+			;;
+	esac
+done
+```
+
+实际使用时抽取成一个函数
+
+```bash
+parseArgs() {
+  while getopts "b:dgm:n:p:uv" opt; do
+  # case处理选项及其参数
+  done
+}
+
+parseArgs "$@"
+```
+
+使用"$@"可以将参数原封不动传递给函数
+
+1. 加双引号是防止参数中可能有空格，空格会被shell自动视为分隔符
+2. "$@"会将每个参数用双引号括起来传递进去，而"@*"则是所有参数括在双引号中，作为一个参数传入函数
+
+### 5.2、getopt，支持长选项
+
+```bash
+#!/bin/bash
+
+# A small example program for using the new getopt(1) program.
+# This program will only work with bash(1)
+# An similar program using the tcsh(1) script language can be found
+# as parse.tcsh
+
+# Example input and output (from the bash prompt):
+# ./parse.bash -a par1 'another arg' --c-long 'wow!*\?' -cmore -b " very long "
+# Option a
+# Option c, no argument
+# Option c, argument `more'
+# Option b, argument ` very long '
+# Remaining arguments:
+# --> `par1'
+# --> `another arg'
+# --> `wow!*\?'
+
+# Note that we use `"$@"' to let each command-line parameter expand to a
+# separate word. The quotes around `$@' are essential!
+# We need TEMP as the `eval set --' would nuke the return value of getopt.
+
+#-o表示短选项，两个冒号表示该选项有一个可选参数，可选参数必须紧贴选项
+#如-carg 而不能是-c arg
+#--long表示长选项
+#"$@"在上面解释过
+# -n:出错时的信息
+# -- ：举一个例子比较好理解：
+#我们要创建一个名字为 "-f"的目录你会怎么办？
+# mkdir -f #不成功，因为-f会被mkdir当作选项来解析，这时就可以使用
+# mkdir -- -f 这样-f就不会被作为选项。
+
+TEMP=`getopt -o ab:c:: --long a-long,b-long:,c-long:: \
+     -n 'example.bash' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+#set 会重新排列参数的顺序，也就是改变$1,$2...$n的值，这些值在getopt中重新排列过了
+eval set -- "$TEMP"
+
+#经过getopt的处理，下面处理具体选项。
+
+while true ; do
+	case "$1" in
+		-a|--a-long) echo "Option a" ; shift ;;
+		-b|--b-long) echo "Option b, argument \`$2'" ; shift 2 ;;
+		-c|--c-long)
+			# c has an optional argument. As we are in quoted mode,
+			# an empty parameter will be generated if its optional
+			# argument is not found.
+			case "$2" in
+				"") echo "Option c, no argument"; shift 2 ;;
+				*)  echo "Option c, argument \`$2'" ; shift 2 ;;
+			esac ;;
+		--) shift ; break ;;
+		*) echo "Internal error!" ; exit 1 ;;
+	esac
+done
+echo "Remaining arguments:"
+for arg do
+	echo '--> '"\`$arg'" ;
+done
+```
+
+> 参考：
+>
+> [Bash Shell中命令行选项/参数处理](https://www.cnblogs.com/FrankTan/archive/2010/03/01/1634516.html)
+
 ## 6、
