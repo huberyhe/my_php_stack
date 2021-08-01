@@ -218,6 +218,26 @@ AVERAGE:     63.80    78.60    70.00
 
 ### 0、其他实例
 
+最后一列
+
+```bash
+awk '{print $NF}'
+```
+
+打印除了第一列的所有列
+
+```bash
+awk '{for(i=2;i<=NF;i++) {
+if(i<NF) {printf "%s ",$i}
+else {print $i}
+}
+}'
+# 或
+awk '{$1="";print}'
+```
+
+
+
 计算文件大小
 
 ```bash
@@ -229,6 +249,7 @@ ls -l *.txt | awk '{sum+=$5} END {print sum}'
 ```bash
 seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR, i*NR, i==NR?"\n":"\t")}'
 ```
+
 
 > 参考：
 >
@@ -373,6 +394,15 @@ pollinate:x:111:1::/var/cache/pollinate:/bin/false
 hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
 ```
 
+2.6 只打印匹配到的内容
+
+```bash
+# echo '222.222.114.222 - - [29/Jul/2021:09:41:59 +0800] "POST /index.php/Ap/get_ip HTTP/1.1" 200 0.000 {\x22sn\x22:\x22B8Z9330005\x22,\x22mac\x22:\x22a80cca9716e2\x22,\x22pwd\x22:\x22\x22}\x0D 104 "-" "Mozilla/4.0" "-"'| grep -oP '(?<=sn\\x22:\\x22)[A-Z0-9]+(?=\\x22)'
+B8Z9330005
+```
+
+
+
 ### 3、正则匹配
 
 ```bash
@@ -454,8 +484,16 @@ Hello world Hello world
 Hello world Heiii wwwww
 ```
 
+### 4、Perl正则表达式
+
+```bash
+grep -P
+```
+
 
 
 > 参考：
 >
 > [Linux文本三剑客超详细教程---grep、sed、awk](https://www.cnblogs.com/along21/p/10366886.html)
+>
+> [Perl Compatible Regular Expressions](https://learnbyexample.github.io/learn_gnugrep_ripgrep/perl-compatible-regular-expressions.html#perl-compatible-regular-expressions)
