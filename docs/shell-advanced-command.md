@@ -311,6 +311,14 @@ nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
 2  daemon:x:1:1:daemon:/usr/sbin:/bin/sh
 ```
 
+#### 3.4 查找并插入
+
+启动脚本添加一条命令
+
+```bash
+sed -i '/exit 0/i touch /tmp/uptime' /etc/rc.local
+```
+
 
 
 > 参考：
