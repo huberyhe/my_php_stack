@@ -192,6 +192,9 @@ array_name=(value1 value2 ... valuen)
 array_name[0]=value0
 array_name[1]=value1
 array_name[2]=value2
+
+# 这种要求元素下标连续
+array_name[${#array_name[@]}]=$value3
 ```
 
 ### 4.2、读取数组
@@ -217,6 +220,31 @@ my_array=(A B "C" D)
 echo "数组元素个数为: ${#my_array[*]}"
 echo "数组元素个数为: ${#my_array[@]}"
 ```
+
+### 4.5、判断元素是否在数组中
+
+1、遍历
+
+```bash
+for i in ${array[@]}
+do
+   [ "$i" == "$var" ] && echo "yes"
+done
+```
+
+2、grep
+
+```bash
+echo "${array[@]}" | grep -wq "$var" && echo "Yes" || echo "No"
+```
+
+3、尝试移除元素后，看数组有没有变化
+
+```bash
+[[ ${array[@]/${var}/} != ${array[@]} ]] && echo "Yes" || echo "No"
+```
+
+
 
 ## 5、命令行输入
 

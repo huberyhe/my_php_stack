@@ -113,3 +113,20 @@ keep_singleton `basename $0`
 
 sleep 60
 ```
+
+## 5、获取脚本当前目录
+
+```bash
+script_dir=$(cd $(dirname $0) && pwd)
+script_dir=$(dirname $(readlink -f $0))
+```
+
+## 6、脚本严格模式 -e
+
+```bash
+set -euo pipefail
+```
+
+- `-e`：当程序返回非0状态码时报错退出
+- `-u`：使用未初始化的变量时报错，而不是当成NULL。 这个比较有用，有点高级编程的感觉
+- `-o pipefail`：使用Pipe中出错命令的状态码（而不是最后一个）作为整个Pipe的状态码。
