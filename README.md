@@ -6,7 +6,10 @@
 
 ## PHP
 
-- PHP垃圾回收机制与生命周期
+- [php基础](docs/php-basic.md)
+- [php运行环境搭建](docs/php-env-build.md)
+
+- php垃圾回收机制与生命周期
 
 - [常见MVC框架的设计思想解读](docs/php-mvc.md)
 

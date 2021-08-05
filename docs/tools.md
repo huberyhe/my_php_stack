@@ -4,15 +4,33 @@
 
 [TOC]
 
-## openssl获取证书信息：
+## openssl
+
+1、获取证书信息
 
 ```bash
-openssl x509 -in cert.pem -noout -text
+openssl x509 -noout -text -in cert.pem
 ```
+
+2、查看网站证书信息
+
+```bash
+echo | openssl s_client -connect gj.sundray.com.cn:443
+```
+
+3、查看网站证书过期世间
+
+```bash
+echo | openssl s_client -servername gj.sundray.com.cn -connect gj.sundray.com.cn:443 2>/dev/null | openssl x509 -noout -dates
+```
+
+
 
 > 参考：
 >
 > [openssl 查看证书细节](https://www.cnblogs.com/shenlinken/p/9968274.html)
+>
+> [openssl 查看证书]()
 
 ## wireshark与tcpdump
 
@@ -28,7 +46,7 @@ tcpdump -ni eth0 "tcp port 443 and (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16)"
 
 - ip过滤：`ip.addr`过滤源或目的ip，`ip.src`过滤源ip，`ip.dst`过滤目的ip，如`ip.addr==45.77.245.161`
 - 端口过滤：`tcp.port`过滤源或目的端口，`tcp.srcport`过滤源端口，`tcp.dstport`过滤目的端口，如`tcp.srcport==443`
-- 协议过滤：直接输入协议名即可，例如`icmp`
+- 协议过滤：直接输入协议名即可，例如`icmp`、`ssl`
 - http模式过滤：`http.request.method=="GET"`过滤GET请求
 - 连接符：`and`、`or`、`&&`、`||`
 
