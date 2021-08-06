@@ -218,13 +218,13 @@ AVERAGE:     63.80    78.60    70.00
 
 ### 0、其他实例
 
-最后一列
+#### 1 最后一列
 
 ```bash
 awk '{print $NF}'
 ```
 
-打印除了第一列的所有列
+#### 2 打印除了第一列的所有列
 
 ```bash
 awk '{for(i=2;i<=NF;i++) {
@@ -236,19 +236,30 @@ else {print $i}
 awk '{$1="";print}'
 ```
 
-
-
-计算文件大小
+#### 3 计算文件大小
 
 ```bash
 ls -l *.txt | awk '{sum+=$5} END {print sum}'
 ```
 
-打印九九乘法表
+#### 4 打印九九乘法表
 
 ```bash
 seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR, i*NR, i==NR?"\n":"\t")}'
 ```
+
+#### 5 删除首行、尾行
+
+```bash
+# 删除首行
+awk 'NR>2{print line}{line=$0} END{print line}' a.txt
+# 删除尾行
+awk 'NR>1{print line}{line=$0}' a.txt
+# 删除首尾两行
+awk 'NR>2{print line}{line=$0}' a.txt
+```
+
+
 
 
 > 参考：
@@ -317,6 +328,13 @@ nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
 
 ```bash
 sed -i '/exit 0/i touch /tmp/uptime' /etc/rc.local
+```
+
+#### 3.5 删除首行、尾行
+
+```bash
+sed '1d' a.txt
+sed '$d' a.txt
 ```
 
 
