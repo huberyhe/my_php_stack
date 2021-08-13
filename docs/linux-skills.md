@@ -202,3 +202,75 @@ forward-socks5 / 127.0.0.1:19820 .
 
 Privoxy默认监听8118端口
 
+## 8、自定义系统操作历史记录
+
+修改`/etc/profile`，添加如下内容：
+
+```bash
+export HISTORY_FILE=/var/log/CommandHistory.log
+export PROMPT_COMMAND='{ thisHistID=`history 1|awk "{print \\$1}"`;lastCommand=`history 1| awk "{\\$1=\"\" ;print}"`;time=`date +%Y%m%d-%H%M%S` user=`id -un`;realUser=${LOGNAME} ; ip=${SSH_CONNECTION};if [ ${thisHistID}x != ${lastHistID}x ];then echo -E [$time] $user\($realUser\)    $ip  $lastCommand;fi; }>> $HISTORY_FILE'
+
+export HISTFILE="/wns/history"
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+#export HISTTIMEFORMAT='%F %T '
+#export HISTIGNORE="pwd:ls:ls -ltr:ls -l:"
+export HISTSIZE=1000
+export HISTFILESIZE=1000
+
+```
+
+
+
+## 9、自定义定时任务
+
+```bash
+[root@gj ~]# cat /etc/crontab
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+* * * * *          /wns/shell/cron_run.sh       min
+5 * * * *          /wns/shell/cron_run.sh       hourly
+10 3 * * *         /wns/shell/cron_run.sh       daily
+0 13 * * *         /wns/shell/cron_run.sh       daily_13
+15 2 * * 0         /wns/shell/cron_run.sh       weekly
+20 3 1 * *         /wns/shell/cron_run.sh       monthly
+*/10 * * * *   /wns/shell/cron_run.sh   10min
+[root@gj ~]# cat /wns/shell/cron_run.sh
+#!/bin/sh
+
+. /etc/profile
+
+[ -d /wns/etc/cron/cron.$1 ] || exit 1
+
+cd /wns/etc/cron/cron.$1
+for i in `ls`; do
+    sh ./$i
+done
+cd -
+[root@gj ~]# ls -l /wns/etc/cron/cron.*
+/wns//etc/cron/cron.daily:
+总用量 12
+-rwxr-xr-x. 1 root root 83 12月 18 2020 container_exec.sh
+-rwxr-xr-x. 1 root root 77 12月 18 2020 token_update.sh
+-rwxr-xr-x. 1 root root 63 12月 18 2020 webui_exec.sh
+
+/wns//etc/cron/cron.hourly:
+总用量 12
+-rwxr-xr-x. 1 root root  474 12月 18 2020 backup_exec.sh
+-rwxr-xr-x. 1 root root 1781 12月 18 2020 db_external_backup_easy_deploy.sh
+-rwxr-xr-x. 1 root root 1665 12月 18 2020 db_external_backup.sh
+
+```
+
+把脚本放到对应的目录即可
