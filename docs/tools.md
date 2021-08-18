@@ -136,3 +136,6 @@ inotifywait -mr --timefmt '%d/%m/%y %H:%M' --format '%T %w %f' \
 done
 ```
 
+## go实现telnet日志服务
+
+TODO

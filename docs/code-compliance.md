@@ -8,14 +8,22 @@ php中存在多种编码规范，涉及基本编码、日志接口、自动加�
 
 CI4开始[遵守了这些规范](https://codeigniter4.github.io/userguide/intro/psr.html)
 
-## **PSR-1: Basic Coding Standard**
+## PSR-1: Basic Coding Standard
 
-## **PSR-2: Coding Style Guide**
+## PSR-2: Coding Style Guide
 
-## **PSR-3: Logger Interface**
+## PSR-3: Logger Interface
 
-## **PSR-4: Autoloading Standard**
+## PSR-4: Autoloading Standard
 
-## **PSR-6: Caching Interface**
+## PSR-6: Caching Interface
 
-## **PSR-7: HTTP Message Interface**
+## PSR-7: HTTP Message Interface
+
+## 编码Checklist
+
+TODO
+
+## 安全编码Checklist
+
+TODO
