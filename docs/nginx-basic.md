@@ -14,7 +14,9 @@
 
 ## 4、上传模块与配置
 
-## 4、其他
+## 5、其他
+
+文档地址：[nginx documentation](http://nginx.org/en/docs/)
 
 gzip、proxy_cache、fastcgi_cache、
 
