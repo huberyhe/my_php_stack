@@ -8,17 +8,12 @@
 
 - [php基础](docs/php-basic.md)
 - [php运行环境搭建](docs/php-env-build.md)
-
 - php垃圾回收机制与生命周期
-
 - [常见MVC框架的设计思想解读](docs/php-mvc.md)
-
 - 常见的设计模式以及项目中的应用
-
+- [类的相关概念：类的三个特性、抽象类与接口](docs/php-class.md)
 - [编码规范](docs/code-compliance.md)
-
 - [深入解析 composer 的自动加载原理](https://segmentfault.com/a/1190000014948542)
-
 - 一些前端小技巧
 
 ## Linux与shell

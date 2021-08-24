@@ -10,7 +10,7 @@
 error_reporting();//设置或获取错误报告级别
 set_error_handler();//设置错误处理函数
 set_time_limit();//设置脚本最大执行时长
-
+set_include_path();
 ```
 
 ## 1、Codeigniter
