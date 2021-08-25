@@ -10,8 +10,11 @@
 error_reporting();//设置或获取错误报告级别
 set_error_handler();//设置错误处理函数
 set_time_limit();//设置脚本最大执行时长
-set_include_path();
+set_include_path();//设置包含文件时查找文件的路径
+register_shutdown_function();//注册一个会在php中止时执行的函数
 ```
+
+## 1、MVC框架的理解
 
 ## 1、Codeigniter
 
