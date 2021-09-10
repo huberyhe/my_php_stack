@@ -523,3 +523,9 @@ grep -P
 > [Linux文本三剑客超详细教程---grep、sed、awk](https://www.cnblogs.com/along21/p/10366886.html)
 >
 > [Perl Compatible Regular Expressions](https://learnbyexample.github.io/learn_gnugrep_ripgrep/perl-compatible-regular-expressions.html#perl-compatible-regular-expressions)
+
+
+
+## getopts获取命令行参数
+
+## trap信号处理

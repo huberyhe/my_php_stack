@@ -52,6 +52,13 @@ f03974f382e9 vh_wxwifi
 
 > 支持的占位符：[docker ps | Docker Documentation](https://docs.docker.com/engine/reference/commandline/ps/#formatting)
 
+## 列出容器IP：
+
+```bash
+docker inspect -f '{{.Name}} - {{.NetworkSettings.IPAddress }}' $(docker ps -aq)
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
+```
+
 ## 过滤容器：
 
 ```bash
