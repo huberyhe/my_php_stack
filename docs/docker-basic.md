@@ -67,4 +67,17 @@ CONTAINER ID   IMAGE     COMMAND                 CREATED        STATUS        PO
 47ae9866a377   wacc      "/wns/shell/start.sh"   4 months ago   Up 2 months             vh_php
 ```
 
+## 导入导出：
+
+```bash
+# 容器
+docker export -o postgres-export.tar postgres
+docker import postgres-export.tar postgres:latest
+# 镜像
+docker save -o images.tar postgres:9.6 mongo:3.4
+docker load -i images.tar
+```
+
+
+
 > 支持的过滤条件：[docker ps | Docker Documentation](https://docs.docker.com/engine/reference/commandline/ps/#filtering)
