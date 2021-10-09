@@ -110,6 +110,15 @@ rm: cannot remove '2.log': No such file or directory
 >:~$
 ```
 
+### 6、排除目录
+
+```bash
+# 排除Nfc目录
+find . -path ./Nfc -prune -o -type f -name *.mk -print
+# 排除多个目录
+find . \( -path ./Gallery2 -o -path ./HTMLViewer -o -path ./Nfc \) -prune -o  -name *.mk -print
+```
+
 ### 0、其他实例：
 
 ```bash
@@ -523,3 +532,21 @@ grep -P
 > [Linux文本三剑客超详细教程---grep、sed、awk](https://www.cnblogs.com/along21/p/10366886.html)
 >
 > [Perl Compatible Regular Expressions](https://learnbyexample.github.io/learn_gnugrep_ripgrep/perl-compatible-regular-expressions.html#perl-compatible-regular-expressions)
+
+
+
+## getopts获取命令行参数
+
+## trap信号处理
+
+## xargs
+
+```bash
+# 哪些目录包含图片文件
+find /wns/ -path /wns/docker_root -prune -o -type f -name *.jpg -print0 | xargs -0 dirname | uniq
+find /wns/ -path /wns/docker_root -prune -o -type f -regextype posix-extended -regex ".*\.(jpg|png|gif)" -print0 | xargs -0 dirname | uniq
+```
+
+
+
+[xargs 命令教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2019/08/xargs-tutorial.html)

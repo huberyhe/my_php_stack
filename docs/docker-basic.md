@@ -52,6 +52,13 @@ f03974f382e9 vh_wxwifi
 
 > 支持的占位符：[docker ps | Docker Documentation](https://docs.docker.com/engine/reference/commandline/ps/#formatting)
 
+## 列出容器IP：
+
+```bash
+docker inspect -f '{{.Name}} - {{.NetworkSettings.IPAddress }}' $(docker ps -aq)
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
+```
+
 ## 过滤容器：
 
 ```bash
@@ -59,5 +66,18 @@ f03974f382e9 vh_wxwifi
 CONTAINER ID   IMAGE     COMMAND                 CREATED        STATUS        PORTS     NAMES
 47ae9866a377   wacc      "/wns/shell/start.sh"   4 months ago   Up 2 months             vh_php
 ```
+
+## 导入导出：
+
+```bash
+# 容器
+docker export -o postgres-export.tar postgres
+docker import postgres-export.tar postgres:latest
+# 镜像
+docker save -o images.tar postgres:9.6 mongo:3.4
+docker load -i images.tar
+```
+
+
 
 > 支持的过滤条件：[docker ps | Docker Documentation](https://docs.docker.com/engine/reference/commandline/ps/#filtering)

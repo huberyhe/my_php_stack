@@ -130,3 +130,13 @@ set -euo pipefail
 - `-e`：当程序返回非0状态码时报错退出
 - `-u`：使用未初始化的变量时报错，而不是当成NULL。 这个比较有用，有点高级编程的感觉
 - `-o pipefail`：使用Pipe中出错命令的状态码（而不是最后一个）作为整个Pipe的状态码。
+
+## 7、获取IP地址
+
+```bash
+ip addr show dev eth0 | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}'
+ifconfig -a eth0|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -d "addr:"
+```
+
+> 参考：[Linux - Shell 脚本中获取本机 ip 地址方法 - 小菠萝测试笔记 - 博客园 (cnblogs.com)](https://www.cnblogs.com/poloyy/p/12212868.html)
+
