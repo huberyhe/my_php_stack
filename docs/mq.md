@@ -45,6 +45,39 @@
 
 ## 2、常用消息队列
 
+### 2.1、Kafka
+
+### 2.2、RabbitMQ
+
+**RabbitMQ**是实现了[高级消息队列协议](https://zh.wikipedia.org/wiki/高级消息队列协议)（AMQP）的开源[消息代理](https://zh.wikipedia.org/wiki/消息代理)软件
+
+官方文档：[RabbitMQ Tutorials — RabbitMQ](https://www.rabbitmq.com/getstarted.html)
+
+特性：
+
+- 可伸缩性：集群服务
+- 消息持久化：从内存持久化消息到硬盘，再从硬盘加载到内存
+
+打印出未ack的队列任务
+
+```bash
+sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged
+```
+
+打印excahnges
+
+```bash
+sudo rabbitmqctl list_exchanges
+```
+
+列出绑定
+
+```bash
+sudo rabbitmqctl list_bindings
+```
+
+
+
 ## 3、应用实例
 
 > 参考：

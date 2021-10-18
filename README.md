@@ -9,6 +9,11 @@
 - [php基础](docs/php-basic.md)
 - [php运行环境搭建](docs/php-env-build.md)
 - php垃圾回收机制与生命周期
+
+[引用计数](https://www.php.net/manual/zh/features.gc.refcounting-basics.php)：php变量存在一个叫“zval”的变量容器之中，变量容器除了包含变量的类型和值外，还包括两个字节额额外信息。if_ref标识这个变量是否属于引用集合，用于区分普通变量和引用变量。refcount表示指向这个变量容器的变量个数。
+
+[生命周期](https://www.cnblogs.com/applelife/p/10511837.html)：以php-fpm为例，启动时php加载扩展并调用其模块初始化例程（MINIT）；请求到达时，php调用RINIT，并执行脚本；脚本执行完后，php调用RSHUTDOWN，执行清理和垃圾回收；停止php-fpm时，php调用每个扩展的关闭函数（MSHUTDOWN），并关闭自己。
+
 - [常见MVC框架的设计思想解读](docs/php-mvc.md)
 - [常见的设计模式以及项目中的应用](docs/php-design-patterns.md)
 - [类的相关概念：类的三个特性、抽象类与接口](docs/php-class.md)
@@ -20,8 +25,6 @@
 
 - [linux基本使用](docs/linux-basic.md)
 - [linux使用技巧](./docs/linux-skills.md)
-- 常用命令
-- 命令行参数
 - [shell基础](docs/shell-basic.md)
 - [shell高级命令使用-三剑客](./docs/shell-advanced-command.md)
 - [shell小技巧](docs/shell-tips.md)
@@ -36,7 +39,7 @@
 
 ## Nginx
 
-- nginx基本知识
+- [nginx基本知识](docs/nginx-basic.md)
 - 
 
 ## 项目部署与Docker
@@ -58,6 +61,7 @@
 
 ## 并发与缓存问题
 
+- 负载均衡：lvs体系架构
 - [缓存机制](docs/cache.md)
 - [消息队列](docs/mq.md)
 
@@ -88,4 +92,10 @@
 
 - [常用工具](./docs/tools.md)
 - [Windows下常用工具](./docs/win-tools.md)
+
+## 常见面试题
+
+- [常见面试题](docs/interview-questions.md)
+
+
 

@@ -305,6 +305,87 @@ parseArgs() {
 parseArgs "$@"
 ```
 
+实例：
+
+```bash
+#!/bin/bash
+###
+### 描述
+###
+### by hyc171819@gmail.com
+###
+### Usage:
+###   hyc_work_build_git.sh
+### Options:
+###   -u        是否上传
+###   -b        是否生成docker镜像
+###   -h        Show this message.
+
+function help() {
+	sed -rn 's/^### ?//;T;p' "$0"
+}
+
+function parseArgs() {
+	while getopts "hub" opt; do
+		case ${opt} in
+		h)
+			help
+			exit 1
+			;;
+		u)
+			arg_upload=1
+			;;
+		b)
+			arg_build=1
+			;;
+		:)
+			exit
+			;;
+		?)
+			exit
+			;;
+		*)
+			echo "*分支:${OPTARG}"
+			;;
+		esac
+	done
+}
+
+# default no(1)
+function askNY ()
+{
+    ret=0
+    timeout=300
+    while
+        echo -n "$1[y/N]"
+    do
+        read ans
+        if [[ -z $ans ]]; then
+            ret=1
+            break
+        elif [[ "$ans"x = "y"x || "$ans"x = "Y"x ]]; then
+            ret=0
+            break
+        elif [[ "$ans"x = "n"x || "$ans"x = "N"x ]]; then
+            ret=1
+            break
+        else
+            continue
+        fi
+    done
+    return $ret
+}
+arg_upload=0
+arg_build=0
+parseArgs "$@"
+
+if [[ $arg_build -ne 0 ]] || askNY "Make finished, build image(Y) or not(N)?" ; then
+	echo ">>> start build image ..."
+
+	# ...
+fi
+```
+
 使用"$@"可以将参数原封不动传递给函数
 
 1. 加双引号是防止参数中可能有空格，空格会被shell自动视为分隔符
