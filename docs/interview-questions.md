@@ -79,7 +79,24 @@ MySQL [mysql]> explain select * from user;
 
 ```
 
-> 参考：[了解MySQL中EXPLAIN解释命令 - SegmentFault 思否](https://segmentfault.com/a/1190000018729502)
+- id：查询序号
+- select_type：查询类型
+- table：表名
+- partitions：匹配的分区
+- type：使用的连接类别，有无使用索引*
+- possible_keys：可能会选择的索引
+- key：实际选择的索引
+- key_len：索引的长度
+- ref：与索引作比较的列
+- rows：要检索的行数（估算值）*
+- filtered：查询条件过滤的行数的百分比
+- Extra：额外信息*
+
+> 参考：
+>
+> 1、[了解MySQL中EXPLAIN解释命令 - SegmentFault 思否](https://segmentfault.com/a/1190000018729502)
+>
+> 2、[explain结果每个字段的含义说明 - 简书 (jianshu.com)](https://www.jianshu.com/p/8fab76bbf448)
 
 ## 8、xss与csrf
 

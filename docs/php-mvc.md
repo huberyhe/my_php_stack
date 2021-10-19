@@ -27,11 +27,23 @@ ini_set('display_errors', 0);//不显示错误信息
 
 ## 1、Codeigniter
 
+[文档地址](https://codeigniter.com/user_guide/index.html)
+
 ## 2、Laravel
+
+[文档地址](https://learnku.com/docs/laravel/8.5)
 
 ## 3、ThinkPHP
 
+[文档地址](https://www.kancloud.cn/manual/thinkphp5_1)
+
 ## 4、Yii
+
+[文档地址](https://www.yiiframework.com/doc/guide/2.0/zh-cn)
+
+## 5、phalcon
+
+[文档地址](https://docs.phalcon.io/4.0/zh-cn/introduction)
 
 ## 
 
