@@ -12,7 +12,11 @@
 - 继承：子类继承父类的一切非私有属性和方法
 - 多态：子类对父类方法重新实现，所以表现可以不同
 
-> 参考：[PHP 对象及其三大特性 - 翟喵儿 - 博客园 (cnblogs.com)](https://www.cnblogs.com/zhaimiaoer/p/5477044.html)
+> 参考：
+>
+> 1、[PHP 对象及其三大特性 - 翟喵儿 - 博客园 (cnblogs.com)](https://www.cnblogs.com/zhaimiaoer/p/5477044.html)
+>
+> 2、[PHP 继承、封装与多态 | 面向对象编程 | PHP 入门到实战教程 (laravelacademy.org)](https://laravelacademy.org/post/21638)
 
 ## 2、抽象类与接口
 

@@ -4,7 +4,7 @@
 
 [TOC]
 
-## 0、框架级的函数
+## 1、框架级的函数
 
 ```php
 error_reporting();//设置或获取错误报告级别
@@ -23,29 +23,31 @@ ini_set('display_errors', 0);//不显示错误信息
 >
 > 
 
-## 1、MVC框架的理解
+## 2、MVC框架的理解
 
-## 1、Codeigniter
+## 3、常见框架
+
+### 3.1、Codeigniter
 
 [文档地址](https://codeigniter.com/user_guide/index.html)
 
-## 2、Laravel
+### 3.2、Laravel
 
 [文档地址](https://learnku.com/docs/laravel/8.5)
 
-## 3、ThinkPHP
+### 3.3、ThinkPHP
 
 [文档地址](https://www.kancloud.cn/manual/thinkphp5_1)
 
-## 4、Yii
+### 3.4、Yii
 
 [文档地址](https://www.yiiframework.com/doc/guide/2.0/zh-cn)
 
-## 5、phalcon
+### 3.5、phalcon
 
 [文档地址](https://docs.phalcon.io/4.0/zh-cn/introduction)
 
-## 
+## 4、自动加载配置
 
 [laravel的启动过程解析](https://www.cnblogs.com/lpfuture/p/5578274.html)
 

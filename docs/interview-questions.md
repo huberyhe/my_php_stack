@@ -106,7 +106,73 @@ CSRF:跨站请求伪造（英语：Cross-site request forgery），也被称为 
 
 >  参考：[用大白话谈谈XSS与CSRF - SegmentFault 思否](https://segmentfault.com/a/1190000007059639)
 
+## 9、text等类型的长度，varchar指定长度有什么作用，与text的区别
 
+char的上限为255字节，varchar的上限65535字节，text的上限为65535。
+
+1、char，存定长，速度快，存在空间浪费的可能，会处理尾部空格，上限255。
+
+2、varchar，存变长，速度慢，不存在空间浪费，不处理尾部空格，上限65535，但是有存储长度实际65532最大可用。
+
+3、text，存变长大数据，速度慢，不存在空间浪费，不处理尾部空格，上限65535，会用额外空间存放数据长度，顾可以全部使用65535。
+
+varchar与text区别：
+
+1、text没有默认值
+
+2、创建索引时，text只能添加前缀索引，并且前缀索引最大只能达到1000字节。
+
+3、varchar可以指定最大长度，text只能是固定最大长度
+
+4、存储相同数据时，VARCHAR与表内联存储（至少对于MyISAM存储引擎而言），因此在大小合理时可能会更快
+
+>  参考：
+>
+> 1、[MySQL之char、varchar和text的设计 - billy鹏 - 博客园 (cnblogs.com)](https://www.cnblogs.com/billyxp/p/3548540.html)
+>
+> 2、[MySQL InnoDB存储引擎的行结构 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/419496579)
+>
+> 3、[InnoDB存储引擎之 行结构-王者之路-青山依舊 (xiangerfer.com)](http://www.xiangerfer.com/?thread-119.htm)
+
+## 10、实际项目中应用到的设计模式
+
+## 11、动态规划算法
+
+## 12、常见概念：
+
+12.1、 微服务：微服务是一种开发软件的架构和组织方法，其中软件由通过明确定义的 API 进行通信的小型独立服务组成。这些服务由各个小型独立团队负责。微服务架构使应用程序更易于扩展和更快地开发，从而加速创新并缩短新功能的上市时间。
+
+12.2、B+树：
+
+12.3、hash表：**散列表**（**Hash table**，也叫**哈希表**），是根据键（Key）而直接访问在内存储存位置的数据结构。也就是说，它通过计算出一个键值的函数，将所需查询的数据映射到表中一个位置来让人访问，这加快了查找速度。这个映射函数称做散列函数，存放记录的数组称做**散列表**。
+
+12.4、单点登录：又陈SSO（Single Sign On），在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
+
+## 13、PHP数组的底层实现
+
+底层实现为散列表(HashTable，也称作：哈希表)
+
+> 参考：
+>
+> 1、[PHP7 数组的底层实现 | Laravel China 社区 (learnku.com)](https://learnku.com/articles/33225)
+>
+> 2、[php7-internal/zend_ht.md at master · pangudashu/php7-internal (github.com)](https://github.com/pangudashu/php7-internal/blob/master/2/zend_ht.md)
+
+## 14、ddos攻击防范
+
+1、备份网站
+
+2、拦截请求，识别异常的流量
+
+3、带宽扩容
+
+4、CDN，如cloudflare
+
+>  参考：
+>
+> 1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
+>
+> 2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
 
 参考：[HTTP长连接、短连接究竟是什么？ - dai.sp - 博客园 (cnblogs.com)](https://www.cnblogs.com/gotodsp/p/6366163.html)
 

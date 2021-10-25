@@ -71,7 +71,7 @@
 - CSRF攻击及防御
 - 命令注入
 - sql注入
-- 
+- sdl安全开发：【软件安全设计】安全开发生命周期（SDL） – 绿盟科技技术博客 (nsfocus.net)](http://blog.nsfocus.net/sdl/)
 
 ## 网络基础
 
@@ -96,6 +96,12 @@
 ## 常见面试题
 
 - [常见面试题](docs/interview-questions.md)
+
+## 成长规划
+
+1、[【原创】PHP/Go程序员的发展与规划_heiyeluren的blog（黑夜路人的开源世界）-CSDN博客](https://blog.csdn.net/heiyeshuwu/article/details/107193766?ops_request_misc=%7B%22request%5Fid%22%3A%22163515565616780261971774%22%2C%22scm%22%3A%2220140713.130102334.pc%5Fblog.%22%7D&request_id=163515565616780261971774&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_v2~rank_v29-1-107193766.pc_v2_rank_blog_default&utm_term=规划&spm=1018.2226.3001.4450)
+
+2、[【原创】PHP程序员的技术成长规划_heiyeluren的blog（黑夜路人的开源世界）-CSDN博客](https://blog.csdn.net/heiyeshuwu/article/details/40098043?ops_request_misc=%7B%22request%5Fid%22%3A%22163515533616780262522777%22%2C%22scm%22%3A%2220140713.130102334.pc%5Fall.%22%7D&request_id=163515533616780262522777&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-1-40098043.pc_search_result_cache&utm_term=php程序员的技术成长规划&spm=1018.2226.3001.4187)
 
 
 
