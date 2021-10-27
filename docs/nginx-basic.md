@@ -8,5 +8,13 @@ nginx基础知识与常用配置
 
 ## 1、标题1
 
-## 2、标题2
+## 2、常用配置
+
+worker_processes auto;
+
+gzip on|off;
+
+expires 30m;
+
+> 参考：https://segmentfault.com/a/1190000015051369
 
