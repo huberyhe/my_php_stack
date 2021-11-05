@@ -50,7 +50,7 @@ FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n'
 # 注：从本地导入远程服务器需使用LOAD DATA LOCAL INFILE
 ```
 
-`SELECT ... INTO OUTFILE`导出的结果会放到mysql服务器端，所以实际少用
+`SELECT ... INTO OUTFILE`导出的结果会放到mysql服务器端，所以实际少用。
 
 ```sql
 mysql -uroot -p dbname -e 'SELECT * FROM table_name WHERE create_time < 1382716800' -N -s > /home/temp.txt
@@ -83,7 +83,8 @@ mysql -uroot -p dbname -e 'SELECT * FROM table_name WHERE create_time < 13827168
 CREATE TABLE t7(
     id INT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(40),
-    crcurl INT UNSIGNED NOT NULL DEFAULT 0);
+    crcurl INT UNSIGNED NOT NULL DEFAULT 0
+);
 ```
 
 ### 字符类型
@@ -118,3 +119,27 @@ SET （最多64个成员）                      64KB
 ## 4、MySQL官方示例数据库
 
 [MySQL :: Other MySQL Documentation](https://dev.mysql.com/doc/index-other.html)
+
+## 5、数据库设计三大范式
+
+1. 第一范式(确保每列保持原子性)
+
+   第二范式在第一范式的基础之上更进一层。第二范式需要确保数据库表中的每一列都和主键相关，而不能只与主键的某一部分相关（主要针对联合主键而言）。也就是说在一个数据库表中，一个表中只能保存一种数据，不可以把多种数据保存在同一张数据库表中。
+
+2. 第二范式(确保表中的每列都和主键相关)
+
+   第二范式在第一范式的基础之上更进一层。第二范式需要确保数据库表中的每一列都和主键相关，而不能只与主键的某一部分相关（主要针对联合主键而言）。也就是说在一个数据库表中，一个表中只能保存一种数据，不可以把多种数据保存在同一张数据库表中。
+
+3. 第三范式(确保每列都和主键列直接相关,而不是间接相关)
+
+   第三范式需要确保数据表中的每一列数据都和主键直接相关，而不能间接相关。
+
+优点：采用范式可以降低数据的冗余性。
+
+缺点：获取数据时，需要通过Join拼接出最后的数据。
+
+> 参考：
+>
+> 1、[数据库设计三大范式 - Ruthless - 博客园 (cnblogs.com)](https://www.cnblogs.com/linjiqin/archive/2012/04/01/2428695.html)
+>
+> 2、[数据库逻辑设计之三大范式通俗理解，一看就懂，书上说的太晦涩 - SegmentFault 思否](https://segmentfault.com/a/1190000013695030)

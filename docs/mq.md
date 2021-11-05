@@ -76,7 +76,11 @@ sudo rabbitmqctl list_exchanges
 sudo rabbitmqctl list_bindings
 ```
 
+**与redis作为消息队列时的区别**，为什么一般会选择rabbitmq？
 
+redis的list设计简单，没有保证消费的机制，一旦消费失败，消息丢失。而rabbitmq会使失败的消息自动回到原队列
+
+> 参考：[Redis 与 MQ 的区别](https://www.cnblogs.com/dengguangxue/p/11537466.html)
 
 ## 3、应用实例
 

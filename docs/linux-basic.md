@@ -159,3 +159,13 @@ tar xvJf node-v8.11.1-linux-x64.tar.xz1
 
 ```
 
+6、iptables四表五链
+
+数据包到了该链处，会去对应表中查询设置的规则，然后决定是否放行、丢弃、转发还是修改等等操作。
+
+四表：filter（过滤）、nat（网络地址转换）、mangle（修改数据包，可实现QOS）、raw（决定数据包是否被状态跟踪机制处理）
+
+五链：INPUT、OUTPUT、FORWARD、PREROUTING、POSTROUTING
+
+命令格式：`iptables [-t 表名] 选项 [链名] [条件] [-j 控制类型]`，默认filter表
+

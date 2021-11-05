@@ -67,6 +67,8 @@ TCP/IP体系结构：网络接口层、网际层IP、运输层、应用层
 
 http/1.0中默认使用短连接，从http/1.1开始默认使用长连接
 
+参考：[HTTP长连接、短连接究竟是什么？ - dai.sp - 博客园 (cnblogs.com)](https://www.cnblogs.com/gotodsp/p/6366163.html)
+
 ## 7、查询计划字段的含义
 
 ```
@@ -144,9 +146,11 @@ varchar与text区别：
 
 12.2、B+树：
 
-12.3、hash表：**散列表**（**Hash table**，也叫**哈希表**），是根据键（Key）而直接访问在内存储存位置的数据结构。也就是说，它通过计算出一个键值的函数，将所需查询的数据映射到表中一个位置来让人访问，这加快了查找速度。这个映射函数称做散列函数，存放记录的数组称做**散列表**。
+12.3、红黑树：二叉平衡树
 
-12.4、单点登录：又陈SSO（Single Sign On），在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
+12.4、hash表：**散列表**（**Hash table**，也叫**哈希表**），是根据键（Key）而直接访问在内存储存位置的数据结构。也就是说，它通过计算出一个键值的函数，将所需查询的数据映射到表中一个位置来让人访问，这加快了查找速度。这个映射函数称做散列函数，存放记录的数组称做**散列表**。
+
+12.5、单点登录：又陈SSO（Single Sign On），在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
 
 ## 13、PHP数组的底层实现
 
@@ -168,11 +172,93 @@ varchar与text区别：
 
 4、CDN，如cloudflare
 
+## 15、如何防止重复提交
+
+表单中带上隐藏域内容是这个表单的token，表单提交时判断这个token有没有使用过：1、token信息放到session里；2、token信息放到缓存里
+
+## 16、flask的生命周期
+
+## 17、列举索引失效的情况
+
+```sql
+create table test {
+    a varchar(50),
+    b int,
+    c int,
+    index idx_a_b(`a`,`b`)
+}
+```
+
+- `select * from test where a = '1' or b = 2;`
+- `select * from test where a = 1;`
+- `select * from test where b = 2;`
+- `select * from test where a like '%hhh';`
+- `select * from test where date(b) = '2021-11-02';`
+- `select * from test where a not in ('jack','mike');  `
+- `select * from test where a is null;`，`is not null`会走索引
+
 >  参考：
 >
-> 1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
+>  1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
 >
-> 2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
+>  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
 
-参考：[HTTP长连接、短连接究竟是什么？ - dai.sp - 博客园 (cnblogs.com)](https://www.cnblogs.com/gotodsp/p/6366163.html)
+## 18、redis中字典与hash表的区别
 
+[从HashMap，Redis 字典看【Hash】。。。 - 掘金 (juejin.cn)](https://juejin.cn/post/6844903927524098055)
+
+## 19、大量数据下，如何查最后几条数据
+
+```sql
+create table user {
+	`id` int(10) unsigned AUTO_INCREMENT,
+	`username` varchar(100) DEFAULT NULL,
+	`password` char(32) NOT NULL COMMENT '6-20',
+	PRIMARY KEY (`id`)
+} ENGINE=InnoDB DEFAULT charset=utf8mb4;
+```
+
+假设表里有1千万条数据，如何查第1万页数据
+
+方法1：估算起始的主键id，这里一定是id > 10000*20。
+
+```sql
+select id,username,`password` from user where id > 200000 limit 0,20;
+```
+
+方法2：利用表的**覆盖索引/延迟关联**来加速分页查询。先找到主键，再查主键匹配的记录
+
+```sql
+SELECT * FROM product WHERE ID > =(select id from product limit 200000, 1) limit 20;
+SELECT * FROM product a JOIN (select id from product limit 200000, 20) b ON a.ID = b.id;
+```
+
+> 参考：
+>
+> 1、[MySQL 延迟关联优化超多分页场景 | Qida's Blog (qidawu.github.io)](http://qidawu.github.io/2019/11/26/mysql-deferred-join/)
+>
+> 2、[mysql优化：覆盖索引（延迟关联） - 一枝花算不算浪漫 - 博客园 (cnblogs.com)](https://www.cnblogs.com/wang-meng/p/ae6d1c4a7b553e9a5c8f46b67fb3e3aa.html)
+
+## 20、存在大量数据的表，如何添加索引才能不影响业务（锁表）
+
+方法一：创建临时表，导入数据添加索引之后再升级成正式表
+
+方法二：在从库上添加索引，然后切换成主库
+
+## 21、是先导入数据，还是先添加索引
+
+先导入数据，避免每条数据都去维护索引
+
+## 22、进程间通信有哪些方式
+
+- 管道
+- 消息队列
+- 共享内存
+- 信号量
+- socket
+
+## 23、面试经验
+
+1、hr要代码截图：直接不要给了，面试官总能挑出毛病，很可能因为代码风格认为不合适
+
+2、面试结束了，面试官问有啥问题要问的：觉得面的还可以的话，问下团队的情况；如果觉得面试一般，可以问下题目的正确答案

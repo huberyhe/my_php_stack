@@ -29,7 +29,8 @@ CREATE TABLE `m_test_db`.`Order` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `partition_key` INT NOT NULL,
   `amt` DECIMAL(5) NULL,
-  PRIMARY KEY (`id`, `partition_key`)) PARTITION BY RANGE(partition_key) PARTITIONS 5( PARTITION part0 VALUES LESS THAN (201901),  PARTITION part1 VALUES LESS THAN (201902),  PARTITION part2 VALUES LESS THAN (201903),  PARTITION part3 VALUES LESS THAN (201904),  PARTITION part4 VALUES LESS THAN (201905)) ;
+  PRIMARY KEY (`id`, `partition_key`)
+) PARTITION BY RANGE(partition_key) PARTITIONS 5( PARTITION part0 VALUES LESS THAN (201901),  PARTITION part1 VALUES LESS THAN (201902),  PARTITION part2 VALUES LESS THAN (201903),  PARTITION part3 VALUES LESS THAN (201904),  PARTITION part4 VALUES LESS THAN (201905)) ;
 ```
 
 1.2 LIST分区
@@ -117,6 +118,40 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 OLTP（在线事务处理），如Blog、电子商务、网络游戏等；
 
 OLAP（在线分析处理），如数据仓库、数据集市。
+
+6.4、行锁、表锁的使用
+
+InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁
+
+- 行锁：
+
+```sql
+SET AUTOCOMMIT=0;
+BEGIN;
+select * from innodb_lock where id=4 for update;// 显式加行锁，须命中索引，不然升级为表锁
+update innodb_lock set v='4001' where id=4;
+COMMIT;
+
+// 分析表锁定
+show status like 'innodb_row_lock%';
+```
+
+- 表锁：
+
+```sql
+lock table myisam_lock read;// 显式加表锁
+...
+unlock tables;
+
+// 查看枷锁情况
+show open tables where in_use > 0;
+// 查看表锁
+show status like 'table_locks%';
+```
+
+> 参考：[MySQL 行锁 表锁机制](https://www.cnblogs.com/itdragon/p/8194622.html)
+>
+> [INNODB索引实现原理_bohu83的博客-CSDN博客_innodb的索引实现](https://blog.csdn.net/bohu83/article/details/81104432)
 
 > MySQL核心手册：[MySQL Internals Manual ](https://dev.mysql.com/doc/internals/en/innodb-page-overview.html)
 >

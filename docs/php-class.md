@@ -66,3 +66,8 @@ abstract class Sutdent extends Human implements Play,Read
 
 > 参考：[php抽象类和接口的区别 - vinter_he - 博客园 (cnblogs.com)](https://www.cnblogs.com/vinter/p/8716685.html)
 
+## 3、其他常见问题
+
+3.1、类中self和static的区别
+
+`self`只能引用当前类中的方法，而`static`关键字允许函数能够在运行时动态绑定类中的方法。

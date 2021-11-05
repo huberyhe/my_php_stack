@@ -50,14 +50,11 @@
 ## 算法与数据结构
 
 - [常见排序算法](https://www.runoob.com/w3cnote/sort-algorithm-summary.html)
-
 - [常见的排序算法——常见的10种排序](https://www.cnblogs.com/flyingdreams/p/11161157.html)
-
 - [十大经典排序算法](https://www.cnblogs.com/itsharehome/p/11058010.html)
-
 - [动态规划经典问题-拼凑面额](https://www.nowcoder.com/questionTerminal/14cf13771cd840849a402b848b5c1c93)
-
 - [LeetCode](https://leetcode.com/)题解-[labuladong 的算法小抄](https://github.com/labuladong/fucking-algorithm)
+- 外部排序，解决大数据排序问题：[外部排序&多路归并排序](https://www.cnblogs.com/luo77/p/5838206.html)
 
 ## 并发与缓存问题
 
@@ -71,15 +68,18 @@
 - CSRF攻击及防御
 - 命令注入
 - sql注入
-- sdl安全开发：【软件安全设计】安全开发生命周期（SDL） – 绿盟科技技术博客 (nsfocus.net)](http://blog.nsfocus.net/sdl/)
-- nginx和php中安全相关的配置：https://www.cnblogs.com/chenpingzhao/p/5785416.html
+- sdl安全开发：[【软件安全设计】安全开发生命周期（SDL）](http://blog.nsfocus.net/sdl/)
+- nginx和php中安全相关的配置：[Linux服务器下nginx的安全配置](https://www.cnblogs.com/chenpingzhao/p/5785416.html)
 
 ## 网络基础
 
-- TCP/IP五层，OSI七层协议
+[网络基础](docs/net-basic.md)
+
+- TCP/IP四层，OSI七层协议
 - TCP与UDP区别
 - http请求的完整过程
 - tls握手过程
+- tcp三次握手与四次挥手
 
 ## 持续集成CI、CD
 

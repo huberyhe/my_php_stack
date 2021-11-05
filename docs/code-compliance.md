@@ -24,6 +24,8 @@ CI4开始[遵守了这些规范](https://codeigniter4.github.io/userguide/intro/
 
 TODO
 
+> 参考：[阿里巴巴java编码规范](https://github.com/alibaba/p3c)
+
 ## 安全编码Checklist
 
 TODO
