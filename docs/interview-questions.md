@@ -1,0 +1,264 @@
+[回到首页](../README.md)
+
+# 常见面试题
+
+说明
+
+[TOC]
+
+## 1、抽象类与接口的区别
+
+- 对接口的使用是通过关键字implements。对抽象类的使用是通过关键字extends。当然接口也可以通过关键字extends继承。
+- 接口中不可以声明成员变量（包括类静态变量），但是可以声明类常量。抽象类中可以声明各种类型成员变量，实现数据的封装。（另JAVA接口中的成员变量都要声明为public static final类型）
+- 接口没有构造函数，抽象类可以有构造函数。
+- 接口中的方法默认都是public类型的，而抽象类中的方法可以使用private,protected,public来修饰。
+- 一个类可以同时实现多个接口，但一个类只能继承于一个抽象类。
+
+- **类可以实现多个接口**，前提是这些接口中方法不重复；抽象类中可以包含已实现的方法（非抽象）和抽象方法，抽象方法必须被子类实现
+
+> 参考：
+>
+> 1、[PHP的抽象类、接口的区别和选择 - SegmentFault 思否](https://segmentfault.com/a/1190000016607792)
+>
+> 2、[接口和抽象类有什么区别？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/20149818/answer/704355929)
+
+## 2、在浏览器中打开一个url，发生了什么
+
+1. 孤单小弟 —— HTTP
+
+2. 真实地址查询 —— DNS
+
+3. 指南好帮手 —— 协议栈
+
+4. 可靠传输 —— TCP
+
+5. 远程定位 —— IP
+
+6. 两点传输 —— MAC
+
+7. 出口 —— 网卡
+
+8. 送别者 —— 交换机
+9. 出境大门 —— 路由器
+
+10. 互相扒皮 —— 服务器 与 客户端
+
+>  参考：
+>
+> 1、[电脑上打开浏览器，输入 www.baidu.com，回车，到百度页面出现。中间发生了什么？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/437193010/answer/2065582348)
+
+## 3、七层OSI网络模型与TCP/IP网络模型、五层网络模型
+
+OSI体系结构：物理层、数据链路层、网络层、传输层、会话层、表示层、应用层
+
+TCP/IP体系结构：网络接口层、网际层IP、运输层、应用层
+
+五层协议：物理层、数据链路层、网络层（IP协议、ICMP、ARP、RARP）、运输层（TCP/UDP协议）、应用层（DNS、HTTP）
+
+> 参考：[计算机网络的七层结构、五层结构和四层结构 - SegmentFault 思否](https://segmentfault.com/a/1190000039204681)
+
+## 4、缓存穿透、击穿、雪崩
+
+参考：[缓存-常见缓存问题](cache.md)
+
+## 5、并发锁机制
+
+## 6、HTTP是长连接还是短连接
+
+http/1.0中默认使用短连接，从http/1.1开始默认使用长连接
+
+参考：[HTTP长连接、短连接究竟是什么？ - dai.sp - 博客园 (cnblogs.com)](https://www.cnblogs.com/gotodsp/p/6366163.html)
+
+## 7、查询计划字段的含义
+
+```
+MySQL [mysql]> explain select * from user;
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+| id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+|  1 | SIMPLE      | user  | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    4 |   100.00 | NULL  |
++----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------+
+
+```
+
+- id：查询序号
+- select_type：查询类型
+- table：表名
+- partitions：匹配的分区
+- type：使用的连接类别，有无使用索引*
+- possible_keys：可能会选择的索引
+- key：实际选择的索引
+- key_len：索引的长度
+- ref：与索引作比较的列
+- rows：要检索的行数（估算值）*
+- filtered：查询条件过滤的行数的百分比
+- Extra：额外信息*
+
+> 参考：
+>
+> 1、[了解MySQL中EXPLAIN解释命令 - SegmentFault 思否](https://segmentfault.com/a/1190000018729502)
+>
+> 2、[explain结果每个字段的含义说明 - 简书 (jianshu.com)](https://www.jianshu.com/p/8fab76bbf448)
+
+## 8、xss与csrf
+
+XSS：跨站脚本（Cross-site scripting，通常简称为XSS）是一种网站应用程序的安全漏洞攻击，是代码注入的一种。它允许恶意用户将代码注入到网页上，其他用户在观看网页时就会受到影响。**这类攻击通常包含了HTML以及用户端脚本语言**。
+
+CSRF:跨站请求伪造（英语：Cross-site request forgery），也被称为 one-click attack 或者 session riding，通常缩写为 CSRF 或者 XSRF， 是一种挟制用户在当前已登录的Web应用程序上**执行非本意的操作的攻击方法**。
+
+>  参考：[用大白话谈谈XSS与CSRF - SegmentFault 思否](https://segmentfault.com/a/1190000007059639)
+
+## 9、text等类型的长度，varchar指定长度有什么作用，与text的区别
+
+char的上限为255字节，varchar的上限65535字节，text的上限为65535。
+
+1、char，存定长，速度快，存在空间浪费的可能，会处理尾部空格，上限255。
+
+2、varchar，存变长，速度慢，不存在空间浪费，不处理尾部空格，上限65535，但是有存储长度实际65532最大可用。
+
+3、text，存变长大数据，速度慢，不存在空间浪费，不处理尾部空格，上限65535，会用额外空间存放数据长度，顾可以全部使用65535。
+
+varchar与text区别：
+
+1、text没有默认值
+
+2、创建索引时，text只能添加前缀索引，并且前缀索引最大只能达到1000字节。
+
+3、varchar可以指定最大长度，text只能是固定最大长度
+
+4、存储相同数据时，VARCHAR与表内联存储（至少对于MyISAM存储引擎而言），因此在大小合理时可能会更快
+
+>  参考：
+>
+> 1、[MySQL之char、varchar和text的设计 - billy鹏 - 博客园 (cnblogs.com)](https://www.cnblogs.com/billyxp/p/3548540.html)
+>
+> 2、[MySQL InnoDB存储引擎的行结构 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/419496579)
+>
+> 3、[InnoDB存储引擎之 行结构-王者之路-青山依舊 (xiangerfer.com)](http://www.xiangerfer.com/?thread-119.htm)
+
+## 10、实际项目中应用到的设计模式
+
+## 11、动态规划算法
+
+## 12、常见概念：
+
+12.1、 微服务：微服务是一种开发软件的架构和组织方法，其中软件由通过明确定义的 API 进行通信的小型独立服务组成。这些服务由各个小型独立团队负责。微服务架构使应用程序更易于扩展和更快地开发，从而加速创新并缩短新功能的上市时间。
+
+12.2、B+树：
+
+12.3、红黑树：二叉平衡树
+
+12.4、hash表：**散列表**（**Hash table**，也叫**哈希表**），是根据键（Key）而直接访问在内存储存位置的数据结构。也就是说，它通过计算出一个键值的函数，将所需查询的数据映射到表中一个位置来让人访问，这加快了查找速度。这个映射函数称做散列函数，存放记录的数组称做**散列表**。
+
+12.5、单点登录：又陈SSO（Single Sign On），在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
+
+## 13、PHP数组的底层实现
+
+底层实现为散列表(HashTable，也称作：哈希表)
+
+> 参考：
+>
+> 1、[PHP7 数组的底层实现 | Laravel China 社区 (learnku.com)](https://learnku.com/articles/33225)
+>
+> 2、[php7-internal/zend_ht.md at master · pangudashu/php7-internal (github.com)](https://github.com/pangudashu/php7-internal/blob/master/2/zend_ht.md)
+
+## 14、ddos攻击防范
+
+1、备份网站
+
+2、拦截请求，识别异常的流量
+
+3、带宽扩容
+
+4、CDN，如cloudflare
+
+## 15、如何防止重复提交
+
+表单中带上隐藏域内容是这个表单的token，表单提交时判断这个token有没有使用过：1、token信息放到session里；2、token信息放到缓存里
+
+## 16、flask的生命周期
+
+## 17、列举索引失效的情况
+
+```sql
+create table test {
+    a varchar(50),
+    b int,
+    c int,
+    index idx_a_b(`a`,`b`)
+}
+```
+
+- `select * from test where a = '1' or b = 2;`
+- `select * from test where a = 1;`
+- `select * from test where b = 2;`
+- `select * from test where a like '%hhh';`
+- `select * from test where date(b) = '2021-11-02';`
+- `select * from test where a not in ('jack','mike');  `
+- `select * from test where a is null;`，`is not null`会走索引
+
+>  参考：
+>
+>  1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
+>
+>  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
+
+## 18、redis中字典与hash表的区别
+
+[从HashMap，Redis 字典看【Hash】。。。 - 掘金 (juejin.cn)](https://juejin.cn/post/6844903927524098055)
+
+## 19、大量数据下，如何查最后几条数据
+
+```sql
+create table user {
+	`id` int(10) unsigned AUTO_INCREMENT,
+	`username` varchar(100) DEFAULT NULL,
+	`password` char(32) NOT NULL COMMENT '6-20',
+	PRIMARY KEY (`id`)
+} ENGINE=InnoDB DEFAULT charset=utf8mb4;
+```
+
+假设表里有1千万条数据，如何查第1万页数据
+
+方法1：估算起始的主键id，这里一定是id > 10000*20。
+
+```sql
+select id,username,`password` from user where id > 200000 limit 0,20;
+```
+
+方法2：利用表的**覆盖索引/延迟关联**来加速分页查询。先找到主键，再查主键匹配的记录
+
+```sql
+SELECT * FROM product WHERE ID > =(select id from product limit 200000, 1) limit 20;
+SELECT * FROM product a JOIN (select id from product limit 200000, 20) b ON a.ID = b.id;
+```
+
+> 参考：
+>
+> 1、[MySQL 延迟关联优化超多分页场景 | Qida's Blog (qidawu.github.io)](http://qidawu.github.io/2019/11/26/mysql-deferred-join/)
+>
+> 2、[mysql优化：覆盖索引（延迟关联） - 一枝花算不算浪漫 - 博客园 (cnblogs.com)](https://www.cnblogs.com/wang-meng/p/ae6d1c4a7b553e9a5c8f46b67fb3e3aa.html)
+
+## 20、存在大量数据的表，如何添加索引才能不影响业务（锁表）
+
+方法一：创建临时表，导入数据添加索引之后再升级成正式表
+
+方法二：在从库上添加索引，然后切换成主库
+
+## 21、是先导入数据，还是先添加索引
+
+先导入数据，避免每条数据都去维护索引
+
+## 22、进程间通信有哪些方式
+
+- 管道
+- 消息队列
+- 共享内存
+- 信号量
+- socket
+
+## 23、面试经验
+
+1、hr要代码截图：直接不要给了，面试官总能挑出毛病，很可能因为代码风格认为不合适
+
+2、面试结束了，面试官问有啥问题要问的：觉得面的还可以的话，问下团队的情况；如果觉得面试一般，可以问下题目的正确答案
