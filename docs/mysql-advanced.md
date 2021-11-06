@@ -87,7 +87,7 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 ## 6、常见问题
 
-6.1、什么情况下会生成临时表
+### 6.1、什么情况下会生成临时表
 
 1. UNION查询；
 2. 用到TEMPTABLE算法或者是UNION查询中的视图；
@@ -98,7 +98,7 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 7. FROM中的子查询；
 8. 子查询或者semi-join时创建的表；
 
-6.2、什么情况下需要回表查询
+### 6.2、什么情况下需要回表查询
 
 回表查询：先定位主键值，再定位行记录，它的性能较扫一遍索引树更低。
 
@@ -106,20 +106,20 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 >  参考：[MySQL优化：如何避免回表查询？什么是索引覆盖？ (转) - myseries - 博客园 (cnblogs.com)](https://www.cnblogs.com/myseries/p/11265849.html)
 
-6.3、聚簇索引、非聚簇索引和辅助索引
+### 6.3、聚簇索引、非聚簇索引和辅助索引
 
 - 聚簇索引：将数据存储与索引放到了一块，找到索引也就找到了数据。表数据按照索引的顺序来存储的，也就是说索引项的顺序与表中记录的物理顺序一致。
 - 非聚簇索引：将数据存储与索引分开，叶结点包含索引字段值及指向数据页数据行的逻辑指针，其行数量与数据表行数据量一致。
 
 >  参考：[浅谈聚簇索引与非聚簇索引 | Java 技术论坛 (learnku.com)](https://learnku.com/articles/50096)
 
-6.3、MyISAM与InnoDB引擎适用场景，OLTP与OLAP的概念
+### 6.4、MyISAM与InnoDB引擎适用场景，OLTP与OLAP的概念
 
 OLTP（在线事务处理），如Blog、电子商务、网络游戏等；
 
 OLAP（在线分析处理），如数据仓库、数据集市。
 
-6.4、行锁、表锁的使用
+### 6.5、行锁、表锁的使用
 
 InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁
 
@@ -152,6 +152,18 @@ show status like 'table_locks%';
 > 参考：[MySQL 行锁 表锁机制](https://www.cnblogs.com/itdragon/p/8194622.html)
 >
 > [INNODB索引实现原理_bohu83的博客-CSDN博客_innodb的索引实现](https://blog.csdn.net/bohu83/article/details/81104432)
+
+6.6、B+树的结构
+
+B+树的内部节点包括：Key键值，Index索引值
+B+树的叶子节点包括：Key键值，Index索引值，Data数据
+B+树的内部节点也可称为索引节点，叶子节点也可称为外部节点
+
+> 参考：[B+树结构参考 - 简书 (jianshu.com)](https://www.jianshu.com/p/b395a81d04ee)
+
+
+
+
 
 > MySQL核心手册：[MySQL Internals Manual ](https://dev.mysql.com/doc/internals/en/innodb-page-overview.html)
 >

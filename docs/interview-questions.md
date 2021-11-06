@@ -144,7 +144,7 @@ varchar与text区别：
 
 12.1、 微服务：微服务是一种开发软件的架构和组织方法，其中软件由通过明确定义的 API 进行通信的小型独立服务组成。这些服务由各个小型独立团队负责。微服务架构使应用程序更易于扩展和更快地开发，从而加速创新并缩短新功能的上市时间。
 
-12.2、B+树：
+12.2、B+树：叶子节点顺序存储关键字，方便范围查询；
 
 12.3、红黑树：二叉平衡树
 
@@ -164,13 +164,20 @@ varchar与text区别：
 
 ## 14、ddos攻击防范
 
-1、备份网站
+1、备份网站：最低限度有一个临时主页，可以发出公告
 
 2、拦截请求，识别异常的流量
 
-3、带宽扩容
+3、带宽扩容：多态主机，通过DNS分摊访问量
 
 4、CDN，如cloudflare
+
+>  参考：
+>
+>  1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
+>
+>  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
+
 
 ## 15、如何防止重复提交
 
@@ -195,13 +202,7 @@ create table test {
 - `select * from test where a like '%hhh';`
 - `select * from test where date(b) = '2021-11-02';`
 - `select * from test where a not in ('jack','mike');  `
-- `select * from test where a is null;`，`is not null`会走索引
-
->  参考：
->
->  1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
->
->  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
+- `select * from test where a is not null;`，`is null`会走索引
 
 ## 18、redis中字典与hash表的区别
 
@@ -226,18 +227,18 @@ create table user {
 select id,username,`password` from user where id > 200000 limit 0,20;
 ```
 
-方法2：利用表的**覆盖索引/延迟关联**来加速分页查询。先找到主键，再查主键匹配的记录
+方法2：利用表的**覆盖索引/延迟关联**来加速分页查询。先找到主键，再查主键匹配的记录，只需要一次回表查询
 
 ```sql
-SELECT * FROM product WHERE ID > =(select id from product limit 200000, 1) limit 20;
-SELECT * FROM product a JOIN (select id from product limit 200000, 20) b ON a.ID = b.id;
+SELECT * FROM user WHERE id > =(select id from user limit 200000, 1) limit 20;
+SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.id;
 ```
 
 > 参考：
 >
 > 1、[MySQL 延迟关联优化超多分页场景 | Qida's Blog (qidawu.github.io)](http://qidawu.github.io/2019/11/26/mysql-deferred-join/)
 >
-> 2、[mysql优化：覆盖索引（延迟关联） - 一枝花算不算浪漫 - 博客园 (cnblogs.com)](https://www.cnblogs.com/wang-meng/p/ae6d1c4a7b553e9a5c8f46b67fb3e3aa.html)
+> 2、[MySQL 分页查询优化——延迟关联优化 - pufeng - 博客园 (cnblogs.com)](https://www.cnblogs.com/pufeng/p/11750495.html)
 
 ## 20、存在大量数据的表，如何添加索引才能不影响业务（锁表）
 
