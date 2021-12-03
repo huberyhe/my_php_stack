@@ -62,6 +62,16 @@
 - [缓存机制](docs/cache.md)
 - [消息队列](docs/mq.md)
 
+## 软件工程
+
+- 23个设计模式
+
+- [7大设计原则](https://bbs.huaweicloud.com/blogs/312691?utm_campaign=other&utm_source=wechat_session&utm_medium=social&utm_oi=43696514924544)：单一职责原则、开放封闭原则、里氏替换原则、接口隔离原则、依赖倒转原则、组合/聚合复用原则、迪米特原则
+
+- [并发的3个特性](https://zhuanlan.zhihu.com/p/58855599)：原子性、有序性、可见性
+
+  
+
 ## 安全编码
 
 - XSS攻击及防御

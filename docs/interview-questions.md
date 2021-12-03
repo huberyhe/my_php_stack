@@ -246,6 +246,12 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 
 方法二：在从库上添加索引，然后切换成主库
 
+> 参考：
+>
+> 1、[加索引可能引发的事故，我们要心中有数 - 掘金 (juejin.cn)](https://juejin.cn/post/6844904193531052040)
+>
+> 2、[分享一次生产MySQL数据库主备切换演练 - 51CTO.COM](https://database.51cto.com/art/201909/602502.htm)
+
 ## 21、是先导入数据，还是先添加索引
 
 先导入数据，避免每条数据都去维护索引
@@ -263,3 +269,13 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 1、hr要代码截图：直接不要给了，面试官总能挑出毛病，很可能因为代码风格认为不合适
 
 2、面试结束了，面试官问有啥问题要问的：觉得面的还可以的话，问下团队的情况；如果觉得面试一般，可以问下题目的正确答案
+
+## 24、常见web身份认证方式
+
+- Cookie + Session 登录
+- Token 登录
+- SSO 单点登录
+- OAuth 第三方登录
+
+> 参考：[前端登录，这一篇就够了 - 掘金 (juejin.cn)](https://juejin.cn/post/6845166891393089544)
+
