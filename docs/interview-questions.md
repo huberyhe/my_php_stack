@@ -246,11 +246,23 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 
 方法二：在从库上添加索引，然后切换成主库
 
+方法三：Online DDL，从 MySQL 5.6 开始，引入了 inplace 算法并且默认使用。有一些第三方工具也可以实现 DDL 操作，最常见的是 percona 的 pt-online-schema-change 工具（简称为 pt-osc），和 github 的 [gh-ost](https://github.com/github/gh-ost) 工具，均支持 MySQL 5.5 以上的版本。
+
+一般情况下的建议：
+
+- 如果使用的是 MySQL 5.5 或者 MySQL 5.6，推荐使用 gh-ost
+- 如果使用的是 MySQL 5.7，索引等不涉及修改数据的操作，建议使用默认的 inplace 算法。如果涉及到修改数据（例如增加列），不关心主从同步延时的情况下使用默认的 inplace 算法，关心主从同步延时的情况下使用 gh-ost
+- 如果使用的是 MySQL 8.0，推荐使用 MySQL 默认的算法设置，在语句不支持 instant 算法并且在意主从同步延时的情况下使用 gh-ost
+
 > 参考：
 >
-> 1、[加索引可能引发的事故，我们要心中有数 - 掘金 (juejin.cn)](https://juejin.cn/post/6844904193531052040)
+> 1、[加索引可能引发的事故，我们要心中有数](https://juejin.cn/post/6844904193531052040)
 >
-> 2、[分享一次生产MySQL数据库主备切换演练 - 51CTO.COM](https://database.51cto.com/art/201909/602502.htm)
+> 2、[分享一次生产MySQL数据库主备切换演练](https://database.51cto.com/art/201909/602502.htm)
+>
+> 3、[MySQL 5.7 特性：Online DDL](https://cloud.tencent.com/developer/article/1697076)
+>
+> 4、[MySQL5.7—在线DDL总结_一个笨小孩](https://blog.51cto.com/fengfeng688/1956827)
 
 ## 21、是先导入数据，还是先添加索引
 
@@ -273,9 +285,89 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 ## 24、常见web身份认证方式
 
 - Cookie + Session 登录
-- Token 登录
+- Token 登录，常用[JWT](https://www.ruanyifeng.com/blog/2018/07/json_web_token-tutorial.html)，可用于分布式认证，也可解决跨域的问题
+
+形式如：Header.Payload.Signature
+
+header和payload是base64url加密后的json字符串
+
+header包含签名算法，默认算法是HMAC SHA256（写成 HS256）
+
 - SSO 单点登录
 - OAuth 第三方登录
 
-> 参考：[前端登录，这一篇就够了 - 掘金 (juejin.cn)](https://juejin.cn/post/6845166891393089544)
+> 参考：[前端登录，这一篇就够了](https://juejin.cn/post/6845166891393089544)
+
+## 25、系统回答MySQL优化
+
+从一下几个方面回答：
+
+1、字段
+
+2、表引擎
+
+3、索引
+
+4、查询缓存
+
+5、分区和分表
+
+6、集群和读写分离
+
+7、
+
+> 参考：[MySQL优化/面试，看这一篇就够了](https://juejin.cn/post/6844903750839058446)
+
+## 26、poll、epoll、select、reactor的IO多路复用
+
+## 27、HTTP2的改进之处
+
+1、对于常见的HTTP头部通过静态表和哈夫曼编码的方式，奖体积缩小了近一半，而且针对后续的请求头部，还可以建立动态表，将体积压缩近90%
+
+2、HTTP2实现了Stream并发，多个Stream只复用1个TCP连接
+
+3、服务器支持主动推送资源
+
+## 28、如何判断一个二叉树是平衡二叉树
+
+树中每个节点都满⾜左右两个⼦树的⾼度差 <= 1
+
+见[leetcode题目](https://leetcode-cn.com/problems/balanced-binary-tree/)
+
+## 29、谈谈对进程、线程和协程的理解
+
+## 30、微服务的理解，微服务有哪些缺点
+
+https://segmentfault.com/a/1190000020092884
+
+每个敏捷团队都使用可用的框架和所选的技术堆栈构建单独的服务组件，每个服务组件形成一个强大的微服务架构，以提供更好的可扩展性。
+
+敏捷团队可以单独处理每个服务组件的问题，而对整个应用程序没有影响或影响最小。
+
+优点：
+
+- 独立开发
+- 独立部署
+- 故障隔离
+- 混合技术栈
+- 粒度缩放，组件已扩展
+
+缺点：
+
+- 故障排查困难
+- 远程调用延迟
+- 增加了配置部署的工作量
+
+## 31、如何写出高质量的代码
+
+## 32、MySQL连表查询的原理是什么
+
+**MySQL的多表查询(笛卡尔积原理)**
+
+1. 先确定数据要用到哪些表。
+2. 将多个表先通过笛卡尔积变成一个表。
+3. 然后去除不符合逻辑的数据（根据两个表的关系去掉）。
+4. 最后当做是一个虚拟表一样来加上条件即可。
+
+注意：列名最好使用表别名来区别。
 

@@ -132,9 +132,9 @@ emergency_restart_interval = 0
 
 ## 9、PHP7有哪些不同
 
-- 标量类型声明
+- 性能可以达到PHP 5.6的3倍：变量、字符串、数组的数据结构优化
 
-- 返回值类型声明
+- 标量类型声明和返回值类型声明：`declare(strict_types=1); `
 
 - NULL 合并运算符：`$username = $_GET['user'] ?? 'nobody';`
 
@@ -200,6 +200,43 @@ fastcgi_pass unix:/tmp/php-cgi.sock;
 
 > 参考：
 >
-> 1、https://xie.infoq.cn/article/fa7b39c76e6556f4a23b53cc2
+> 1、[全面剖析PHP-FPM+Nginx通信原理 - InfoQ 写作平台](https://xie.infoq.cn/article/fa7b39c76e6556f4a23b53cc2)
 >
-> 2、https://shuwoom.com/?p=4366
+> 2、[Nginx与php-fpm通信原理详解 - shuwoom的博客](https://shuwoom.com/?p=4366)
+
+### 11、PHP8有哪些改进，JIT是什么
+
+- JIT即时编译
+- 命名参数
+- 联合类型
+- Nullsafe运算符：`echo $session?->user?->getAddress()?->country`
+- match语法
+
+```php
+match(){
+	value=>condition1,
+	express=>condition2,
+	default=>condition3,
+}
+```
+
+
+
+### 12、composer自动加载机制，PSR编码规范
+
+` \<NamespaceName>(\<SubNamespaceNames>)*\<ClassName>`
+
+顶级命名空间+子命名空间+类名
+
+加载时，顶级命名空间对应一个目录，子命名空间是这个目录下的子目录，字母中包含这个类同名的php文件
+
+> 参考：
+>
+> 1、[深入解析 composer 的自动加载原理](https://segmentfault.com/a/1190000014948542)
+>
+> 2、[Composer 自动加载原理 |《Laravel 之道 5.6》](https://learnku.com/docs/the-laravel-way/5.6/Tao-3-1/2928)
+>
+> 3、[PSR-4 自动加载规范 |《PHP PSR 标准规范》](https://learnku.com/docs/psr/psr-4-autoloader/1608)
+
+### 13、php代码运行过程
+

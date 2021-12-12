@@ -80,6 +80,10 @@ sudo rabbitmqctl list_bindings
 
 redis的list设计简单，没有保证消费的机制，一旦消费失败，消息丢失。而rabbitmq会使失败的消息自动回到原队列
 
+redis： 轻量级，低延迟，高并发，低可靠性；
+
+rabbitmq：重量级，高可靠，异步，不保证实时；
+
 > 参考：[Redis 与 MQ 的区别](https://www.cnblogs.com/dengguangxue/p/11537466.html)
 
 ## 3、应用实例

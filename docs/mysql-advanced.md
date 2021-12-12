@@ -149,11 +149,13 @@ show open tables where in_use > 0;
 show status like 'table_locks%';
 ```
 
-> 参考：[MySQL 行锁 表锁机制](https://www.cnblogs.com/itdragon/p/8194622.html)
+> 参考：
 >
-> [INNODB索引实现原理_bohu83的博客-CSDN博客_innodb的索引实现](https://blog.csdn.net/bohu83/article/details/81104432)
+> 1、[MySQL 行锁 表锁机制](https://www.cnblogs.com/itdragon/p/8194622.html)
+>
+> 2、[INNODB索引实现原理_bohu83的博客-CSDN博客_innodb的索引实现](https://blog.csdn.net/bohu83/article/details/81104432)
 
-6.6、B+树的结构
+### 6.6、B+树的结构
 
 B+树的内部节点包括：Key键值，Index索引值
 B+树的叶子节点包括：Key键值，Index索引值，Data数据
@@ -162,6 +164,71 @@ B+树的内部节点也可称为索引节点，叶子节点也可称为外部节
 > 参考：[B+树结构参考 - 简书 (jianshu.com)](https://www.jianshu.com/p/b395a81d04ee)
 
 
+
+### 6.7、Procedure Analyse优化表结构
+
+PROCEDURE ANALYSE的语法如下：
+
+```sql
+SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
+```
+
+`max_elements`:指定每列非重复值的最大值，当超过这个值的时候，MySQL不会推荐enum类型。（默认值256）
+
+ `max_memory `（默认值8192）`analyse()`为每列找出所有非重复值所采用的最大内存大小。
+
+执行返回中的Optimal_fieldtype列是mysql建议采用的列。
+
+> 参考：[Procedure Analyse优化表结构 ](https://www.cnblogs.com/duanxz/p/3968639.html)
+
+### 6.8、索引的类型划分
+
+### 1、按功能逻辑划分
+
+普通索引、主键索引、唯一索引、全文索引
+
+### 2、按物理实现划分
+
+聚集索引、非聚集索引
+
+### 3、按字段个数划分
+
+单个索引、联合索引
+
+### 4、按索引结构划分
+
+常见的有：BTREE、RTREE、HASH、FULLTEXT、SPATIAL
+
+> 参考：[MySQL索引方法 - 成九 - 博客园 (cnblogs.com)](https://www.cnblogs.com/luyucheng/p/6289048.html)
+
+### 6.9、什么场景下应该使用索引
+
+#### 推荐使用
+
+- WHERE, GROUP BY, ORDER BY 子句中的字段
+
+- 多个单列索引在多条件查询是只会有一个最优的索引生效，因此多条件查询中最好创建联合索引。
+
+联合索引的时候必须满足最左匹配原则，并且最好考虑到 sql 语句的执行顺序，比如 WHERE a = 1 GROUP BY b ORDER BY c, 那么联合索引应该设计为 (a,b,c)，因为在上一篇文章 MySQL 基础语法 中我们介绍过，mysql 查询语句的执行顺序 WHERE > GROUP BY > ORDER BY。
+
+- 多张表 JOIN 的时候，对表连接字段创建索引。
+
+- 当 SELECT 中有不在索引中的字段时，会先通过索引查询出满足条件的主键值，然后通过主键回表查询出所有的 SELECT 中的字段，影响查询效率。因此如果 SELECT 中的内容很少，为了避免回表，可以把 SELECT 中的字段都加到联合索引中，这也就是宽索引的概念。但是需要注意，如果索引字段过多，存储和维护索引的成本也会增加。
+
+#### 不推荐使用或索引失效情况
+
+- 数据量很小的表
+- 有大量重复数据的字段
+- 频繁更新的字段
+- 如果对索引字段使用了函数或者表达式计算，索引失效
+- innodb OR 条件没有对所有条件创建索引，索引失效
+- 大于小于条件 < >，索引是否生效取决于命中的数量比例，如果命中数量很多，索引生效，命中数量很小，索引失效
+- 不等于条件 != <>，索引失效
+- LIKE 值以 % 开头，索引失效
+
+### 6.9、分布式id生成器
+
+雪花算法：1bit保留+41bit毫秒时间戳+10bit机器ID+12bit序列号=64bit整数
 
 
 

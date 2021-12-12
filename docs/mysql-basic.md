@@ -151,3 +151,17 @@ SET （最多64个成员）                      64KB
 1. 在where条件常使用的字段 。
 2. 该字段的内容不是唯一的几个可选值，而是有较丰富的取值选项的字段 。
 3. 该字段内容不是频繁变化的。
+
+### 7、常见的SQL考题
+
+7.1、有一个学生选修课程的数据表，查询选修了多门课程的人数
+
+course：stu_id, course_name
+
+```sql
+select count(stu_id)
+from course
+group by stu_id
+having count(course_name) > 1
+```
+

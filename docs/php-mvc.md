@@ -55,6 +55,10 @@ AOP（面向切面编程）：在软件业，AOP为Aspect Oriented Programming�
 
 门面模式：门面为容器中的类提供了一个静态调用接口，相比于传统的静态方法调用， 带来了更好的可测试性和扩展性，你可以为任何的非静态类库定义一个`facade`类。说的直白一点，Facade功能可以让类无需实例化而直接进行静态方式调用。
 
+依赖注入：
+
+[Thinkphp5.1中用到的设计模式（依赖注入，容器，Facade门面模式）](https://cloud.tencent.com/developer/article/1795111)
+
 ### 3.4、Yii
 
 [文档地址](https://www.yiiframework.com/doc/guide/2.0/zh-cn)
