@@ -34,6 +34,10 @@
 
 ## MySQL
 
+- [MySQL的基本使用](docs/mysql-basic.md)
+- [MySQL的高级使用-分区分表、主从复制、读写分离等](docs/mysql-advanced.md)
+- [MySQL事务](docs/mysql-transaction.md)
+
 - [MySQL有哪些存储引擎，各自的优缺点，应用场景](https://juejin.im/post/6844903684912971783)
 - mysql常用命令
 

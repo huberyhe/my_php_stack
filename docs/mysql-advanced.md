@@ -230,9 +230,19 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 雪花算法：1bit保留+41bit毫秒时间戳+10bit机器ID+12bit序列号=64bit整数
 
+## 7、其他命令
 
+### 7.1、`show index from tb_name`查看表索引详细信息
+
+其中`Cardinality`字段表示这个列有多少种值，这个数是近似的可以用 `ANALYZE TABLE tb_name` or (for `MyISAM` tables)`myisamchk -a`更新
 
 > MySQL核心手册：[MySQL Internals Manual ](https://dev.mysql.com/doc/internals/en/innodb-page-overview.html)
 >
 > MySQL参考手册：[MySQL 5.7 Reference Manual]([MySQL :: MySQL 5.7 Reference Manual](https://dev.mysql.com/doc/refman/5.7/en/))
+
+### 7.2、`PROCEDURE ANALYSE`优化表结构
+
+```sql
+SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
+```
 
