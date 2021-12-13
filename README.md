@@ -34,6 +34,10 @@
 
 ## MySQL
 
+- [MySQL的基本使用](docs/mysql-basic.md)
+- [MySQL的高级使用-分区分表、主从复制、读写分离等](docs/mysql-advanced.md)
+- [MySQL事务](docs/mysql-transaction.md)
+
 - [MySQL有哪些存储引擎，各自的优缺点，应用场景](https://juejin.im/post/6844903684912971783)
 - mysql常用命令
 
@@ -55,12 +59,29 @@
 - [动态规划经典问题-拼凑面额](https://www.nowcoder.com/questionTerminal/14cf13771cd840849a402b848b5c1c93)
 - [LeetCode](https://leetcode.com/)题解-[labuladong 的算法小抄](https://github.com/labuladong/fucking-algorithm)
 - 外部排序，解决大数据排序问题：[外部排序&多路归并排序](https://www.cnblogs.com/luo77/p/5838206.html)
+- [必会的算法问题](docs/arithmetic-questions.md)
 
 ## 并发与缓存问题
 
 - 负载均衡：lvs体系架构
 - [缓存机制](docs/cache.md)
 - [消息队列](docs/mq.md)
+
+## 软件工程
+
+- 23个设计模式
+
+- [7大设计原则](https://bbs.huaweicloud.com/blogs/312691?utm_campaign=other&utm_source=wechat_session&utm_medium=social&utm_oi=43696514924544)：单一职责原则、开放封闭原则、里氏替换原则、接口隔离原则、依赖倒转原则、组合/聚合复用原则、迪米特原则
+
+- [并发的3个特性](https://zhuanlan.zhihu.com/p/58855599)：原子性、有序性、可见性
+
+- 如何画架构图
+
+- 完整项目开发流程
+
+- 系统设计
+
+  
 
 ## 安全编码
 

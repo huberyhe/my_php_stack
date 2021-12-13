@@ -275,7 +275,7 @@ awk 'NR>2{print line}{line=$0}' a.txt
 >
 > [Linux awk 命令](https://www.runoob.com/linux/linux-comm-awk.html)
 >
-> [Linux：shell脚本基础（grep及正则表达式、后向引用、sed/awk基础篇）]([Linux：shell脚本基础（grep及正则表达式、后向引用、sed/awk基础篇）_码神岛 (misuland.com)](https://msd.misuland.com/pd/3255818066314925244))
+> [Linux：shell脚本基础（grep及正则表达式、后向引用、sed/awk基础篇）](https://msd.misuland.com/pd/3255818066314925244)
 
 ## sed编辑文本
 

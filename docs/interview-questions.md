@@ -144,7 +144,7 @@ varchar与text区别：
 
 12.1、 微服务：微服务是一种开发软件的架构和组织方法，其中软件由通过明确定义的 API 进行通信的小型独立服务组成。这些服务由各个小型独立团队负责。微服务架构使应用程序更易于扩展和更快地开发，从而加速创新并缩短新功能的上市时间。
 
-12.2、B+树：
+12.2、B+树：叶子节点顺序存储关键字，方便范围查询；
 
 12.3、红黑树：二叉平衡树
 
@@ -164,13 +164,20 @@ varchar与text区别：
 
 ## 14、ddos攻击防范
 
-1、备份网站
+1、备份网站：最低限度有一个临时主页，可以发出公告
 
 2、拦截请求，识别异常的流量
 
-3、带宽扩容
+3、带宽扩容：多态主机，通过DNS分摊访问量
 
 4、CDN，如cloudflare
+
+>  参考：
+>
+>  1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
+>
+>  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
+
 
 ## 15、如何防止重复提交
 
@@ -195,13 +202,7 @@ create table test {
 - `select * from test where a like '%hhh';`
 - `select * from test where date(b) = '2021-11-02';`
 - `select * from test where a not in ('jack','mike');  `
-- `select * from test where a is null;`，`is not null`会走索引
-
->  参考：
->
->  1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
->
->  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
+- `select * from test where a is not null;`，`is null`会走索引
 
 ## 18、redis中字典与hash表的区别
 
@@ -226,24 +227,42 @@ create table user {
 select id,username,`password` from user where id > 200000 limit 0,20;
 ```
 
-方法2：利用表的**覆盖索引/延迟关联**来加速分页查询。先找到主键，再查主键匹配的记录
+方法2：利用表的**覆盖索引/延迟关联**来加速分页查询。先找到主键，再查主键匹配的记录，只需要一次回表查询
 
 ```sql
-SELECT * FROM product WHERE ID > =(select id from product limit 200000, 1) limit 20;
-SELECT * FROM product a JOIN (select id from product limit 200000, 20) b ON a.ID = b.id;
+SELECT * FROM user WHERE id > =(select id from user limit 200000, 1) limit 20;
+SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.id;
 ```
 
 > 参考：
 >
 > 1、[MySQL 延迟关联优化超多分页场景 | Qida's Blog (qidawu.github.io)](http://qidawu.github.io/2019/11/26/mysql-deferred-join/)
 >
-> 2、[mysql优化：覆盖索引（延迟关联） - 一枝花算不算浪漫 - 博客园 (cnblogs.com)](https://www.cnblogs.com/wang-meng/p/ae6d1c4a7b553e9a5c8f46b67fb3e3aa.html)
+> 2、[MySQL 分页查询优化——延迟关联优化 - pufeng - 博客园 (cnblogs.com)](https://www.cnblogs.com/pufeng/p/11750495.html)
 
 ## 20、存在大量数据的表，如何添加索引才能不影响业务（锁表）
 
 方法一：创建临时表，导入数据添加索引之后再升级成正式表
 
 方法二：在从库上添加索引，然后切换成主库
+
+方法三：Online DDL，从 MySQL 5.6 开始，引入了 inplace 算法并且默认使用。有一些第三方工具也可以实现 DDL 操作，最常见的是 percona 的 pt-online-schema-change 工具（简称为 pt-osc），和 github 的 [gh-ost](https://github.com/github/gh-ost) 工具，均支持 MySQL 5.5 以上的版本。
+
+一般情况下的建议：
+
+- 如果使用的是 MySQL 5.5 或者 MySQL 5.6，推荐使用 gh-ost
+- 如果使用的是 MySQL 5.7，索引等不涉及修改数据的操作，建议使用默认的 inplace 算法。如果涉及到修改数据（例如增加列），不关心主从同步延时的情况下使用默认的 inplace 算法，关心主从同步延时的情况下使用 gh-ost
+- 如果使用的是 MySQL 8.0，推荐使用 MySQL 默认的算法设置，在语句不支持 instant 算法并且在意主从同步延时的情况下使用 gh-ost
+
+> 参考：
+>
+> 1、[加索引可能引发的事故，我们要心中有数](https://juejin.cn/post/6844904193531052040)
+>
+> 2、[分享一次生产MySQL数据库主备切换演练](https://database.51cto.com/art/201909/602502.htm)
+>
+> 3、[MySQL 5.7 特性：Online DDL](https://cloud.tencent.com/developer/article/1697076)
+>
+> 4、[MySQL5.7—在线DDL总结_一个笨小孩](https://blog.51cto.com/fengfeng688/1956827)
 
 ## 21、是先导入数据，还是先添加索引
 
@@ -262,3 +281,93 @@ SELECT * FROM product a JOIN (select id from product limit 200000, 20) b ON a.ID
 1、hr要代码截图：直接不要给了，面试官总能挑出毛病，很可能因为代码风格认为不合适
 
 2、面试结束了，面试官问有啥问题要问的：觉得面的还可以的话，问下团队的情况；如果觉得面试一般，可以问下题目的正确答案
+
+## 24、常见web身份认证方式
+
+- Cookie + Session 登录
+- Token 登录，常用[JWT](https://www.ruanyifeng.com/blog/2018/07/json_web_token-tutorial.html)，可用于分布式认证，也可解决跨域的问题
+
+形式如：Header.Payload.Signature
+
+header和payload是base64url加密后的json字符串
+
+header包含签名算法，默认算法是HMAC SHA256（写成 HS256）
+
+- SSO 单点登录
+- OAuth 第三方登录
+
+> 参考：[前端登录，这一篇就够了](https://juejin.cn/post/6845166891393089544)
+
+## 25、系统回答MySQL优化
+
+从一下几个方面回答：
+
+1、字段
+
+2、表引擎
+
+3、索引
+
+4、查询缓存
+
+5、分区和分表
+
+6、集群和读写分离
+
+7、
+
+> 参考：[MySQL优化/面试，看这一篇就够了](https://juejin.cn/post/6844903750839058446)
+
+## 26、poll、epoll、select、reactor的IO多路复用
+
+## 27、HTTP2的改进之处
+
+1、对于常见的HTTP头部通过静态表和哈夫曼编码的方式，奖体积缩小了近一半，而且针对后续的请求头部，还可以建立动态表，将体积压缩近90%
+
+2、HTTP2实现了Stream并发，多个Stream只复用1个TCP连接
+
+3、服务器支持主动推送资源
+
+## 28、如何判断一个二叉树是平衡二叉树
+
+树中每个节点都满⾜左右两个⼦树的⾼度差 <= 1
+
+见[leetcode题目](https://leetcode-cn.com/problems/balanced-binary-tree/)
+
+## 29、谈谈对进程、线程和协程的理解
+
+## 30、微服务的理解，微服务有哪些缺点
+
+https://segmentfault.com/a/1190000020092884
+
+每个敏捷团队都使用可用的框架和所选的技术堆栈构建单独的服务组件，每个服务组件形成一个强大的微服务架构，以提供更好的可扩展性。
+
+敏捷团队可以单独处理每个服务组件的问题，而对整个应用程序没有影响或影响最小。
+
+优点：
+
+- 独立开发
+- 独立部署
+- 故障隔离
+- 混合技术栈
+- 粒度缩放，组件已扩展
+
+缺点：
+
+- 故障排查困难
+- 远程调用延迟
+- 增加了配置部署的工作量
+
+## 31、如何写出高质量的代码
+
+## 32、MySQL连表查询的原理是什么
+
+**MySQL的多表查询(笛卡尔积原理)**
+
+1. 先确定数据要用到哪些表。
+2. 将多个表先通过笛卡尔积变成一个表。
+3. 然后去除不符合逻辑的数据（根据两个表的关系去掉）。
+4. 最后当做是一个虚拟表一样来加上条件即可。
+
+注意：列名最好使用表别名来区别。
+
