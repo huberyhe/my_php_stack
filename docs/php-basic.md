@@ -86,6 +86,34 @@ if (is_dir($dir)) {
 
 preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 
+### 5.1、正则基础
+
+\w \W \d \s 
+
+\w 任意单词字符，指任意字母、数字、下划线
+
+后向引用
+
+子组
+
+一次性子组
+
+条件子组
+
+注释：字符序列(?#标记开始一个注释直到遇到一个右括号
+
+### 5.2、常见正则表达式
+
+邮箱：`^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$`
+
+密码(以字母开头，长度在6~18之间，只能包含字母、数字和下划线)：`^[a-zA-Z]\w{5,17}$`
+
+>  参考：
+>
+> 1、[cdoco/common-regex: 常用正则表达式 - 收集一些在平时项目开发中经常用到的正则表达式。](https://github.com/cdoco/common-regex)
+>
+> 2、[最全的常用正则表达式大全——包括校验数字、字符、一些特殊的需求等等](https://www.cnblogs.com/zxin/archive/2013/01/26/2877765.HTML)
+
 ## 6、php.ini常见配置
 
 ignore_user_abort：

@@ -119,7 +119,29 @@ OLTP（在线事务处理），如Blog、电子商务、网络游戏等；
 
 OLAP（在线分析处理），如数据仓库、数据集市。
 
-### 6.5、行锁、表锁的使用
+### 6.5、MyISAM为什么比InnoDB查询更快
+
+MyISAM在查询主键和非主键时，速度都更快，因为MyISAM要维护的东西更少，比如：
+
+1、数据块，InnoDB要缓存，MyISAM只缓存索引块， 这中间还有换进换出的减少；
+
+2、InnoDB寻址要映射到块，再到行，MyISAM记录的直接是文件的OFFSET，定位比InnoDB要快
+
+3、InnoDB还需要维护MVCC一致； 虽然你的场景没有，但他还是需要去检查和维护MVCC (Multi-Version Concurrency Control)多版本并发控制 。
+
+> 参考：[MySQL中MyISAM为什么比InnoDB查询快](https://www.cnblogs.com/chingho/p/14798021.html)
+
+### 6.6、MyISAM与InnoDB中B+树的区别
+
+MyISAM的主索引和普通索引都是非聚族索引，叶子节点不会存放行数据，而是存放的**磁盘地址**
+
+> 参考：
+>
+> 1、[Innodb和MyIsam在B+树中的区别是什么？](https://blog.csdn.net/weixin_42740530/article/details/106922905)
+>
+> 2、[MyISAM与InnoDB的索引结构](https://www.cnblogs.com/yuyafeng/p/11350873.html)
+
+### 6.7、行锁、表锁的使用
 
 InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁
 
@@ -155,7 +177,7 @@ show status like 'table_locks%';
 >
 > 2、[INNODB索引实现原理_bohu83的博客-CSDN博客_innodb的索引实现](https://blog.csdn.net/bohu83/article/details/81104432)
 
-### 6.6、B+树的结构
+### 6.8、B+树的结构
 
 B+树的内部节点包括：Key键值，Index索引值
 B+树的叶子节点包括：Key键值，Index索引值，Data数据
@@ -165,7 +187,7 @@ B+树的内部节点也可称为索引节点，叶子节点也可称为外部节
 
 
 
-### 6.7、Procedure Analyse优化表结构
+### 6.9、Procedure Analyse优化表结构
 
 PROCEDURE ANALYSE的语法如下：
 
@@ -181,27 +203,27 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 > 参考：[Procedure Analyse优化表结构 ](https://www.cnblogs.com/duanxz/p/3968639.html)
 
-### 6.8、索引的类型划分
+### 6.10、索引的类型划分
 
-### 1、按功能逻辑划分
+#### 1、按功能逻辑划分
 
 普通索引、主键索引、唯一索引、全文索引
 
-### 2、按物理实现划分
+#### 2、按物理实现划分
 
 聚集索引、非聚集索引
 
-### 3、按字段个数划分
+#### 3、按字段个数划分
 
 单个索引、联合索引
 
-### 4、按索引结构划分
+#### 4、按索引结构划分
 
 常见的有：BTREE、RTREE、HASH、FULLTEXT、SPATIAL
 
 > 参考：[MySQL索引方法 - 成九 - 博客园 (cnblogs.com)](https://www.cnblogs.com/luyucheng/p/6289048.html)
 
-### 6.9、什么场景下应该使用索引
+### 6.11、什么场景下应该使用索引
 
 #### 推荐使用
 
@@ -226,7 +248,7 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 - 不等于条件 != <>，索引失效
 - LIKE 值以 % 开头，索引失效
 
-### 6.9、分布式id生成器
+### 6.12、分布式id生成器
 
 雪花算法：1bit保留+41bit毫秒时间戳+10bit机器ID+12bit序列号=64bit整数
 
