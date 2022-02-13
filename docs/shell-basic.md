@@ -180,6 +180,16 @@ str1="ab"
 str2=${str}${str1}
 ```
 
+### 3.6、字符串默认值
+
+```bash
+str="abc"
+echo ${str:-123} # 输出abc
+echo ${str2:-123} # 输出123
+```
+
+
+
 > 参考：[Bash 字符串处理命令](https://www.cnblogs.com/dmir/p/6267374.html)
 
 ## 4、数组使用
@@ -463,4 +473,42 @@ done
 >
 > [Bash Shell中命令行选项/参数处理](https://www.cnblogs.com/FrankTan/archive/2010/03/01/1634516.html)
 
-## 6、
+## 6、map的使用
+
+### 6.1、声明
+
+```bash
+declare -A map
+```
+
+### 6.2、初始化
+
+```bash
+map=(["aa"]="11" ["bb"]="22")
+map["name"]="val"
+map["apple"]="pen"
+```
+
+### 6.3、输出与遍历
+
+```bash
+# 输出所有key
+echo ${!map[@]}
+
+# 输出所有value
+echo ${map[@]}
+
+# 输出长度
+echo ${#map[@]}
+
+# 遍历
+for key in ${!map[*]};do
+    echo "$key => ${map[$key]}"
+done
+```
+
+
+
+> 参考：
+>
+> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
