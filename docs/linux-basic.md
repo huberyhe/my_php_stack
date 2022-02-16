@@ -169,3 +169,9 @@ tar xvJf node-v8.11.1-linux-x64.tar.xz1
 
 命令格式：`iptables [-t 表名] 选项 [链名] [条件] [-j 控制类型]`，默认filter表
 
+7、`free -m`中各字段的意义
+
+
+
+
+
