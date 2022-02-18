@@ -346,6 +346,13 @@ sed '1d' a.txt
 sed '$d' a.txt
 ```
 
+#### 3.6 正则匹配
+
+```bash
+ $ echo "libgcc-4.8.5-4.h5.x86_64.rpm" | sed -r "s/libgcc-([0-9]+\.[0-9]+.*)\.rpm/\1/g"
+4.8.5-4.h5.x86_64
+```
+
 
 
 > 参考：
@@ -447,6 +454,8 @@ hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
  $ grep -E "(bash|zsh)" /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
+ $ echo "libgcc-4.8.5-4.h5.x86_64.rpm" | grep -Eo "[0-9]+\.[0-9]+.*x86_64"
+4.8.5-4.h5.x86_64
 ```
 
 #### 3.1 匹配字符

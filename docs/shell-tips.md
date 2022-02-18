@@ -140,3 +140,17 @@ ifconfig -a eth0|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -
 
 > 参考：[Linux - Shell 脚本中获取本机 ip 地址方法 - 小菠萝测试笔记 - 博客园 (cnblogs.com)](https://www.cnblogs.com/poloyy/p/12212868.html)
 
+## 8、函数多值返回和接收
+
+原生是不支持多值返回的，但可以通过小技巧模拟实现
+
+```bash
+function get_load()
+{
+	echo $(uptime | tr -d " " | awk -F "[:,]" '{print $8" "$9" "$10}')
+}
+read load1 load5 load15 < <(get_load)
+
+read load1 load5 load15 <<< $(echo $(uptime | tr -d " " | awk -F "[:,]" '{print $8" "$9" "$10}'))
+```
+

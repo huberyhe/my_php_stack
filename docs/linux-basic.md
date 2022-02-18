@@ -53,7 +53,7 @@ W： 将当前设置写入~/.toprc文件，下次启动自动调用toprc文件�
 
 ### 2.2、tar归档
 
-1、切换到指定目录后打包：
+#### 1、切换到指定目录后打包：
 
 如果我想打包`/mnt/d/Workspace/业务@云平台/script_tools`目录下的`wac_login`目录，
 
@@ -89,7 +89,7 @@ drwxrwxrwx 1 hubery hubery   4096 Aug 10 17:07 pem_files
 -rw-r--r-- 1 hubery hubery 491520 Aug 12 09:29 /tmp/test_wac_login.tar
 ```
 
-2、查看归档文件内容
+#### 2、查看归档文件内容
 
 ```bash
 tar -tf test_wac_login.tar
@@ -113,7 +113,7 @@ wac_login/test_wac_login.php
 wac_login/test_wac_login.tar
 ```
 
-3、解压到指定目录
+#### 3、解压到指定目录
 
 ```bash
 tar xf /tmp/test_wac_login.tar -C ~/
@@ -136,14 +136,14 @@ drwxr-xr-x 1 hubery hubery    512 Aug 10 17:07 pem_files
 -rwxr-xr-x 1 hubery hubery  10240 Aug 12 09:16 test_wac_login.tar
 ```
 
-4、tar.gz格式文件打包与解压
+#### 4、tar.gz格式文件打包与解压
 
 ```bash
 tar cvzf test.tar.gz test
 tar xvzf test.tat.gz
 ```
 
-5、tar.xz格式文件打包与解压
+#### 5、tar.xz格式文件打包与解压
 
 ```bash
 tar cvf test.tar test
@@ -155,11 +155,34 @@ xz -d node-v8.11.1-linux-x64.tar.xz
 tar xvf node-v8.11.1-linux-x64.tar.xz123
 # 或一步完成
 tar xvJf node-v8.11.1-linux-x64.tar.xz1
-
-
 ```
 
-6、iptables四表五链
+#### 6、利用tar备份文件
+
+```bash
+ $ tar -cpf - /etc/init.d/README -C / | tar -xpf - -C /tmp
+tar: Removing leading `/' from member names
+ $ ls /tmp/etc/init.d/README
+/tmp/etc/init.d/README
+```
+
+#### 7、按行读取文件
+
+```bash
+cat data.dat | while read line
+do
+    echo "File:${line}"
+done
+
+while read line
+do
+    echo "File:${line}"
+done < data.dat
+```
+
+
+
+### 2.3、iptables四表五链
 
 数据包到了该链处，会去对应表中查询设置的规则，然后决定是否放行、丢弃、转发还是修改等等操作。
 
@@ -168,4 +191,18 @@ tar xvJf node-v8.11.1-linux-x64.tar.xz1
 五链：INPUT、OUTPUT、FORWARD、PREROUTING、POSTROUTING
 
 命令格式：`iptables [-t 表名] 选项 [链名] [条件] [-j 控制类型]`，默认filter表
+
+### 2.4、zip和unzip
+
+命令格式：`zip -r <zip name> <files>`
+
+#### 1、排除目录
+
+`-x`参数，参数为文件路径，须用引号
+
+例如：
+
+```bash
+zip -r backend_3party.zip /go/gopath/src/ -x '/go/gopath/src/backup_20220107.zip' -x '/go/gopath/src/cloud.google.com/*'
+```
 
