@@ -40,6 +40,46 @@
 | -x file | 可执行     |
 | -L file | 是链接文件 |
 
+### 1.4、小数比较
+
+#### 1、方法1：bc，非内置命令
+
+```bash
+v1=0.124
+v2=0.128
+if [[ `echo "$v1==$v2" | bc` -eq 1 ]]; then
+	echo "equal"
+elif [[ `echo "$v1>$v2" | bc` -eq 1 ]]; then
+	echo "greater-than"
+elif [[ `echo "$v1<$v2" | bc` -eq 1 ]]; then
+	echo "less-than"
+else
+	echo "err"
+fi
+```
+
+#### 2、方法2：awk
+
+```bash
+awk -v num1=6.6 -v num2=5.5 'BEGIN{print(num1>num2)?"0":"1"}'
+```
+
+#### 3、方法3：expr，推荐
+
+```bash
+v1=0.124
+v2=0.128
+if [[ `expr $v1 \= $v2` -eq 1 ]]; then
+	echo "equal"
+elif [[ `expr $v1 \> $v2` -eq 1 ]]; then
+	echo "greater-than"
+elif [[ `expr $v1 \< $v2` -eq 1 ]]; then
+	echo "less-than"
+else
+	echo "err"
+fi
+```
+
 
 
 > 参考：[shell浅谈之二运算符和IF条件判断](https://blog.csdn.net/taiyang1987912/article/details/38893381)
@@ -585,4 +625,5 @@ done
 
 > 参考：
 >
+> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
 > [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)

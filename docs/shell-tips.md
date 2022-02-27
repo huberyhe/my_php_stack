@@ -234,5 +234,18 @@ if [[ $1 != '' ]]; then
 fi
 
 ls | sed "s:^:`pwd`/:"
+
+## 11、函数多值返回和接收
+
+原生是不支持多值返回的，但可以通过小技巧模拟实现
+
+```bash
+function get_load()
+{
+	echo $(uptime | tr -d " " | awk -F "[:,]" '{print $8" "$9" "$10}')
+}
+read load1 load5 load15 < <(get_load)
+
+read load1 load5 load15 <<< $(echo $(uptime | tr -d " " | awk -F "[:,]" '{print $8" "$9" "$10}'))
 ```
 
