@@ -179,15 +179,34 @@ str="abc"
 echo ${#str}
 ```
 
-### 3.2、查找子串位置
+### 3.2、匹配字符串开头的子串长度
+
+**expr match "$string" '$substring'**
+$substring 是一个正则表达式。
+
+```bash
+MyString=abcABC123ABCabc
+echo $(expr match "$MyString" 'abc[A-Z]*.2')   # 结果为 8
+```
+
+### 3.3、查找子串位置/索引
+
+**expr index $string $substring**
+在字符串 $string 中匹配到的 $substring 第一次出现的位置。
 
 ```bash
 str="abc"
 str1=`expr index $str "a"`
-echo $str1
+echo $str1 # 结果为 1
 ```
 
-### 3.3、截取子串
+### 3.4、截取子串
+
+**${string:position}**
+在 $string 中从位置 $position 处开始提取子串。
+如果 $string 是 "*" 或者 "@"，那么将会提取从位置 $position 开始的位置参数。
+**${string:position:length}**
+在 $string 中从位置 $position 开始提取 $length 长度的子串。
 
 ```bash
 str="abc"
@@ -201,7 +220,15 @@ echo ${str:(-6):5}      # 从倒数第二个位置向左提取字符串, abcde
 echo ${str:(-4):3}      # 从倒数第二个位置向左提取6个字符, cde
 ```
 
-### 3.4、字符串替换
+**expr match "$string" '\($substring\)'**
+从 $string 的开始位置提取 $substring，$substring 是正则表达式。
+
+```bash
+MyString=abcABC123ABCabc
+echo $(expr match "$MyString" '\(.[b-c]*[A-Z]..[0-9]\)') # abcABC1
+```
+
+### 3.5、字符串替换
 
 ```bash
 str="apple, tree, apple tree"
@@ -212,7 +239,7 @@ echo ${str/#apple/APPLE}  # 如果字符串str以apple开头，则用APPLE替换
 echo ${str/%apple/APPLE}  # 如果字符串str以apple结尾，则用APPLE替换它
 ```
 
-### 3.5、字符串连接
+### 3.6、字符串连接
 
 ```bash
 str="abc"
@@ -220,7 +247,64 @@ str1="ab"
 str2=${str}${str1}
 ```
 
-> 参考：[Bash 字符串处理命令](https://www.cnblogs.com/dmir/p/6267374.html)
+### 3.7、字符串默认值
+
+```bash
+str="abc"
+echo ${str:-123} # 输出abc
+echo ${str2:-123} # 输出123
+```
+
+### 3.8、删除子串
+
+**${string#substring}**
+从 $string 的开头位置截掉最短匹配的 $substring。
+**${string##substring}**
+从 $string 的开头位置截掉最长匹配的 $substring。
+
+```bash
+MyString=abcABC123ABCabc
+echo ${MyString#a*C} # 123ABCabc
+# 截掉 'a' 到 'C' 之间最短的匹配字符串。
+
+echo ${MyString##a*C} # abc
+# 截掉 'a' 到 'C' 之间最长的匹配字符串。
+```
+
+**${string%substring}**
+从 $string 的结尾位置截掉最短匹配的 $substring。
+**${string%%substring}**
+从 $string 的结尾位置截掉最长匹配的 $substring。
+
+```bash
+MyString=abcABC123ABCabc
+echo ${MyString%b*c} # abcABC123ABCa
+# 从 $MyString 的结尾位置截掉 'b' 到 'c' 之间最短的匹配。
+
+echo ${MyString%%b*c} # a
+# 从 $MyString 的结尾位置截掉 'b' 到 'c' 之间最长的匹配。
+```
+
+**实用案例**：获取文件名的前缀和后缀
+
+```bash
+FILE="example.tar.gz"
+echo "${FILE%%.*}" # => example
+ 
+echo "${FILE%.*}" # => example.tar
+ 
+echo "${FILE#*.}" # => tar.gz
+ 
+echo "${FILE##*.}" # => gz
+```
+
+
+
+> 参考：
+>
+> 1、[Bash 字符串处理命令](https://www.cnblogs.com/dmir/p/6267374.html)
+>
+> 2、[Bash 中常见的字符串操作](https://www.cnblogs.com/sparkdev/p/10006970.html)
 
 ## 4、数组使用
 
@@ -503,4 +587,43 @@ done
 >
 > [Bash Shell中命令行选项/参数处理](https://www.cnblogs.com/FrankTan/archive/2010/03/01/1634516.html)
 
-## 6、
+## 6、map的使用
+
+### 6.1、声明
+
+```bash
+declare -A map
+```
+
+### 6.2、初始化
+
+```bash
+map=(["aa"]="11" ["bb"]="22")
+map["name"]="val"
+map["apple"]="pen"
+```
+
+### 6.3、输出与遍历
+
+```bash
+# 输出所有key
+echo ${!map[@]}
+
+# 输出所有value
+echo ${map[@]}
+
+# 输出长度
+echo ${#map[@]}
+
+# 遍历
+for key in ${!map[*]};do
+    echo "$key => ${map[$key]}"
+done
+```
+
+
+
+> 参考：
+>
+> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
+> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)

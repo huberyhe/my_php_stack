@@ -206,3 +206,9 @@ done < data.dat
 zip -r backend_3party.zip /go/gopath/src/ -x '/go/gopath/src/backup_20220107.zip' -x '/go/gopath/src/cloud.google.com/*'
 ```
 
+#### 2.5、`free -m`中各字段的意义
+
+
+
+
+
