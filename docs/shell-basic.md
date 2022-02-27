@@ -621,6 +621,16 @@ for key in ${!map[*]};do
 done
 ```
 
+### 7、其他命令
+
+### 7.1、获取随机数
+
+shuf -i LO-HI -n COUNT
+
+```bash
+shuf -i 1-100 -n1
+```
+
 
 
 > 参考：

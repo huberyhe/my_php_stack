@@ -21,6 +21,10 @@
 - [深入解析 composer 的自动加载原理](https://segmentfault.com/a/1190000014948542)
 - 一些前端小技巧
 
+## Golang
+
+- [golang基础](docs/go-basic.md)
+
 ## Linux与shell
 
 - [linux基本使用](docs/linux-basic.md)
@@ -40,6 +44,11 @@
 
 - [MySQL有哪些存储引擎，各自的优缺点，应用场景](https://juejin.im/post/6844903684912971783)
 - mysql常用命令
+
+## 其他数据库
+
+- postgre
+- [dgraph基础](docs/dgraph-basic.md)
 
 ## Nginx
 
