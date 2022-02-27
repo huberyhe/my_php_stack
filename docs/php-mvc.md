@@ -73,10 +73,6 @@ AOP（面向切面编程）：在软件业，AOP为Aspect Oriented Programming�
 
 [源码地址](https://github.com/laruence/yaf)
 
-### 3.7、CakePHP
-
-[文档地址]([Contents - 3.10 (cakephp.org)](https://book.cakephp.org/3/zh/contents.html))
-
 ## 4、自动加载配置
 
 [laravel的启动过程解析](https://www.cnblogs.com/lpfuture/p/5578274.html)
