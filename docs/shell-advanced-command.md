@@ -436,6 +436,12 @@ hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
 B8Z9330005
 ```
 
+2.7 去掉空行
+
+```bash
+tar -tzf upgrade_pkgs.tar.gz | sed 's#\./##g' | grep -v '^$'
+```
+
 
 
 ### 3、正则匹配

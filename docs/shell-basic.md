@@ -19,13 +19,14 @@
 
 ### 1.2、字符串比较
 
-| 运算符             | 描述   |
-| ------------------ | ------ |
-| string             | 不为空 |
-| -n string          | 不为空 |
-| -z string          | 为空   |
-| string1 == string2 | 相等   |
-| string1 != string2 | 不等   |
+| 运算符             | 描述              |
+| ------------------ | ----------------- |
+| string             | 不为空            |
+| -n string          | 不为空            |
+| -z string          | 为空              |
+| string1 == string2 | 相等              |
+| string1 != string2 | 不等              |
+| string =~ a.*      | 正则匹配，以a开头 |
 
 ### 1.3、文件判断
 
@@ -78,6 +79,22 @@ elif [[ `expr $v1 \< $v2` -eq 1 ]]; then
 else
 	echo "err"
 fi
+```
+
+### 1.5、test
+
+test 与 [] 的功能基本相同，例如
+
+#### 1、判断字符串相同
+
+```
+test "abc" = "a" && echo "same"
+```
+
+#### 2、判断文件存在
+
+```bash
+test -f /etc/passwd && echo "file exist"
 ```
 
 
@@ -366,6 +383,31 @@ echo "${array[@]}" | grep -wq "$var" && echo "Yes" || echo "No"
 
 ```bash
 [[ ${array[@]/${var}/} != ${array[@]} ]] && echo "Yes" || echo "No"
+```
+
+### 4.6、数组作为函数参数
+
+直接传递时函数接收到的只是数组的第一个元素，需要传递所有元素，使用`"${list[*]}"`，例如：
+
+```bash
+cover_list=(
+placeholder
+/types/types.go
+)
+
+# 是否在数组中
+function inArray() {
+    needle=$1
+    haystack=$2
+    [[ ${haystack[@]/${needle}/} != ${haystack[@]} ]] && return
+}
+
+
+if inArray $f "${cover_list[*]}"; then
+	echo "in array"
+else
+	echo "not in array"
+fi
 ```
 
 
