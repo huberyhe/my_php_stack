@@ -339,11 +339,53 @@ nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
 sed -i '/exit 0/i touch /tmp/uptime' /etc/rc.local
 ```
 
+为增强可读性，分隔符可以换成其他的，如
+
+```bash
+sed -i '\#exit 0#i touch /tmp/uptime' /etc/rc.local
+```
+
 #### 3.5 删除首行、尾行
 
 ```bash
 sed '1d' a.txt
 sed '$d' a.txt
+```
+
+#### 3.6 插入多行文本
+
+参考：[插入多行并使用sed保持缩进 | 经验摘录 (1r1g.com)](https://qa.1r1g.com/sf/ask/2607249361/)
+
+```bash
+lines_to_insert=$(cat<<'EOF'
+def string_cleanup(x, notwanted):
+    for item in notwanted:
+        x = re.sub(item, '', x)
+    return x
+EOF
+)
+
+nl=$'\n' bsnl=$'\\\n'
+sed -i.bak "/^import re/a \
+${lines_to_insert//$nl/$bsnl}
+" sed-insertlines.txt
+```
+
+插入后：
+
+```python
+#!/bin/python
+
+import re  # Regular Expression library
+def string_cleanup(x, notwanted):
+    for item in notwanted:
+        x = re.sub(item, '', x)
+    return x
+
+
+def string_replace(i_string, pattern, newpattern):
+    string_corrected = re.sub(pattern, newpattern, i_string)
+    return string_corrected
 ```
 
 
