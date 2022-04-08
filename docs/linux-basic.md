@@ -206,7 +206,23 @@ done < data.dat
 zip -r backend_3party.zip /go/gopath/src/ -x '/go/gopath/src/backup_20220107.zip' -x '/go/gopath/src/cloud.google.com/*'
 ```
 
-#### 2.5、`free -m`中各字段的意义
+### 2.5、`free -m`中各字段的意义
+
+### 2.6、ps使用
+
+#### 1、查看程序启动时间
+
+```bash
+ps -eo pid,lstart,etime,cmd | grep nginx
+```
+
+### 2.7、日志截断
+
+```bash
+truncate -s 0 logfile
+```
+
+
 
 
 

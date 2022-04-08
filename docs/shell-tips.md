@@ -286,3 +286,23 @@ function get_random_port {
 get_random_port 1 10000; #这里指定了1~10000区间，从中任取一个未占用端口号
 ```
 
+## 12、shell脚本同时打印到终端和日志文件
+
+### 1、exec & tee
+
+```bash
+[ -f "$log_file" ] || touch "$log_file"
+exec &> >(tee -a "$log_file")
+```
+
+### 2、exec & tail
+
+```bash
+exec >> $log_file 2>&1 && tail $log_file
+```
+
+这个方法有个缺点，终端会包含一小段上次执行后的日志，因为这里用了tail
+
+> 参考：[bash - Using exec and tee to redirect logs to stdout and a log file in the same time](https://unix.stackexchange.com/questions/145651/using-exec-and-tee-to-redirect-logs-to-stdout-and-a-log-file-in-the-same-time)
+
+## 13、exec的使用方法
