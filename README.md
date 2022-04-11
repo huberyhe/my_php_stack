@@ -47,7 +47,8 @@
 
 ## 其他数据库
 
-- postgre
+- [sqlite](doc/sqlite-basic.md)
+- [postgresql](docs/postgresql-basic.md)
 - [dgraph基础](docs/dgraph-basic.md)
 
 ## Nginx
