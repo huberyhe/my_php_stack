@@ -388,6 +388,24 @@ def string_replace(i_string, pattern, newpattern):
     return string_corrected
 ```
 
+#### 3.7 替换nginx配置中的端口
+
+参考：[command line - Replace only certain numbers using sed - Ask Ubuntu](https://askubuntu.com/questions/911534/replace-only-certain-numbers-using-sed)
+
+已知旧端口为80，需要替换成8081。要注意不能把8080里80替换掉了，这就需要匹配边界
+
+```bash
+ $ cat nginx.conf                
+port1 80;
+port2 8080;
+ $ sed 's#80#8081#g' nginx.conf 
+port1 8081;
+port2 80818081;
+ $ sed 's#\b80\b#8081#g' nginx.conf
+port1 8081;
+port2 8080;
+```
+
 
 
 > 参考：

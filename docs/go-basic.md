@@ -169,3 +169,39 @@ func Fun() func(string) string {
 }
 ```
 
+### 10、使用避坑
+
+```go
+package main
+
+import "fmt"
+
+var AppPath = "/opt/topsec/topihs"
+func init() {
+    AppPath, err := GetAppPath()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func GetAppPath() (string, error) {
+	return ""/opt/topsec"", nil
+}
+
+func main() {
+    fmt.Println("AppPath", AppPath)
+}
+```
+
+这里输出 /opt/topsec/topihs，因为init中的AppPath会当作一个局部变量。正确的写法是
+
+```go
+func init() {
+    var err error
+    AppPath, err = GetAppPath()
+	if err != nil {
+		panic(err)
+	}
+}
+```
+

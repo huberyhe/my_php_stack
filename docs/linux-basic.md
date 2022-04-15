@@ -180,6 +180,87 @@ do
 done < data.dat
 ```
 
+#### 8、指定解压文件的前缀路径
+
+```bash
+       --strip-components=NUMBER
+              strip NUMBER leading components from file names on extraction
+```
+
+该参数可以去掉归档文件的前缀路径，配合`-C`可以修改前缀路径。例：
+
+```bash
+ $ mkdir tar_test && cd tar_test
+ $ wget -O mysql-5.6.15.tar.gz  http://oss.aliyuncs.com/aliyunecs/onekey/mysql/mysql-5.6.15-linux-glibc2.5-i686.tar.gz
+ $ tar xvzf mysql-5.6.15.tar.gz
+ $ ls -l
+total 289484
+drwxr-xr-x 13 hubery hubery      4096 Apr 14 09:03 mysql-5.6.15-linux-glibc2.5-i686
+-rw-r--r--  1 hubery hubery 296419798 Dec 26  2013 mysql-5.6.15.tar.gz
+ $ mkdir ./mysql-5.6.15 && tar -xzvf mysql-5.6.15.tar.gz -C ./mysql-5.6.15 --strip-components 1
+ $ ls -l mysql-5.6.15
+total 156
+-rw-r--r--  1 hubery hubery 17987 Nov 18  2013 COPYING
+-rw-r--r--  1 hubery hubery 88388 Nov 18  2013 INSTALL-BINARY
+-rw-r--r--  1 hubery hubery  2496 Nov 18  2013 README
+drwxr-xr-x  2 hubery hubery  4096 Apr 14 09:04 bin
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 data
+drwxr-xr-x  2 hubery hubery  4096 Apr 14 09:04 docs
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 include
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 lib
+drwxr-xr-x  4 hubery hubery  4096 Apr 14 09:04 man
+drwxr-xr-x 10 hubery hubery  4096 Apr 14 09:04 mysql-test
+drwxr-xr-x  2 hubery hubery  4096 Apr 14 09:04 scripts
+drwxr-xr-x 28 hubery hubery  4096 Apr 14 09:04 share
+drwxr-xr-x  4 hubery hubery  4096 Apr 14 09:04 sql-bench
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 support-files
+```
+
+#### 9、归档时使用绝对路径
+
+```bash
+       -P, --absolute-names
+              don't strip leading `/'s from file names
+```
+
+用于保留绝对路径。默认归档解解开使用的相对路径，解开时需要加`-C`参数指定路径，更好的方法是归档和解开时都加`-P`参数。例：
+
+```bash
+ $ tar cf tar_test.tar /home/hubery/tar_test
+tar: Removing leading `/' from member names
+ $ tar xvf tar_test.tar
+home/hubery/tar_test/
+home/hubery/tar_test/123
+ $ ls -l ./home/hubery/tar_test
+total 0
+-rw-r--r-- 1 hubery hubery 0 Apr 14 09:18 123
+ $ tar xvf tar_test.tar -C /
+home/hubery/tar_test/
+home/hubery/tar_test/123
+ $ tar cfP tar_test.tar /home/hubery/tar_test
+ $ tar xvfP tar_test.tar
+/home/hubery/tar_test/
+/home/hubery/tar_test/123
+```
+
+#### 10、归档时修改文件路径
+
+```bash
+       --transform=EXPRESSION, --xform=EXPRESSION
+              use sed replace EXPRESSION to transform file names
+
+              File name matching options (affect both exclude and include patterns):
+```
+
+可以修改文件路径，语法同sed。例：
+
+```bash
+# 将 ./ 替换成 usr/
+tar -cf archive.tar --transform 's,^\./,usr/,'
+# 添加 new 后缀
+tar -cf archive.tar --transform 's/$/new/'
+```
+
 
 
 ### 2.3、iptables四表五链
