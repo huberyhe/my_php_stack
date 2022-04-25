@@ -306,3 +306,43 @@ exec >> $log_file 2>&1 && tail $log_file
 > 参考：[bash - Using exec and tee to redirect logs to stdout and a log file in the same time](https://unix.stackexchange.com/questions/145651/using-exec-and-tee-to-redirect-logs-to-stdout-and-a-log-file-in-the-same-time)
 
 ## 13、exec的使用方法
+
+## 14、函数返回多个参数及其接收
+
+```bash
+# 输入：V3.1-0.128b220210
+# 输出：3.1 0.128
+function get_ver()
+{
+	echo $1 | sed -r "s/V([0-9\.]+)\-([0-9\.]+)\w?[0-9]{6}/\1 \2/g"
+}
+
+read v1_big v1_little < <(get_ver "V3.1-0.128b220210")
+```
+
+## 15、去掉字符
+
+```bash
+tr -d "\r"
+```
+
+## 16、输出到日志时添加时间
+
+```bash
+./script.sh | while IFS= read -r line; do printf '%s %s\n' "$(date)" "$line"; done >>/var/log/logfile
+```
+
+或
+
+```bash
+adddate() {
+    while IFS= read -r line; do
+        printf '%s %s\n' "$(date)" "$line";
+    done
+}
+
+./thisscript.sh | adddate >>/var/log/logfile
+./thatscript.sh | adddate >>/var/log/logfile
+./theotherscript.sh | adddate >>/var/log/logfile
+```
+

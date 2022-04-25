@@ -54,6 +54,25 @@ mydb=#
 
 ```
 
+### 4、检查表、表字段是否存在
+
+表字段可以通过检查`INFORMATION_SCHEMA.COLUMNS`表，表可以通过`INFORMATION_SCHEMA.TABLES`表或`to_regclass('${tb_name}')`命令
+
+如果表存在但字段不存在，则执行字段添加语句
+
+```bash
+DO
+\$do\$
+BEGIN
+IF (SELECT COUNT(*) AS ct1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '${tb_name}' AND COLUMN_NAME = '${column_name}' ) = 0
+AND to_regclass('${tb_name}') IS NOT NULL
+THEN
+    ALTER TABLE ${tb_name} ADD COLUMN ${column_name} ${column_define};
+END IF;
+END;
+\$do\$;
+```
+
 
 
 > 参考：

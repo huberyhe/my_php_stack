@@ -613,6 +613,7 @@ grep -P
 # 哪些目录包含图片文件
 find /wns/ -path /wns/docker_root -prune -o -type f -name *.jpg -print0 | xargs -0 dirname | uniq
 find /wns/ -path /wns/docker_root -prune -o -type f -regextype posix-extended -regex ".*\.(jpg|png|gif)" -print0 | xargs -0 dirname | uniq
+netstat -lpn | awk '{print $7}' | awk -F'/' '{print $1}' | xargs -I PID ps -q PID -o pid=,cmd= | sort -n | uniq
 ```
 
 
