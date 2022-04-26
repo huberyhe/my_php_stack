@@ -663,9 +663,51 @@ for key in ${!map[*]};do
 done
 ```
 
-## 7、其他命令
+## 7、数值运算
 
-### 7.1、获取随机数
+### 7.1、运算符[ ]
+
+只支持整数，结果也是整数
+
+```bash
+a=2
+b=3
+c=$[a+b]
+d=$[a-b]
+e=$[a*b]
+f=$[a/b]
+g=$[a%b] 
+```
+
+### 7.2、运算符(())
+
+同7.1
+
+### 7.3、expr及其反引用
+
+```bash
+a=2
+b=3
+expr $a + $b
+expr $a - $b
+expr $a \* $b
+expr $a / $b
+expr $a % $b
+```
+
+### 7.3、bc
+
+```bash
+echo '2.0*3.00'|bc
+echo '2.25+4.5'|bc
+echo '5.66-7.888'|bc
+```
+
+> 参考：[玩转Bash脚本：数值计算](https://blog.csdn.net/guodongxiaren/article/details/40370701)
+
+## 8、其他命令
+
+### 8.1、获取随机数
 
 shuf -i LO-HI -n COUNT
 

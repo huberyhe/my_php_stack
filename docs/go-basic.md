@@ -117,11 +117,21 @@ fmt.Println(time.Parse("2006-01-02 15:04:05", "2022-04-07 06:43:27"))
 
 
 
-## 6、协程
+## 6、文件
 
-## 7、dlv调试
+touch文件：
 
-## 8、数据库事务处理
+```go
+os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
+```
+
+
+
+## 7、协程
+
+## 8、dlv调试
+
+## 9、数据库事务处理
 
 ```go
 db, err := postgreHelper.Open()
@@ -146,7 +156,7 @@ defer func() {
 
 > 参考：[Golang transaction 事务使用的正确姿势](http://www.mspring.org/2019/03/18/Golang-transaction-事务使用的正确姿势/)
 
-## 9、闭包
+## 10、闭包
 
 ```go
 package main
@@ -169,7 +179,7 @@ func Fun() func(string) string {
 }
 ```
 
-### 10、使用避坑
+### 11、使用避坑
 
 ```go
 package main
@@ -182,6 +192,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+    fmt.Println("AppPath1", AppPath)
 }
 
 func GetAppPath() (string, error) {
@@ -189,7 +200,7 @@ func GetAppPath() (string, error) {
 }
 
 func main() {
-    fmt.Println("AppPath", AppPath)
+    fmt.Println("AppPath2", AppPath)
 }
 ```
 
