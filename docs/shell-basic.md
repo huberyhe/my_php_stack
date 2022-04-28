@@ -663,6 +663,10 @@ for key in ${!map[*]};do
 done
 ```
 
+> 参考：
+>
+> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
+
 ## 7、数值运算
 
 ### 7.1、运算符[ ]
@@ -705,9 +709,89 @@ echo '5.66-7.888'|bc
 
 > 参考：[玩转Bash脚本：数值计算](https://blog.csdn.net/guodongxiaren/article/details/40370701)
 
-## 8、其他命令
+## 8、特殊变量
 
-### 8.1、获取随机数
+
+
+| 变量 | 含义                                                         |
+| ---- | ------------------------------------------------------------ |
+| $0   | 当前脚本的文件名                                             |
+| $n   | 传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是$1，第二个参数是$2。 |
+| $#   | 传递给脚本或函数的参数个数。                                 |
+| $*   | 传递给脚本或函数的所有参数。                                 |
+| $@   | 传递给脚本或函数的所有参数。被双引号(" ")包含时，与 $* 稍有不同，下面将会讲到。 |
+| $?   | 上个命令的退出状态，或函数的返回值。                         |
+| $$   | 当前Shell进程ID。对于 Shell 脚本，就是这些脚本所在的进程ID。 |
+| $!   | 子shell的进程ID                                              |
+
+$* 和 $@ 的区别
+
+```bash
+#!/bin/bash
+echo "\$*=" $*
+echo "\"\$*\"=" "$*"
+
+echo "\$@=" $@
+echo "\"\$@\"=" "$@"
+
+echo "print each param from \$*"
+for var in $*
+do
+    echo "$var"
+done
+
+echo "print each param from \$@"
+for var in $@
+do
+    echo "$var"
+done
+
+echo "print each param from \"\$*\""
+for var in "$*"
+do
+    echo "$var"
+done
+
+echo "print each param from \"\$@\""
+for var in "$@"
+do
+    echo "$var"
+done
+```
+
+执行 ./test.sh "a A" "b" "c" "d"，看到下面的结果：
+
+```bash
+$*= a A b c d
+"$*"= a A b c d
+$@= a A b c d
+"$@"= a A b c d
+print each param from $*
+a
+A
+b
+c
+d
+print each param from $@
+a
+A
+b
+c
+d
+print each param from "$*"
+a A b c d
+print each param from "$@"
+a A
+b
+c
+d
+```
+
+
+
+## 9、其他命令
+
+### 9.1、获取随机数
 
 shuf -i LO-HI -n COUNT
 
@@ -715,9 +799,3 @@ shuf -i LO-HI -n COUNT
 shuf -i 1-100 -n1
 ```
 
-
-
-> 参考：
->
-> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
-> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
