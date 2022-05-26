@@ -278,7 +278,7 @@ func Fun() func(string) string {
 
 Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
 
-RWMutext是单写多读模型，读锁占用时会阻止写，不会阻止读
+RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写
 
 ## 1.13. 使用避坑
 
@@ -313,6 +313,265 @@ func init() {
     AppPath, err = GetAppPath()
 	if err != nil {
 		panic(err)
+	}
+}
+```
+
+### 1.14. map并发问题
+
+并发写一个map会出现问题，运行时报错：`fatal error: concurrent map read and map write`
+
+有两个解决方法：
+
+1、sync.RWMutex
+
+```go
+type Pool struct {
+	sync.RWMutex
+	m map[string]int
+}
+
+func NewPool() Pool {
+	return Pool{
+		m: make(map[string]int),
+	}
+}
+
+func (p Pool) Set(tag string, item int) {
+	p.Lock()
+	defer p.Unlock()
+	p.m[tag] = item
+}
+
+func (p Pool) Get(tag string) int {
+	p.RLock()
+	defer p.RUnlock()
+	return p.m[tag]
+}
+
+func (p Pool) Range(f func(string, interface{}) bool) {
+	p.RLock()
+	defer p.RUnlock()
+	for k, v := range p.m {
+		if !f(k, v) {
+			break
+		}
+	}
+}
+```
+
+2、sync.Map
+
+```go
+var scene sync.Map
+
+// 将键值对保存到sync.Map
+scene.Store("greece", 97)
+scene.Store("london", 100)
+scene.Store("egypt", 200)
+
+// 从sync.Map中根据键取值
+fmt.Println(scene.Load("london"))
+
+// 根据键删除对应的键值对
+scene.Delete("london")
+
+// 遍历所有sync.Map中的键值对
+scene.Range(func(k, v interface{}) bool {
+    fmt.Println("iterate:", k, v)
+    return true
+})
+```
+
+### 1.15. logrus使用
+
+![image-20220526100147494](..\imgs\image-20220526100147494.png)
+
+#### 1、配置formater
+
+```go
+type TopLog struct {
+	*logrus.Logger
+}
+
+func NewLog(logType string, logPath string, logLevel string) (*TopLog, error) {
+	logrusLevel, err := logrus.ParseLevel(logLevel)
+	if err != nil {
+		return nil, err
+	}
+
+	log = logrus.New()
+	log.SetFormatter(&myFormatter{
+		logrus.TextFormatter{
+			DisableColors:   true,
+			TimestampFormat: "2006-01-02 15:04:05",
+			FullTimestamp:   true,
+			DisableQuote:    true,
+		},
+	})
+	log.SetReportCaller(true)
+	log.SetOutput(os.Stdout)
+	log.SetLevel(logrusLevel)
+
+	return &TopLog{
+		log,
+	}, nil
+}
+
+func Logger() *logrus.Entry {
+	entry := log.WithFields(logrus.Fields{})
+	return entry
+}
+
+type myFormatter struct {
+	logrus.TextFormatter
+}
+
+func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	// 给日志等级点颜色看看
+	var levelColor int
+	switch entry.Level {
+	case logrus.DebugLevel, logrus.TraceLevel:
+		levelColor = 31 // gray
+	case logrus.WarnLevel:
+		levelColor = 33 // yellow
+	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
+		levelColor = 31 // red
+	default:
+		levelColor = 36 // blue
+	}
+
+	var b *bytes.Buffer
+	if entry.Buffer != nil {
+		b = entry.Buffer
+	} else {
+		b = &bytes.Buffer{}
+	}
+
+	// 第一行 时间和消息
+	b.WriteString(fmt.Sprintf("[%s] \x1b[%dm%s\x1b[0m %s", entry.Time.Format(f.TimestampFormat), levelColor, strings.ToUpper(entry.Level.String()), entry.Message))
+
+	// 第二行 数据体，如有
+	var dataStr []string
+	for key, value := range entry.Data {
+		dataStr = append(dataStr, fmt.Sprint(key, "=", value))
+	}
+	if len(dataStr) > 0 {
+		b.WriteString("\n\t" + strings.Join(dataStr, ","))
+	}
+
+	// 第三行和第四行 调用方法和文件，如有
+	var funcVal, fileVal string
+	if entry.HasCaller() {
+		if f.CallerPrettyfier != nil {
+			funcVal, fileVal = f.CallerPrettyfier(entry.Caller)
+		} else {
+			funcVal = entry.Caller.Function
+			fileVal = fmt.Sprintf("%s:%d", entry.Caller.File, entry.Caller.Line)
+		}
+	}
+	if funcVal != "" {
+		b.WriteString(fmt.Sprintf("\n\t%s", funcVal))
+	}
+	if fileVal != "" {
+		b.WriteString(fmt.Sprintf("\n\t%s", fileVal))
+	}
+
+	b.WriteByte('\n')
+	return b.Bytes(), nil
+}
+```
+
+#### 2、配置gorm使用logrus
+
+```go
+type Database struct {
+	*gorm.DB
+	Error error
+}
+
+type Host struct {
+	Database  string       `json:"database"`
+	Password  string       `json:"password"`
+	Host      string       `json:"host"`
+	User      string       `json:"user"`
+	Port      string       `json:"port"`
+	DebugMode bool         `json:"-,optional"`
+	Logger    *gorm.Logger `json:"-,optional"`
+}
+
+var (
+	db   *Database
+	once sync.Once
+)
+
+func DB() *gorm.DB {
+	return db.DB
+}
+
+func Open(host Host) (*Database, error) {
+	once.Do(
+		func() {
+			db = new(Database)
+			db.connect(host)
+		})
+	return db, db.Error
+}
+
+// 只可关闭一次
+func (db *Database) Close() {
+	if db.DB != nil {
+		_ = db.DB.Close()
+		db.DB = nil
+	}
+
+	return
+}
+
+// 连接数据库
+func (db *Database) connect(host Host) {
+	var err error
+
+	dbDSN := fmt.Sprintf(`host=%s user=%s password=%s database=%s port=%s sslmode=disable`,
+		host.Host, host.User, host.Password, host.Database, host.Port)
+	db.DB, err = gorm.Open("postgres", dbDSN)
+	if err != nil {
+		db.Error = err
+		return
+	}
+
+	db.DB.LogMode(host.DebugMode)
+	if host.Logger != nil {
+		db.DB.SetLogger(*host.Logger)
+	} else {
+		db.DB.SetLogger(&GormLogger{})
+	}
+
+	db.DB.DB().SetMaxIdleConns(5)
+	db.DB.DB().SetMaxOpenConns(20)
+	db.SingularTable(true)
+
+	return
+}
+
+type GormLogger struct{}
+
+func (*GormLogger) Print(v ...interface{}) {
+	log := runlog.Logger()
+	switch v[0] {
+	case "sql":
+		log.WithFields(
+			logrus.Fields{
+				"module":        "gorm",
+				"type":          "sql",
+				"rows_returned": v[5],
+				"src":           v[1],
+				"values":        v[4],
+				"duration":      v[2],
+			},
+		).Info(v[3])
+	case "log":
+		log.WithFields(logrus.Fields{"module": "gorm", "type": "log"}).Print(v[2])
 	}
 }
 ```
