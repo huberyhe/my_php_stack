@@ -315,6 +315,49 @@ echo "${FILE#*.}" # => tar.gz
 echo "${FILE##*.}" # => gz
 ```
 
+### 3.9、字符串分割成数组
+
+1、利用字符串替换
+
+```bash
+string="hello,shell,split,test"  
+array=(${string//,/ })  
+ 
+for var in ${array[@]}
+do
+   echo $var
+done
+```
+
+2、利用IFS分隔符
+
+```bash
+string="hello,shell,split,test"  
+ 
+#对IFS变量 进行替换处理
+OLD_IFS="$IFS"
+IFS=","
+array=($string)
+IFS="$OLD_IFS"
+ 
+for var in ${array[@]}
+do
+   echo $var
+done
+```
+
+3、利用tr字符串替换
+
+```bash
+string="hello,shell,split,test"  
+array=(`echo $string | tr ',' ' '` )  
+ 
+for var in ${array[@]}
+do
+   echo $var
+done 
+```
+
 
 
 > 参考：
