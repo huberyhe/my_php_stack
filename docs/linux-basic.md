@@ -303,6 +303,39 @@ ps -eo pid,lstart,etime,cmd | grep nginx
 truncate -s 0 logfile
 ```
 
+### 2.8、时间和时区设置
+
+#### 1、设置时间
+
+```bash
+date -s "20220530 11:30:00"
+```
+
+#### 2、设置硬件时钟
+
+```bash
+hwclock --set --date="11/03/17 14:55"
+hwclock --show
+```
+
+#### 3、设置时区
+
+```bash
+# 用户环境时区
+tzselect
+# 执行结果
+TZ=’Asia/Shanghai’; export TZ
+
+# 系统时区
+echo "ZONE=Asia/Shanghai" >> /etc/sysconfig/clock
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+reboot
+
+# centos系统时区
+timedatectl set-timezone Asia/Shanghai
+reboot
+```
+
 
 
 

@@ -60,6 +60,10 @@ Context:	http, server, location, if in location
 > 参考：
 >
 > 1、[nginx 缓存设置 - walkfade - 博客园 (cnblogs.com)](https://www.cnblogs.com/sreops/p/11073277.html)
+>
+> 2、[深入理解浏览器的缓存机制 - SegmentFault 思否](https://segmentfault.com/a/1190000017004307)
+>
+> 3、[图解Http缓存控制之max-age=0、no-cache、no-store区别 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/55623075)
 
 #### 2、proxy_cache缓存：缓存后端的内容，可以是静态或动态资源
 

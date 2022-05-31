@@ -139,7 +139,7 @@ if name.MatchString(param["username"]) {
 }
 ```
 
-### 1.5.2. 正则匹配子串
+### 1.5.2. 正则查找子串
 
 ```go
 re := regexp.MustCompile(`<!--{{TPL_LIST_ITEM_START}}-->([\s\S]*?)<!--{{TPL_LIST_ITEM_END}}-->`)
@@ -151,6 +151,14 @@ if len(matches) > 1 {
     err = errors.New("模板错误")
     return
 }
+```
+
+### 1.5.3. 替换
+
+```go
+re, _ := regexp.Compile("a");
+rep := re.ReplaceAllStringFunc("abcd", strings.ToUpper);
+fmt.Println(rep) // Abcd
 ```
 
 
@@ -222,7 +230,59 @@ os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
 
 ## 1.9. dlv调试
 
-### 1.9.1. 设置字符串可显示长度
+### 1.9.1. 调试时带上命令行参数，`--`后带上参数
+
+```bash
+dlv debug main.go --output ./bin/license -- -c ./etc/license.json
+dlv exec ./bin/license -- -c ./etc/license.json
+```
+
+### 1.9.2. 设置字符串可显示长度
+
+```
+config max-string-len 99999
+```
+
+### 1.9.3. 常用命令
+
+```
+// 打断点
+b main.main
+b main.go:18
+// 查看断点
+breakpoints/bp
+// 清除断点
+clear 1
+// 清除所有断点
+clearall
+// 下一步
+next/n
+// 跳入
+step/s
+// 跳出
+stepout
+// 继续
+continue/c
+// 在断点执行命令
+on 1 p i
+// 有条件中断断点
+condition
+// 查看函数参数
+args
+// 查看所有局部变量
+locals
+// 打印源代码
+list
+
+// 显示协程
+goroutines
+// 切换协程
+goroutine 1
+// 显示线程
+threads
+// 跟踪，运行到此处时打印一条信息并继续
+trace
+```
 
 
 
@@ -317,7 +377,7 @@ func init() {
 }
 ```
 
-### 1.14. map并发问题
+## 1.14. map并发问题
 
 并发写一个map会出现问题，运行时报错：`fatal error: concurrent map read and map write`
 
@@ -383,11 +443,15 @@ scene.Range(func(k, v interface{}) bool {
 })
 ```
 
-### 1.15. logrus使用
+## 1.15. logrus使用
+
+logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: Structured, pluggable logging for Go](https://github.com/sirupsen/logrus)。其他常用日志库还有[Zerolog](https://github.com/rs/zerolog)、 [Zap](https://github.com/uber-go/zap)和[Apex](https://github.com/apex/log).
+
+项目中任何输出应统一使用日志库，不应该使用print打印，包括第三方库如gorm.
 
 ![image-20220526100147494](..\imgs\image-20220526100147494.png)
 
-#### 1、配置formater
+### 1.15.1. 配置formater，指定日志输入格式
 
 ```go
 type TopLog struct {
@@ -482,7 +546,7 @@ func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 ```
 
-#### 2、配置gorm使用logrus
+### 1.15.2. 配置gorm使用logrus
 
 ```go
 type Database struct {
@@ -575,4 +639,51 @@ func (*GormLogger) Print(v ...interface{}) {
 	}
 }
 ```
+
+## 1.16. 性能测试pprof
+
+## 1.17. 性能优化
+
+### 1.17.1. 读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
+
+优化前，直接把上传的文件读到内存并解析
+
+```go
+xmlFile, e := os.Open(f)
+if e != nil {
+    return e
+}
+
+defer xmlFile.Close()
+
+b, _ := ioutil.ReadAll(xmlFile)
+
+var xmlHead XmlHeadStruct
+
+reader := bytes.NewReader(b)
+decoder := xml.NewDecoder(reader)
+decoder.CharsetReader = charset.NewReader
+
+if e = decoder.Decode(&xmlHead); e != nil {
+    return e
+}
+```
+
+使用io.buffer
+
+```go
+f, _ := os.Open(fname)
+defer f.Close()
+
+var head XmlHeadStruct
+decoder := xml.NewDecoder(bufio.NewReader(f))
+_ = decoder.Decode(&head)
+
+```
+
+> 参考：
+>
+> 1、[XML parsing and memory usage : golang (reddit.com)](https://www.reddit.com/r/golang/comments/7a4dxw/xml_parsing_and_memory_usage/)
+>
+> 2、[go - How to read multiple times from same io.Reader - Stack Overflow](https://stackoverflow.com/questions/39791021/how-to-read-multiple-times-from-same-io-reader)
 
