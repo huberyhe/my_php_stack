@@ -1,10 +1,10 @@
 [回到首页](../README.md)
 
-# Shell小技巧
+# 1. Shell小技巧
 
 [TOC]
 
-## 1、Shell 脚本如何输出帮助信息？
+## 1.1. Shell 脚本如何输出帮助信息？
 
 作者展示了一个技巧，将帮助信息写在 Bash 脚本脚本的头部，然后只要执行“脚本名 + help”，就能输出这段帮助信息。
 
@@ -36,9 +36,9 @@ fi
 >
 > [Shell 脚本如何输出帮助信息？](https://samizdat.dev/help-message-for-shell-scripts/)（英文）
 
-## 2、上级管道的输出作为下级
+## 1.2. 上级管道的输出作为下级
 
-## 3、EOF的用法
+## 1.3. EOF的用法
 
 ```bash
 #!/bin/bash
@@ -55,7 +55,7 @@ tsedb soft memlock 8000000
 EOF
 ```
 
-## 4、脚本单例执行
+## 1.4. 脚本单例执行
 
 定时任务防止脚本同时执行的方法：
 1、原理就是使用flock加锁，加锁不成功时（已被枷锁）直接退出脚本
@@ -114,14 +114,14 @@ keep_singleton `basename $0`
 sleep 60
 ```
 
-## 5、获取脚本当前目录
+## 1.5. 获取脚本当前目录
 
 ```bash
 script_dir=$(cd $(dirname $0) && pwd)
 script_dir=$(dirname $(readlink -f $0))
 ```
 
-## 6、脚本严格模式 -e
+## 1.6. 脚本严格模式 -e
 
 ```bash
 set -euo pipefail
@@ -131,7 +131,7 @@ set -euo pipefail
 - `-u`：使用未初始化的变量时报错，而不是当成NULL。 这个比较有用，有点高级编程的感觉
 - `-o pipefail`：使用Pipe中出错命令的状态码（而不是最后一个）作为整个Pipe的状态码。
 
-## 7、获取IP地址
+## 1.7. 获取IP地址
 
 ```bash
 ip addr show dev eth0 | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}'
@@ -140,7 +140,7 @@ ifconfig -a eth0|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -
 
 > 参考：[Linux - Shell 脚本中获取本机 ip 地址方法 - 小菠萝测试笔记 - 博客园 (cnblogs.com)](https://www.cnblogs.com/poloyy/p/12212868.html)
 
-## 8、交互式确认询问
+## 1.8. 交互式确认询问
 
 ```bash
 #!/bin/bash
@@ -202,7 +202,7 @@ else
 fi
 ```
 
-## 9、判断是否为root身份
+## 1.9. 判断是否为root身份
 
 ```bash
 #!/bin/bash
@@ -224,7 +224,7 @@ else
 fi
 ```
 
-## 10、ls显示绝对路径
+## 1.10. ls显示绝对路径
 
 ```bash
 #!/bin/bash
@@ -247,5 +247,102 @@ function get_load()
 read load1 load5 load15 < <(get_load)
 
 read load1 load5 load15 <<< $(echo $(uptime | tr -d " " | awk -F "[:,]" '{print $8" "$9" "$10}'))
+```
+
+## 1.11. 获取一个未占用的端口
+
+```bash
+#!/bin/bash
+PORT=0
+#判断当前端口是否被占用，没被占用返回0，反之1
+function Listening {
+   TCPListeningnum=`netstat -an | grep ":$1 " | awk '$1 == "tcp" && $NF == "LISTEN" {print $0}' | wc -l`
+   UDPListeningnum=`netstat -an | grep ":$1 " | awk '$1 == "udp" && $NF == "0.0.0.0:*" {print $0}' | wc -l`
+   (( Listeningnum = TCPListeningnum + UDPListeningnum ))
+   if [ $Listeningnum == 0 ]; then
+       echo "0"
+   else
+       echo "1"
+   fi
+}
+
+#指定区间随机数
+function random_range {
+   shuf -i $1-$2 -n1
+}
+
+#得到随机端口
+function get_random_port {
+   templ=0
+   while [ $PORT == 0 ]; do
+       temp1=`random_range $1 $2`
+       if [ `Listening $temp1` == 0 ] ; then
+              PORT=$temp1
+       fi
+   done
+   echo "port=$PORT"
+}
+
+get_random_port 1 10000; #这里指定了1~10000区间，从中任取一个未占用端口号
+```
+
+## 1.12. shell脚本同时打印到终端和日志文件
+
+### 1.12.1. exec & tee
+
+```bash
+[ -f "$log_file" ] || touch "$log_file"
+exec &> >(tee -a "$log_file")
+```
+
+### 1.12.2. exec & tail
+
+```bash
+exec >> $log_file 2>&1 && tail $log_file
+```
+
+这个方法有个缺点，终端会包含一小段上次执行后的日志，因为这里用了tail
+
+> 参考：[bash - Using exec and tee to redirect logs to stdout and a log file in the same time](https://unix.stackexchange.com/questions/145651/using-exec-and-tee-to-redirect-logs-to-stdout-and-a-log-file-in-the-same-time)
+
+## 1.13. exec的使用方法
+
+## 1.14. 函数返回多个参数及其接收
+
+```bash
+# 输入：V3.1-0.128b220210
+# 输出：3.1 0.128
+function get_ver()
+{
+	echo $1 | sed -r "s/V([0-9\.]+)\-([0-9\.]+)\w?[0-9]{6}/\1 \2/g"
+}
+
+read v1_big v1_little < <(get_ver "V3.1-0.128b220210")
+```
+
+## 1.15. 去掉字符
+
+```bash
+tr -d "\r"
+```
+
+## 1.16. 输出到日志时添加时间
+
+```bash
+./script.sh | while IFS= read -r line; do printf '%s %s\n' "$(date)" "$line"; done >>/var/log/logfile
+```
+
+或
+
+```bash
+adddate() {
+    while IFS= read -r line; do
+        printf '%s %s\n' "$(date)" "$line";
+    done
+}
+
+./thisscript.sh | adddate >>/var/log/logfile
+./thatscript.sh | adddate >>/var/log/logfile
+./theotherscript.sh | adddate >>/var/log/logfile
 ```
 

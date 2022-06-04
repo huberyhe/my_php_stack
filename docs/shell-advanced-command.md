@@ -1,16 +1,16 @@
 [回到首页](../README.md)
 
-# Shell高级命令
+# 1. Shell高级命令
 
 find、awk、sed、grep等
 
 [TOC]
 
-## find查找文件
+## 1.1. find查找文件
 
 `find path -option [ -print ] [ -exec -ok command ] {} \;`
 
-### 1、常用过滤条件
+### 1.1.1. 常用过滤条件
 
 - -mount, -xdev : 只检查和指定目录在同一个文件系统下的文件，避免列出其它文件系统中的文件
 - -amin n : 在过去 n 分钟内被读取过
@@ -34,7 +34,7 @@ find、awk、sed、grep等
 
 - -pid n : process id 是 n 的文件
 
-### 2、过滤条件组合：或、且、非
+### 1.1.2. 过滤条件组合：或、且、非
 
 - 或：-o
 - 且：-a
@@ -51,7 +51,7 @@ find、awk、sed、grep等
 ./ddd.pdf
 ```
 
-### 3、使用正则表示式搜索
+### 1.1.3. 使用正则表示式搜索
 
 `-regex`支持正则表达式匹配文件路径
 
@@ -65,7 +65,7 @@ find、awk、sed、grep等
 ./ddd.pdf
 ```
 
-### 4、对查找结果文件执行操作
+### 1.1.4. 对查找结果文件执行操作
 
 查找 /var/log 目录中更改时间在 7 日以前的普通文件，并在删除之前询问它们：
 
@@ -85,7 +85,7 @@ find . -type f -perm 644 -exec ls -l {} \;
 find / -type f -size 0 -exec ls -l {} \;
 ```
 
-### 5、文件名中包含空格时的处理
+### 1.1.5. 文件名中包含空格时的处理
 
 当文件名中包含空格符时，xargs对文件操作会提示找不到文件
 
@@ -110,7 +110,7 @@ rm: cannot remove '2.log': No such file or directory
 >:~$
 ```
 
-### 6、排除目录
+### 1.1.6. 排除目录
 
 ```bash
 # 排除Nfc目录
@@ -119,7 +119,7 @@ find . -path ./Nfc -prune -o -type f -name *.mk -print
 find . \( -path ./Gallery2 -o -path ./HTMLViewer -o -path ./Nfc \) -prune -o  -name *.mk -print
 ```
 
-### 0、其他实例：
+### 1.1.7. 其他实例：
 
 ```bash
 # 删除10天前以html后缀的文件，包括带空格的文件
@@ -134,7 +134,7 @@ find . -maxdepth 1 -name '*.txt'
 >
 > [Linux查找目录下的按时间过滤的文件](https://www.cnblogs.com/hhwww/p/10827558.html)
 
-## awk格式化输出
+## 1.2. awk格式化输出
 
 ```
 awk [选项参数] 'script' var=value file(s)
@@ -142,21 +142,21 @@ awk [选项参数] 'script' var=value file(s)
 awk [选项参数] -f scriptfile var=value file(s)
 ```
 
-### 1、多分隔符
+### 1.2.1. 多分隔符
 
 ```bash
 # 使用多个分隔符.先使用空格分割，然后对分割结果再使用","分割
 awk -F '[ ,]' '{print $1,$2,$5}' log.txt
 ```
 
-### 2、过滤
+### 1.2.2. 过滤
 
 ```bash
 # 过滤第一列大于2并且第二列等于'Are'的行
 awk '$1>2 && $2=="Are" {print $1,$2,$3}' log.txt
 ```
 
-### 3、正则匹配
+### 1.2.3. 正则匹配
 
 ```bash
 # 输出第二列包含 "th"，并打印第二列与第四列
@@ -167,7 +167,7 @@ awk '/re/ ' log.txt
 awk 'BEGIN{IGNORECASE=1} /this/' log.txt
 ```
 
-### 4、常用内置变量
+### 1.2.4. 常用内置变量
 
 -  FS(Field Separator)：输入字段分隔符， 默认为空白字符
 -  OFS(Out of Field Separator)：输出字段分隔符， 默认为空白字符
@@ -179,7 +179,7 @@ awk 'BEGIN{IGNORECASE=1} /this/' log.txt
 -  ARGC：命令行参数的个数
 -  ARGV：数组，保存的是命令行所给定的各参数
 
-### 5、awk脚本
+### 1.2.5. awk脚本
 
 ```bash
 $ cat score.txt
@@ -225,15 +225,15 @@ Bob    2415     40       57       62      159
 AVERAGE:     63.80    78.60    70.00
 ```
 
-### 0、其他实例
+### 1.2.6. 其他实例
 
-#### 1 最后一列
+#### 1.2.6.1. 最后一列
 
 ```bash
 awk '{print $NF}'
 ```
 
-#### 2 打印除了第一列的所有列
+#### 1.2.6.2. 打印除了第一列的所有列
 
 ```bash
 awk '{for(i=2;i<=NF;i++) {
@@ -245,19 +245,19 @@ else {print $i}
 awk '{$1="";print}'
 ```
 
-#### 3 计算文件大小
+#### 1.2.6.3. 计算文件大小
 
 ```bash
 ls -l *.txt | awk '{sum+=$5} END {print sum}'
 ```
 
-#### 4 打印九九乘法表
+#### 1.2.6.4. 打印九九乘法表
 
 ```bash
 seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR, i*NR, i==NR?"\n":"\t")}'
 ```
 
-#### 5 删除首行、尾行
+#### 1.2.6.5. 删除首行、尾行
 
 ```bash
 # 删除首行
@@ -277,13 +277,13 @@ awk 'NR>2{print line}{line=$0}' a.txt
 >
 > [Linux：shell脚本基础（grep及正则表达式、后向引用、sed/awk基础篇）](https://msd.misuland.com/pd/3255818066314925244)
 
-## sed编辑文本
+## 1.3. sed编辑文本
 
 ```bash
 sed [-nefr] [动作]
 ```
 
-### 1、选项与参数
+### 1.3.1. 选项与参数
 
 - -n ：使用安静(silent)模式。在一般 sed 的用法中，所有来自 STDIN 的数据一般都会被列出到终端上。但如果加上 -n 参数后，则只有经过sed 特殊处理的那一行(或者动作)才会被列出来。
 - -e ：直接在命令列模式上进行 sed 的动作编辑；
@@ -291,7 +291,7 @@ sed [-nefr] [动作]
 - -r ：sed 的动作支持的是延伸型正规表示法的语法。(默认是基础正规表示法语法)
 - -i ：直接修改读取的文件内容，而不是输出到终端。
 
-### 2、动作
+### 1.3.2. 动作
 
 动作说明： [n1[,n2]]function
 n1, n2 ：不见得会存在，一般代表『选择进行动作的行数』，举例来说，如果我的动作是需要在 10 到 20 行之间进行的，则『 10,20[动作行为] 』
@@ -304,9 +304,9 @@ n1, n2 ：不见得会存在，一般代表『选择进行动作的行数』，�
 - p ：列印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～
 - s ：取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！例如 1,20s/old/new/g 就是啦！
 
-### 3、实例
+### 1.3.3. 实例
 
-#### 3.1 数据搜寻并执行命令
+#### 1.3.3.1. 数据搜寻并执行命令
 
 搜索/etc/passwd,找到root对应的行，执行后面花括号中的一组命令，每个命令之间用分号分隔，这里把bash替换为blueshell，再输出这行：
 
@@ -315,13 +315,13 @@ nl /etc/passwd | sed -n '/root/{s/bash/blueshell/;p;q}'
 1  root:x:0:0:root:/root:/bin/blueshell
 ```
 
-#### 3.2 数据的搜寻并替换
+#### 1.3.3.2. 数据的搜寻并替换
 
 ```bash
 sed 's/要被取代的字串/新的字串/g'
 ```
 
-#### 3.3 多点编辑
+#### 1.3.3.3. 多点编辑
 
 一条sed命令，删除/etc/passwd第三行到末尾的数据，并把bash替换为blueshell
 
@@ -331,7 +331,7 @@ nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
 2  daemon:x:1:1:daemon:/usr/sbin:/bin/sh
 ```
 
-#### 3.4 查找并插入
+#### 1.3.3.4. 查找并插入
 
 启动脚本添加一条命令
 
@@ -339,11 +339,71 @@ nl /etc/passwd | sed -e '3,$d' -e 's/bash/blueshell/'
 sed -i '/exit 0/i touch /tmp/uptime' /etc/rc.local
 ```
 
-#### 3.5 删除首行、尾行
+为增强可读性，分隔符可以换成其他的，如
+
+```bash
+sed -i '\#exit 0#i touch /tmp/uptime' /etc/rc.local
+```
+
+#### 1.3.3.5. 删除首行、尾行
 
 ```bash
 sed '1d' a.txt
 sed '$d' a.txt
+```
+
+#### 1.3.3.6. 插入多行文本
+
+参考：[插入多行并使用sed保持缩进 | 经验摘录 (1r1g.com)](https://qa.1r1g.com/sf/ask/2607249361/)
+
+```bash
+lines_to_insert=$(cat<<'EOF'
+def string_cleanup(x, notwanted):
+    for item in notwanted:
+        x = re.sub(item, '', x)
+    return x
+EOF
+)
+
+nl=$'\n' bsnl=$'\\\n'
+sed -i.bak "/^import re/a \
+${lines_to_insert//$nl/$bsnl}
+" sed-insertlines.txt
+```
+
+插入后：
+
+```python
+#!/bin/python
+
+import re  # Regular Expression library
+def string_cleanup(x, notwanted):
+    for item in notwanted:
+        x = re.sub(item, '', x)
+    return x
+
+
+def string_replace(i_string, pattern, newpattern):
+    string_corrected = re.sub(pattern, newpattern, i_string)
+    return string_corrected
+```
+
+#### 1.3.3.7. 替换nginx配置中的端口
+
+参考：[command line - Replace only certain numbers using sed - Ask Ubuntu](https://askubuntu.com/questions/911534/replace-only-certain-numbers-using-sed)
+
+已知旧端口为80，需要替换成8081。要注意不能把8080里80替换掉了，这就需要匹配边界
+
+```bash
+ $ cat nginx.conf                
+port1 80;
+port2 8080;
+ $ sed 's#80#8081#g' nginx.conf 
+port1 8081;
+port2 80818081;
+ $ sed 's#\b80\b#8081#g' nginx.conf
+port1 8081;
+port2 8080;
 ```
 
 
@@ -352,7 +412,7 @@ sed '$d' a.txt
 >
 > [Linux sed 命令]([Linux sed 命令 | 菜鸟教程 (runoob.com)](https://www.runoob.com/linux/linux-comm-sed.html))
 
-## grep查找文本
+## 1.4. grep查找文本
 
 ```bash
 grep [OPTION]... PATTERNS [FILE]...
@@ -362,7 +422,7 @@ grep全称是Global Regular Expression Print，表示全局正则表达式版本
 
 **egrep = grep -E：扩展的正则表达式** （除了**\< , \> , \b** 使用其他正则都可以去掉\）
 
-### 1、常用参数
+### 1.4.1. 常用参数
 
 -  -A<显示行数>：除了显示符合范本样式的那一列之外，并显示该行之后的内容。
 -  -B<显示行数>：除了显示符合样式的那一行之外，并显示该行之前的内容。
@@ -380,7 +440,7 @@ grep全称是Global Regular Expression Print，表示全局正则表达式版本
 -  **-v：显示不被pattern 匹配到的行，相当于[^] 反向匹配**
 -  -w ：匹配 **整个单词**
 
-### 2、实例
+### 1.4.2. 实例
 
 2.1 查找关键字，显示关键字所在行号
 
@@ -436,9 +496,15 @@ hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
 B8Z9330005
 ```
 
+2.7 去掉空行
+
+```bash
+tar -tzf upgrade_pkgs.tar.gz | sed 's#\./##g' | grep -v '^$'
+```
 
 
-### 3、正则匹配
+
+### 1.4.3. 正则匹配
 
 ```bash
  $ grep "\(bash\|zsh\)" /etc/passwd
@@ -451,7 +517,7 @@ hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
 4.8.5-4.h5.x86_64
 ```
 
-#### 3.1 匹配字符
+#### 1.4.3.1. 匹配字符
 
 -  . 匹配任意单个字符，不能匹配空行
 -  [] 匹配指定范围内的任意单个字符
@@ -469,7 +535,7 @@ hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
 -  [:print:] 可打印字符
 -  [:punct:] 标点符号
 
-#### 3.2 配置次数
+#### 1.4.3.2. 配置次数
 
 -  *****  匹配前面的字符任意次，**包括0次**，贪婪模式：尽可能长的匹配
 -  **.\*** 任意长度的任意字符，**不包括0次**
@@ -480,7 +546,7 @@ hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
 -  \{,n\}  匹配前面的字符至多n次
 -  \{n,\}  匹配前面的字符至少n次
 
-#### 3.3 位置锚定：定位出现的位置
+#### 1.4.3.3. 位置锚定：定位出现的位置
 
 -  ^  行首锚定，用于模式的最左侧
 -  $  行尾锚定，用于模式的最右侧
@@ -491,7 +557,7 @@ hubery:x:1000:1000:,,,:/home/hubery:/usr/bin/zsh
 -  \> 或 \b  词尾锚定；用于单词模式的右侧
 -  \<PATTERN\>
 
-#### 3.4 分组和后向引用
+#### 1.4.3.4. 分组和后向引用
 
 ① 分组：\(\) 将一个或多个字符捆绑在一起，当作一个整体进行处理
 
@@ -521,7 +587,7 @@ Hello world Hello world
 Hello world Heiii wwwww
 ```
 
-### 4、Perl正则表达式
+### 1.4.4. Perl正则表达式
 
 ```bash
 grep -P
@@ -537,16 +603,17 @@ grep -P
 
 
 
-## getopts获取命令行参数
+## 1.5. getopts获取命令行参数
 
-## trap信号处理
+## 1.6. trap信号处理
 
-## xargs
+## 1.7. xargs
 
 ```bash
 # 哪些目录包含图片文件
 find /wns/ -path /wns/docker_root -prune -o -type f -name *.jpg -print0 | xargs -0 dirname | uniq
 find /wns/ -path /wns/docker_root -prune -o -type f -regextype posix-extended -regex ".*\.(jpg|png|gif)" -print0 | xargs -0 dirname | uniq
+netstat -lpn | awk '{print $7}' | awk -F'/' '{print $1}' | xargs -I PID ps -q PID -o pid=,cmd= | sort -n | uniq
 ```
 
 

@@ -1,12 +1,12 @@
 [回到首页](../README.md)
 
-# Shell基础
+# 1. Shell基础
 
 [TOC]
 
-## 1、判断语句
+## 1.1. 判断语句
 
-### 1.1、整数比较
+### 1.1.1. 整数比较
 
 | 运算符        | 描述     |
 | ------------- | -------- |
@@ -17,17 +17,18 @@
 | num1 -ge num2 | 大于等于 |
 | num1 -le num2 | 小于等于 |
 
-### 1.2、字符串比较
+### 1.1.2. 字符串比较
 
-| 运算符             | 描述   |
-| ------------------ | ------ |
-| string             | 不为空 |
-| -n string          | 不为空 |
-| -z string          | 为空   |
-| string1 == string2 | 相等   |
-| string1 != string2 | 不等   |
+| 运算符             | 描述                                                     |
+| ------------------ | -------------------------------------------------------- |
+| string             | 不为空                                                   |
+| -n string          | 不为空                                                   |
+| -z string          | 为空                                                     |
+| string1 == string2 | 相等                                                     |
+| string1 != string2 | 不等                                                     |
+| string =~ a.*      | 正则匹配，以a开头，又例 [[ "$str" =~ ^"${JAR_NAME}".* ]] |
 
-### 1.3、文件判断
+### 1.1.3. 文件判断
 
 | 运算符  | 描述       |
 | ------- | ---------- |
@@ -40,9 +41,9 @@
 | -x file | 可执行     |
 | -L file | 是链接文件 |
 
-### 1.4、小数比较
+### 1.1.4. 小数比较
 
-#### 1、方法1：bc，非内置命令
+#### 1.1.4.1. 法1：bc，非内置命令
 
 ```bash
 v1=0.124
@@ -58,13 +59,13 @@ else
 fi
 ```
 
-#### 2、方法2：awk
+#### 1.1.4.2. 方法2：awk
 
 ```bash
 awk -v num1=6.6 -v num2=5.5 'BEGIN{print(num1>num2)?"0":"1"}'
 ```
 
-#### 3、方法3：expr，推荐
+#### 1.1.4.3. 方法3：expr，推荐
 
 ```bash
 v1=0.124
@@ -80,13 +81,29 @@ else
 fi
 ```
 
+### 1.1.5. test
+
+test 与 [] 的功能基本相同，例如
+
+#### 1.1.5.1. 判断字符串相同
+
+```
+test "abc" = "a" && echo "same"
+```
+
+#### 1.1.5.2. 判断文件存在
+
+```bash
+test -f /etc/passwd && echo "file exist"
+```
+
 
 
 > 参考：[shell浅谈之二运算符和IF条件判断](https://blog.csdn.net/taiyang1987912/article/details/38893381)
 
-## 2、控制语句
+## 1.2. 控制语句
 
-### 2.1、if语句
+### 1.2.1. if语句
 
 ```bash
 if [[ condition1 ]]; then
@@ -105,7 +122,7 @@ condition &&　do_sth１ || do_sth2
 if [ condition ]; then echo 1; else echo 0; fi
 ```
 
-### 2.2、for循环
+### 1.2.2. for循环
 
 ```bash
 for var in item1 item2 ... itemN
@@ -114,7 +131,7 @@ do
 done
 ```
 
-### 2.3、while循环
+### 1.2.3. while循环
 
 ```bash
 while condition
@@ -125,7 +142,7 @@ done
 
 
 
-### 2.4、case语句
+### 1.2.4. case语句
 
 case结构变量值依次比较，遇到双分号则跳到esac后的语句执行，没有匹配则脚本将执行默认值"*)"后的命令，直到"';;"为止。case的匹配值必须是常量或正则表达式。
 
@@ -170,16 +187,16 @@ do
 done
 ```
 
-## 3、字符串处理
+## 1.3. 字符串处理
 
-### 3.1、字符串长度
+### 1.3.1. 字符串长度
 
 ```bash
 str="abc"
 echo ${#str}
 ```
 
-### 3.2、匹配字符串开头的子串长度
+### 1.3.2. 匹配字符串开头的子串长度
 
 **expr match "$string" '$substring'**
 $substring 是一个正则表达式。
@@ -189,7 +206,7 @@ MyString=abcABC123ABCabc
 echo $(expr match "$MyString" 'abc[A-Z]*.2')   # 结果为 8
 ```
 
-### 3.3、查找子串位置/索引
+### 1.3.3. 查找子串位置/索引
 
 **expr index $string $substring**
 在字符串 $string 中匹配到的 $substring 第一次出现的位置。
@@ -200,7 +217,7 @@ str1=`expr index $str "a"`
 echo $str1 # 结果为 1
 ```
 
-### 3.4、截取子串
+### 1.3.4. 截取子串
 
 **${string:position}**
 在 $string 中从位置 $position 处开始提取子串。
@@ -228,7 +245,7 @@ MyString=abcABC123ABCabc
 echo $(expr match "$MyString" '\(.[b-c]*[A-Z]..[0-9]\)') # abcABC1
 ```
 
-### 3.5、字符串替换
+### 1.3.5. 字符串替换
 
 ```bash
 str="apple, tree, apple tree"
@@ -239,7 +256,7 @@ echo ${str/#apple/APPLE}  # 如果字符串str以apple开头，则用APPLE替换
 echo ${str/%apple/APPLE}  # 如果字符串str以apple结尾，则用APPLE替换它
 ```
 
-### 3.6、字符串连接
+### 1.3.6. 字符串连接
 
 ```bash
 str="abc"
@@ -247,7 +264,7 @@ str1="ab"
 str2=${str}${str1}
 ```
 
-### 3.7、字符串默认值
+### 1.3.7. 字符串默认值
 
 ```bash
 str="abc"
@@ -255,7 +272,7 @@ echo ${str:-123} # 输出abc
 echo ${str2:-123} # 输出123
 ```
 
-### 3.8、删除子串
+### 1.3.8. 删除子串
 
 **${string#substring}**
 从 $string 的开头位置截掉最短匹配的 $substring。
@@ -298,6 +315,49 @@ echo "${FILE#*.}" # => tar.gz
 echo "${FILE##*.}" # => gz
 ```
 
+### 1.3.9. 字符串分割成数组
+
+1、利用字符串替换
+
+```bash
+string="hello,shell,split,test"  
+array=(${string//,/ })  
+ 
+for var in ${array[@]}
+do
+   echo $var
+done
+```
+
+2、利用IFS分隔符
+
+```bash
+string="hello,shell,split,test"  
+ 
+#对IFS变量 进行替换处理
+OLD_IFS="$IFS"
+IFS=","
+array=($string)
+IFS="$OLD_IFS"
+ 
+for var in ${array[@]}
+do
+   echo $var
+done
+```
+
+3、利用tr字符串替换
+
+```bash
+string="hello,shell,split,test"  
+array=(`echo $string | tr ',' ' '` )  
+ 
+for var in ${array[@]}
+do
+   echo $var
+done 
+```
+
 
 
 > 参考：
@@ -306,9 +366,9 @@ echo "${FILE##*.}" # => gz
 >
 > 2、[Bash 中常见的字符串操作](https://www.cnblogs.com/sparkdev/p/10006970.html)
 
-## 4、数组使用
+## 1.4. 数组使用
 
-### 4.1、定义一个数组变量
+### 1.4.1. 定义一个数组变量
 
 ```bash
 array_name=(value1 value2 ... valuen)
@@ -321,13 +381,13 @@ array_name[2]=value2
 array_name[${#array_name[@]}]=$value3
 ```
 
-### 4.2、读取数组
+### 1.4.2. 读取数组
 
 ```bash
 ${array_name[index]}
 ```
 
-### 4.3、获取数组中所有元素
+### 1.4.3. 获取数组中所有元素
 
 ```bash
 my_array=(A B "C" D)
@@ -336,7 +396,7 @@ echo "数组的元素为: ${my_array[*]}"
 echo "数组的元素为: ${my_array[@]}"
 ```
 
-### 4.4、获取数组长度
+### 1.4.4. 获取数组长度
 
 ```bash
 my_array=(A B "C" D)
@@ -345,7 +405,7 @@ echo "数组元素个数为: ${#my_array[*]}"
 echo "数组元素个数为: ${#my_array[@]}"
 ```
 
-### 4.5、判断元素是否在数组中
+### 1.4.5. 判断元素是否在数组中
 
 1、遍历
 
@@ -368,9 +428,34 @@ echo "${array[@]}" | grep -wq "$var" && echo "Yes" || echo "No"
 [[ ${array[@]/${var}/} != ${array[@]} ]] && echo "Yes" || echo "No"
 ```
 
+### 1.4.6. 数组作为函数参数
+
+直接传递时函数接收到的只是数组的第一个元素，需要传递所有元素，使用`"${list[*]}"`，例如：
+
+```bash
+cover_list=(
+placeholder
+/types/types.go
+)
+
+# 是否在数组中
+function inArray() {
+    needle=$1
+    haystack=$2
+    [[ ${haystack[@]/${needle}/} != ${haystack[@]} ]] && return
+}
 
 
-## 5、命令行输入
+if inArray $f "${cover_list[*]}"; then
+	echo "in array"
+else
+	echo "not in array"
+fi
+```
+
+
+
+## 1.5. 命令行输入
 
 例如命令行：
 
@@ -382,7 +467,7 @@ echo "${array[@]}" | grep -wq "$var" && echo "Yes" || echo "No"
 
 --prefix是一个长选项，需要一个参数，使用等号连接（非必需）
 
-### 5.1、手工处理
+### 1.5.1. 手工处理
 
   \*  $0 ： ./test.sh,即命令本身，相当于C/C++中的argv[0]
   \*  $1 ： -f,第一个参数.
@@ -392,7 +477,7 @@ echo "${array[@]}" | grep -wq "$var" && echo "Yes" || echo "No"
   \*  $@ ：参数本身的列表，也不包括命令本身，如上例为 -f config.conf -v --prefix=/home
   \*  $* ：和$@相同，但"$*" 和 "$@"(加引号)并不同，"$*"将所有的参数解释成一个字符串，而"$@"是一个参数数组。
 
-### 5.2、getopts，不支持长选项，但使用非常简单，满足大部分场景
+### 1.5.2. getopts，不支持长选项，但使用非常简单，满足大部分场景
 
 ```bash
 #!/bin/bash
@@ -515,7 +600,7 @@ fi
 1. 加双引号是防止参数中可能有空格，空格会被shell自动视为分隔符
 2. "$@"会将每个参数用双引号括起来传递进去，而"@*"则是所有参数括在双引号中，作为一个参数传入函数
 
-### 5.2、getopt，支持长选项
+### 1.5.3. getopt，支持长选项
 
 ```bash
 #!/bin/bash
@@ -587,15 +672,15 @@ done
 >
 > [Bash Shell中命令行选项/参数处理](https://www.cnblogs.com/FrankTan/archive/2010/03/01/1634516.html)
 
-## 6、map的使用
+## 1.6. map的使用
 
-### 6.1、声明
+### 1.6.1. 声明
 
 ```bash
 declare -A map
 ```
 
-### 6.2、初始化
+### 1.6.2. 初始化
 
 ```bash
 map=(["aa"]="11" ["bb"]="22")
@@ -603,7 +688,7 @@ map["name"]="val"
 map["apple"]="pen"
 ```
 
-### 6.3、输出与遍历
+### 1.6.3. 输出与遍历
 
 ```bash
 # 输出所有key
@@ -621,9 +706,139 @@ for key in ${!map[*]};do
 done
 ```
 
-
-
 > 参考：
 >
 > [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
-> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
+
+## 1.7. 数值运算
+
+### 1.7.1. 运算符[ ]
+
+只支持整数，结果也是整数
+
+```bash
+a=2
+b=3
+c=$[a+b]
+d=$[a-b]
+e=$[a*b]
+f=$[a/b]
+g=$[a%b] 
+```
+
+### 1.7.2. 运算符(())
+
+同7.1
+
+### 1.7.3. expr及其反引用
+
+```bash
+a=2
+b=3
+expr $a + $b
+expr $a - $b
+expr $a \* $b
+expr $a / $b
+expr $a % $b
+```
+
+### 1.7.4. bc
+
+```bash
+echo '2.0*3.00'|bc
+echo '2.25+4.5'|bc
+echo '5.66-7.888'|bc
+```
+
+> 参考：[玩转Bash脚本：数值计算](https://blog.csdn.net/guodongxiaren/article/details/40370701)
+
+## 1.8. 特殊变量
+
+
+
+| 变量 | 含义                                                         |
+| ---- | ------------------------------------------------------------ |
+| $0   | 当前脚本的文件名                                             |
+| $n   | 传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是$1，第二个参数是$2。 |
+| $#   | 传递给脚本或函数的参数个数。                                 |
+| $*   | 传递给脚本或函数的所有参数。                                 |
+| $@   | 传递给脚本或函数的所有参数。被双引号(" ")包含时，与 $* 稍有不同，下面将会讲到。 |
+| $?   | 上个命令的退出状态，或函数的返回值。                         |
+| $$   | 当前Shell进程ID。对于 Shell 脚本，就是这些脚本所在的进程ID。 |
+| $!   | 子shell的进程ID                                              |
+
+$* 和 $@ 的区别
+
+```bash
+#!/bin/bash
+echo "\$*=" $*
+echo "\"\$*\"=" "$*"
+
+echo "\$@=" $@
+echo "\"\$@\"=" "$@"
+
+echo "print each param from \$*"
+for var in $*
+do
+    echo "$var"
+done
+
+echo "print each param from \$@"
+for var in $@
+do
+    echo "$var"
+done
+
+echo "print each param from \"\$*\""
+for var in "$*"
+do
+    echo "$var"
+done
+
+echo "print each param from \"\$@\""
+for var in "$@"
+do
+    echo "$var"
+done
+```
+
+执行 ./test.sh "a A" "b" "c" "d"，看到下面的结果：
+
+```bash
+$*= a A b c d
+"$*"= a A b c d
+$@= a A b c d
+"$@"= a A b c d
+print each param from $*
+a
+A
+b
+c
+d
+print each param from $@
+a
+A
+b
+c
+d
+print each param from "$*"
+a A b c d
+print each param from "$@"
+a A
+b
+c
+d
+```
+
+
+
+## 1.9. 其他命令
+
+### 1.9.1. 获取随机数
+
+shuf -i LO-HI -n COUNT
+
+```bash
+shuf -i 1-100 -n1
+```
+

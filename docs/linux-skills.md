@@ -1,10 +1,10 @@
 [回到首页](../README.md)
 
-# Linux技巧
+# 1. Linux技巧
 
 [TOC]
 
-## 1、yum update时忽略某些软件
+## 1.1. yum update时忽略某些软件
 生产环境应避免升级linux内核和关键应用，例如之前遇到过docker与centos版本不兼容引发容器网络异常
 
 1.1、临时：
@@ -24,7 +24,7 @@ yum versionlock add freetype
 yum versionlock list
 ```
 
-## 2、自解压文件：用于制作单文件升级包
+## 1.2. 自解压文件：用于制作单文件升级包
 
 假设我们要制作一个名字叫`pkg_20210714.csu`的升级包，直接`sh pkg_20210714.csu`可以完成升级。这个文件本身是一个shell脚本，但尾部又包含升级所需的文件
 
@@ -119,19 +119,287 @@ $
 
 > 参考：[Linux 下自解压文件的制作](https://www.cnblogs.com/pied/p/5016529.html)
 
-## 3、进程管理systemd
+## 1.3. 进程管理systemd
 
-## 4、进程管理supervisord
+### 1.3.1. 入门使用
 
-## 5、日志文件管理logrotate
+```bash
+cat > /usr/lib/systemd/system/foo.service<< EOF
+[Unit]
+Description=Foo
 
-## 6、文件增量备份
+[Service]
+ExecStart=/usr/sbin/foo-daemon
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable foo.service
+systemctl start foo.service
+```
+
+Service没有指定Type，默认Type=simple，适用于简单的单体应用，如果是守护进程，应使用Type=forking
+
+Service没有指定ExecStop，systemctl会发送SIGTERM信号来停止服务，超时则发送SIGKILL信号
+
+### 1.3.2. 官方示例
+
+
+nginx
+
+```yaml
+[Unit]
+Description=The nginx HTTP and reverse proxy server
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+# Nginx will fail to start if /run/nginx.pid already exists but has the wrong
+# SELinux context. This might happen when running `nginx -t` from the cmdline.
+# https://bugzilla.redhat.com/show_bug.cgi?id=1268621
+ExecStartPre=/usr/bin/rm -f /run/nginx.pid
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx
+ExecReload=/usr/sbin/nginx -s reload
+KillSignal=SIGQUIT
+TimeoutStopSec=5
+KillMode=process
+PrivateTmp=true
+Restart=always
+MemoryLimit=2048K
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
+php-fpm
+
+```yaml
+[Unit]
+Description=The PHP FastCGI Process Manager
+After=syslog.target network.target
+
+[Service]
+Type=notify
+PIDFile=/run/php-fpm/php-fpm.pid
+EnvironmentFile=/etc/sysconfig/php-fpm
+ExecStart=/usr/sbin/php-fpm --nodaemonize
+ExecReload=/bin/kill -USR2 $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+crond
+
+```yaml
+[Unit]
+Description=Command Scheduler
+After=auditd.service systemd-user-sessions.service time-sync.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/crond
+ExecStart=/usr/sbin/crond -n $CRONDARGS
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+uwsgi
+
+```yaml
+[Unit]
+Description=uWSGI Emperor
+After=syslog.target
+
+[Service]
+ExecStart=/root/uwsgi/uwsgi --ini /etc/uwsgi/emperor.ini
+# Requires systemd version 211 or newer
+RuntimeDirectory=uwsgi
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
+
+### 1.3.3. 限制服务资源
+
+利用cgroups防止服务占用过多系统资源，比如内存限制到2G，超出就重启
+
+1、使用`systemctl set-property`命令
+
+```bash
+# systemctl set-property mysql@3327.service MemoryLimit=5G       # 5G 内存
+# systemctl set-property mysql@3327.service CPUQuota=150%        # 150% cpu 使用率
+# systemctl set-property mysql@3327.service BlockIOWeight=1000   # IO 权重
+
+# systemctl show mysql@3327.service -p MemoryLimit # 查看某个参数
+```
+
+这个操作会写到配置文件，将永久生效，如果想只生效一次，可加上`--runtime`参数
+
+2、写到配置文件Service
+
+```yaml
+[Service]
+MemoryLimit=5G
+```
+
+
+
+### 1.3.4. watchdog软狗
+
+设置Service的Type=notify，服务在运行时定时发送心跳到systemd服务，避免服务卡死
+
+python可以使用`systemd.daemon`包，go可以使用`coreos/go-systemd`包
+
+### 1.3.5. 其他常用命令
+
+列出所有配置文件
+
+```bash
+systemctl list-unit-files
+```
+
+显示某个unit的底层参数
+
+```bash
+systemctl show httpd.service
+```
+
+服务是否启动
+
+```bash
+systemctl is-active nginx.service
+```
+
+查看各服务启动耗时
+
+```bash
+systemd-analyze blame
+```
+
+### 1.3.6. 管理一组服务
+
+假设app服务组有service1、service2、service3三个子服务，且service3依赖service2
+app.service
+
+```bash
+[Unit]
+Description=Application
+
+[Service]
+# The dummy program will exit
+Type=oneshot
+# Execute a dummy program
+ExecStart=/bin/true
+# This service shall be considered active after start
+RemainAfterExit=yes
+
+[Install]
+# Components of this application should be started at boot time
+WantedBy=multi-user.target
+```
+
+app-srv1.service
+
+```yaml
+[Unit]
+Description=Application Component 1
+# When systemd stops or restarts the app.service, the action is propagated to this unit
+PartOf=app.service
+# Start this unit after the app.service start
+After=app.service
+
+[Service]
+# Pretend that the component is running
+ExecStart=/bin/sleep infinity
+# Restart the service on non-zero exit code when terminated by a signal other than SIGHUP, SIGINT, SIGTERM or SIGPIPE
+Restart=on-failure
+
+[Install]
+# This unit should start when app.service is starting
+WantedBy=app.service
+```
+
+app-srv2.service
+
+```yaml
+[Unit]
+Description=Application Component 2
+PartOf=app.service
+After=app.service
+
+[Service]
+ExecStart=/bin/sleep infinity
+Restart=on-failure
+
+[Install]
+WantedBy=app.service
+```
+
+app-srv3.service
+
+```yaml
+[Unit]
+Description=Application Component 3
+PartOf=app.service
+After=app.service
+# This unit should start after the app-component2 started
+After=app-component2.service
+
+[Service]
+ExecStart=/bin/sleep infinity
+Restart=on-failure
+
+[Install]
+WantedBy=app.service
+```
+
+
+
+> 参考：
+>
+> 1、[Systemd 入门教程：命令篇 - 阮一峰的网络日志](http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html)
+>
+> 2、[systemd.service](https://www.freedesktop.org/software/systemd/man/systemd.service.html#)
+>
+> 3、[How do i change property values for a systemd service?](https://www.lightnetics.com/topic/17440/how-do-i-change-property-values-for-a-systemd-service)
+>
+> 4、[利用 systemd 的 watchdog 功能重启卡住的服务](https://blog.lilydjwg.me/2016/12/22/restart-services-with-watchdog-feature-of-systemd.207942.html)
+>
+> 5、[Using systemd services of Type=notify with Watchdog in C – Hackeriet](https://blog.hackeriet.no/systemd-service-type-notify-and-watchdog-c/)
+>
+> 6、[使用 systemd 限制系统资源的使用](https://blog.arstercz.com/使用-systemd-限制系统资源的使用/)
+>
+> 7 、[Controlling a Multi-Service Application with systemd](https://alesnosek.com/blog/2016/12/04/controlling-a-multi-service-application-with-systemd/)
+
+## 1.4. 进程管理supervisord
+
+## 1.5. 日志文件管理logrotate
+
+## 1.6. 文件增量备份
 
 > 参考:
 >
 > [rsync 用法教程](https://www.ruanyifeng.com/blog/2020/08/rsync.html)
 
-## 7、代理设置
+## 1.7. 代理设置
 
 wget可能没法直接下载github上的文件，可能需要代理
 
@@ -202,7 +470,7 @@ forward-socks5 / 127.0.0.1:19820 .
 
 Privoxy默认监听8118端口
 
-## 8、自定义系统操作历史记录
+## 1.8. 自定义系统操作历史记录
 
 修改`/etc/profile`，添加如下内容：
 
@@ -221,7 +489,7 @@ export HISTFILESIZE=1000
 
 
 
-## 9、自定义定时任务
+## 1.9. 自定义定时任务
 
 ```bash
 [root@gj ~]# cat /etc/crontab
@@ -275,11 +543,11 @@ cd -
 
 把脚本放到对应的目录即可
 
-## 10、iptables基本使用
+## 1.10. iptables基本使用
 
-## 11、firewall基本使用
+## 1.11. firewall基本使用
 
-## 12、selinux基本使用
+## 1.12. selinux基本使用
 
 ```bash
 #!/usr/bin/env bash

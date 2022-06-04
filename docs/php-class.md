@@ -1,12 +1,12 @@
 [回到首页](../README.md)
 
-# PHP类的概念
+# 1. PHP类的概念
 
 说明
 
 [TOC]
 
-## 1、类的三个特性
+## 1.1. 类的三个特性
 
 - 封装：让类更加安全。让成员属性变成私有，使用方法来访问成员属性
 - 继承：子类继承父类的一切非私有属性和方法
@@ -18,7 +18,7 @@
 >
 > 2、[PHP 继承、封装与多态 | 面向对象编程 | PHP 入门到实战教程 (laravelacademy.org)](https://laravelacademy.org/post/21638)
 
-## 2、抽象类与接口
+## 1.2. 抽象类与接口
 
 抽象类：abstract class，继承extends
 
@@ -66,7 +66,7 @@ abstract class Sutdent extends Human implements Play,Read
 
 > 参考：[php抽象类和接口的区别 - vinter_he - 博客园 (cnblogs.com)](https://www.cnblogs.com/vinter/p/8716685.html)
 
-## 3、其他常见问题
+## 1.3. 其他常见问题
 
 3.1、类中self和static的区别
 

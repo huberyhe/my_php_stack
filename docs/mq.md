@@ -1,12 +1,12 @@
 [回到首页](../README.md)
 
-# 消息队列
+# 1. 消息队列
 
 消息队列的使用场景
 
 [TOC]
 
-## 1、使用场景
+## 1.1. 使用场景
 
 1.1、异步处理
 
@@ -43,11 +43,11 @@
 
 1.5、消息通讯
 
-## 2、常用消息队列
+## 1.2. 常用消息队列
 
-### 2.1、Kafka
+### 1.2.1. Kafka
 
-### 2.2、RabbitMQ
+### 1.2.2. RabbitMQ
 
 **RabbitMQ**是实现了[高级消息队列协议](https://zh.wikipedia.org/wiki/高级消息队列协议)（AMQP）的开源[消息代理](https://zh.wikipedia.org/wiki/消息代理)软件
 
@@ -86,7 +86,7 @@ rabbitmq：重量级，高可靠，异步，不保证实时；
 
 > 参考：[Redis 与 MQ 的区别](https://www.cnblogs.com/dengguangxue/p/11537466.html)
 
-## 3、应用实例
+## 1.3. 应用实例
 
 > 参考：
 >

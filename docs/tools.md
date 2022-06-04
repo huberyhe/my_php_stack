@@ -1,10 +1,10 @@
 [回到首页](../README.md)
 
-# 工具
+# 1. 工具
 
 [TOC]
 
-## openssl
+## 1.1. openssl
 
 1、获取证书信息
 
@@ -32,7 +32,7 @@ echo | openssl s_client -servername gj.sundray.com.cn -connect gj.sundray.com.cn
 >
 > [openssl 查看证书]()
 
-## wireshark与tcpdump
+## 1.2. wireshark与tcpdump
 
 1、抓https的tls握手包
 
@@ -72,7 +72,7 @@ TCP的几次握手就是通过这样的ACK表现出来的。但SYN与FIN是不�
 >
 > [Wireshark常用过滤使用方法](https://www.cnblogs.com/nmap/p/6291683.html)
 
-## rsync实现增量备份
+## 1.3. rsync实现增量备份
 
 调用实例：增量备份家目录
 
@@ -107,7 +107,7 @@ ln -s "${BACKUP_PATH}" "${LATEST_LINK}"
 
 > 参考：[rsync 用法教程]([rsync 用法教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2020/08/rsync.html))
 
-## inotifywait文件修改自动处理
+## 1.4. inotifywait文件修改自动处理
 
 linux下inotifywait命令可以监控文件变化，以做进一步处理
 
@@ -136,6 +136,6 @@ inotifywait -mr --timefmt '%d/%m/%y %H:%M' --format '%T %w %f' \
 done
 ```
 
-## go实现telnet日志服务
+## 1.5. go实现telnet日志服务
 
 TODO

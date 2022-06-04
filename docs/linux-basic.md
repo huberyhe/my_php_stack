@@ -1,25 +1,25 @@
 [回到首页](../README.md)
 
-# Linux基础使用
+# 1. Linux基础使用
 
 [TOC]
 
-## 1、操作系统
+## 1.1. 操作系统
 
-### 1.1、Alpine
+### 1.1.1. Alpine
 
-#### 1、使用usermod
+#### 1.1.1.1. 使用usermod
 
 ```bash
 echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 apk --no-cache add shadow
 ```
 
-## 
+## 1.2. 
 
-## 2、基础命令
+## 1.3. 基础命令
 
-### 2.1、top命令交互指令
+### 1.3.1. top命令交互指令
 
 ```
 c： 显示完整的命令
@@ -51,9 +51,9 @@ W： 将当前设置写入~/.toprc文件，下次启动自动调用toprc文件�
 1(数字1)： 显示每个CPU的详细情况
 ```
 
-### 2.2、tar归档
+### 1.3.2. tar归档
 
-#### 1、切换到指定目录后打包：
+#### 1.3.2.1. 切换到指定目录后打包：
 
 如果我想打包`/mnt/d/Workspace/业务@云平台/script_tools`目录下的`wac_login`目录，
 
@@ -89,7 +89,7 @@ drwxrwxrwx 1 hubery hubery   4096 Aug 10 17:07 pem_files
 -rw-r--r-- 1 hubery hubery 491520 Aug 12 09:29 /tmp/test_wac_login.tar
 ```
 
-#### 2、查看归档文件内容
+#### 1.3.2.2. 查看归档文件内容
 
 ```bash
 tar -tf test_wac_login.tar
@@ -113,7 +113,7 @@ wac_login/test_wac_login.php
 wac_login/test_wac_login.tar
 ```
 
-#### 3、解压到指定目录
+#### 1.3.2.3. 解压到指定目录
 
 ```bash
 tar xf /tmp/test_wac_login.tar -C ~/
@@ -136,14 +136,14 @@ drwxr-xr-x 1 hubery hubery    512 Aug 10 17:07 pem_files
 -rwxr-xr-x 1 hubery hubery  10240 Aug 12 09:16 test_wac_login.tar
 ```
 
-#### 4、tar.gz格式文件打包与解压
+#### 1.3.2.4. tar.gz格式文件打包与解压
 
 ```bash
 tar cvzf test.tar.gz test
 tar xvzf test.tat.gz
 ```
 
-#### 5、tar.xz格式文件打包与解压
+#### 1.3.2.5. tar.xz格式文件打包与解压
 
 ```bash
 tar cvf test.tar test
@@ -157,7 +157,7 @@ tar xvf node-v8.11.1-linux-x64.tar.xz123
 tar xvJf node-v8.11.1-linux-x64.tar.xz1
 ```
 
-#### 6、利用tar备份文件
+#### 1.3.2.6. 利用tar备份文件
 
 ```bash
  $ tar -cpf - /etc/init.d/README -C / | tar -xpf - -C /tmp
@@ -166,7 +166,7 @@ tar: Removing leading `/' from member names
 /tmp/etc/init.d/README
 ```
 
-#### 7、按行读取文件
+#### 1.3.2.7. 按行读取文件
 
 ```bash
 cat data.dat | while read line
@@ -180,9 +180,90 @@ do
 done < data.dat
 ```
 
+#### 1.3.2.8. 指定解压文件的前缀路径
+
+```bash
+       --strip-components=NUMBER
+              strip NUMBER leading components from file names on extraction
+```
+
+该参数可以去掉归档文件的前缀路径，配合`-C`可以修改前缀路径。例：
+
+```bash
+ $ mkdir tar_test && cd tar_test
+ $ wget -O mysql-5.6.15.tar.gz  http://oss.aliyuncs.com/aliyunecs/onekey/mysql/mysql-5.6.15-linux-glibc2.5-i686.tar.gz
+ $ tar xvzf mysql-5.6.15.tar.gz
+ $ ls -l
+total 289484
+drwxr-xr-x 13 hubery hubery      4096 Apr 14 09:03 mysql-5.6.15-linux-glibc2.5-i686
+-rw-r--r--  1 hubery hubery 296419798 Dec 26  2013 mysql-5.6.15.tar.gz
+ $ mkdir ./mysql-5.6.15 && tar -xzvf mysql-5.6.15.tar.gz -C ./mysql-5.6.15 --strip-components 1
+ $ ls -l mysql-5.6.15
+total 156
+-rw-r--r--  1 hubery hubery 17987 Nov 18  2013 COPYING
+-rw-r--r--  1 hubery hubery 88388 Nov 18  2013 INSTALL-BINARY
+-rw-r--r--  1 hubery hubery  2496 Nov 18  2013 README
+drwxr-xr-x  2 hubery hubery  4096 Apr 14 09:04 bin
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 data
+drwxr-xr-x  2 hubery hubery  4096 Apr 14 09:04 docs
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 include
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 lib
+drwxr-xr-x  4 hubery hubery  4096 Apr 14 09:04 man
+drwxr-xr-x 10 hubery hubery  4096 Apr 14 09:04 mysql-test
+drwxr-xr-x  2 hubery hubery  4096 Apr 14 09:04 scripts
+drwxr-xr-x 28 hubery hubery  4096 Apr 14 09:04 share
+drwxr-xr-x  4 hubery hubery  4096 Apr 14 09:04 sql-bench
+drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 support-files
+```
+
+#### 1.3.2.9. 归档时使用绝对路径
+
+```bash
+       -P, --absolute-names
+              don't strip leading `/'s from file names
+```
+
+用于保留绝对路径。默认归档解解开使用的相对路径，解开时需要加`-C`参数指定路径，更好的方法是归档和解开时都加`-P`参数。例：
+
+```bash
+ $ tar cf tar_test.tar /home/hubery/tar_test
+tar: Removing leading `/' from member names
+ $ tar xvf tar_test.tar
+home/hubery/tar_test/
+home/hubery/tar_test/123
+ $ ls -l ./home/hubery/tar_test
+total 0
+-rw-r--r-- 1 hubery hubery 0 Apr 14 09:18 123
+ $ tar xvf tar_test.tar -C /
+home/hubery/tar_test/
+home/hubery/tar_test/123
+ $ tar cfP tar_test.tar /home/hubery/tar_test
+ $ tar xvfP tar_test.tar
+/home/hubery/tar_test/
+/home/hubery/tar_test/123
+```
+
+#### 1.3.2.10. 归档时修改文件路径
+
+```bash
+       --transform=EXPRESSION, --xform=EXPRESSION
+              use sed replace EXPRESSION to transform file names
+
+              File name matching options (affect both exclude and include patterns):
+```
+
+可以修改文件路径，语法同sed。例：
+
+```bash
+# 将 ./ 替换成 usr/
+tar -cf archive.tar --transform 's,^\./,usr/,'
+# 添加 new 后缀
+tar -cf archive.tar --transform 's/$/new/'
+```
 
 
-### 2.3、iptables四表五链
+
+### 1.3.3. ptables四表五链
 
 数据包到了该链处，会去对应表中查询设置的规则，然后决定是否放行、丢弃、转发还是修改等等操作。
 
@@ -192,11 +273,11 @@ done < data.dat
 
 命令格式：`iptables [-t 表名] 选项 [链名] [条件] [-j 控制类型]`，默认filter表
 
-### 2.4、zip和unzip
+### 1.3.4. zip和unzip
 
 命令格式：`zip -r <zip name> <files>`
 
-#### 1、排除目录
+#### 1.3.4.1. 排除目录
 
 `-x`参数，参数为文件路径，须用引号
 
@@ -206,7 +287,56 @@ done < data.dat
 zip -r backend_3party.zip /go/gopath/src/ -x '/go/gopath/src/backup_20220107.zip' -x '/go/gopath/src/cloud.google.com/*'
 ```
 
-#### 2.5、`free -m`中各字段的意义
+### 1.3.5. `free -m`中各字段的意义
+
+### 1.3.6. ps使用
+
+#### 1.3.6.1. 查看程序启动时间
+
+```bash
+ps -eo pid,lstart,etime,cmd | grep nginx
+```
+
+### 1.3.7. 日志截断
+
+```bash
+truncate -s 0 logfile
+```
+
+### 1.3.8. 时间和时区设置
+
+#### 1.3.8.1. 设置时间
+
+```bash
+date -s "20220530 11:30:00"
+```
+
+#### 1.3.8.2. 设置硬件时钟
+
+```bash
+hwclock --set --date="11/03/17 14:55"
+hwclock --show
+```
+
+#### 1.3.8.3. 设置时区
+
+```bash
+# 用户环境时区
+tzselect
+# 执行结果
+TZ=’Asia/Shanghai’; export TZ
+
+# 系统时区
+echo "ZONE=Asia/Shanghai" >> /etc/sysconfig/clock
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+reboot
+
+# centos系统时区
+timedatectl set-timezone Asia/Shanghai
+reboot
+```
+
+
 
 
 
