@@ -1,12 +1,12 @@
 [回到首页](../README.md)
 
-# 样例
+# 1. 样例
 
 说明
 
 [TOC]
 
-## 1、分区
+## 1.1. 分区
 
 指将同一表中不同行的记录分配到不同的物理文件中，几个分区就有几个.idb文件
 
@@ -49,7 +49,7 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 > 参考：[搞懂MySQL分区](https://www.cnblogs.com/GrimMjx/p/10526821.html)
 
-## 2、分库分表
+## 1.2. 分库分表
 
 **使用场景**：一张表的查询速度慢到影响使用；频繁写入影响查询（并发锁）
 
@@ -61,13 +61,13 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 > 参考：[MySql分库分表与分区的区别和思考](https://www.cnblogs.com/GrimMjx/p/11772033.html)
 
-## 3、读写分离
+## 1.3. 读写分离
 
-## 4、主从复制原理
+## 1.4. 主从复制原理
 
 `binlog` -> 主节点 `log dump thread` 线程-> 从节点I/O线程 -> `relay log` -> 从节点sql进程重放sql
 
-## 5、Mycat中间件
+## 1.5. Mycat中间件
 
 官网地址：[Mycat1.6](http://www.mycat.org.cn/)
 
@@ -85,9 +85,9 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 >
 > 4、[mysql读写分离优缺点](https://zhuanlan.zhihu.com/p/358474872)
 
-## 6、常见问题
+## 1.6. 常见问题
 
-### 6.1、什么情况下会生成临时表
+### 1.6.1. 什么情况下会生成临时表
 
 1. UNION查询；
 2. 用到TEMPTABLE算法或者是UNION查询中的视图；
@@ -98,7 +98,7 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 7. FROM中的子查询；
 8. 子查询或者semi-join时创建的表；
 
-### 6.2、什么情况下需要回表查询
+### 1.6.2. 什么情况下需要回表查询
 
 回表查询：先定位主键值，再定位行记录，它的性能较扫一遍索引树更低。
 
@@ -106,20 +106,20 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 >  参考：[MySQL优化：如何避免回表查询？什么是索引覆盖？ (转) - myseries - 博客园 (cnblogs.com)](https://www.cnblogs.com/myseries/p/11265849.html)
 
-### 6.3、聚簇索引、非聚簇索引和辅助索引
+### 1.6.3. 聚簇索引、非聚簇索引和辅助索引
 
 - 聚簇索引：将数据存储与索引放到了一块，找到索引也就找到了数据。表数据按照索引的顺序来存储的，也就是说索引项的顺序与表中记录的物理顺序一致。
 - 非聚簇索引：将数据存储与索引分开，叶结点包含索引字段值及指向数据页数据行的逻辑指针，其行数量与数据表行数据量一致。
 
 >  参考：[浅谈聚簇索引与非聚簇索引 | Java 技术论坛 (learnku.com)](https://learnku.com/articles/50096)
 
-### 6.4、MyISAM与InnoDB引擎适用场景，OLTP与OLAP的概念
+### 1.6.4. MyISAM与InnoDB引擎适用场景，OLTP与OLAP的概念
 
 OLTP（在线事务处理），如Blog、电子商务、网络游戏等；
 
 OLAP（在线分析处理），如数据仓库、数据集市。
 
-### 6.5、MyISAM为什么比InnoDB查询更快
+### 1.6.5. MyISAM为什么比InnoDB查询更快
 
 MyISAM在查询主键和非主键时，速度都更快，因为MyISAM要维护的东西更少，比如：
 
@@ -131,7 +131,7 @@ MyISAM在查询主键和非主键时，速度都更快，因为MyISAM要维护�
 
 > 参考：[MySQL中MyISAM为什么比InnoDB查询快](https://www.cnblogs.com/chingho/p/14798021.html)
 
-### 6.6、MyISAM与InnoDB中B+树的区别
+### 1.6.6. MyISAM与InnoDB中B+树的区别
 
 MyISAM的主索引和普通索引都是非聚族索引，叶子节点不会存放行数据，而是存放的**磁盘地址**
 
@@ -141,7 +141,7 @@ MyISAM的主索引和普通索引都是非聚族索引，叶子节点不会存�
 >
 > 2、[MyISAM与InnoDB的索引结构](https://www.cnblogs.com/yuyafeng/p/11350873.html)
 
-### 6.7、行锁、表锁的使用
+### 1.6.7. 行锁、表锁的使用
 
 InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁
 
@@ -177,7 +177,7 @@ show status like 'table_locks%';
 >
 > 2、[INNODB索引实现原理_bohu83的博客-CSDN博客_innodb的索引实现](https://blog.csdn.net/bohu83/article/details/81104432)
 
-### 6.8、B+树的结构
+### 1.6.8. B+树的结构
 
 B+树的内部节点包括：Key键值，Index索引值
 B+树的叶子节点包括：Key键值，Index索引值，Data数据
@@ -187,7 +187,7 @@ B+树的内部节点也可称为索引节点，叶子节点也可称为外部节
 
 
 
-### 6.9、Procedure Analyse优化表结构
+### 1.6.9. Procedure Analyse优化表结构
 
 PROCEDURE ANALYSE的语法如下：
 
@@ -203,29 +203,29 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 > 参考：[Procedure Analyse优化表结构 ](https://www.cnblogs.com/duanxz/p/3968639.html)
 
-### 6.10、索引的类型划分
+### 1.6.10. 索引的类型划分
 
-#### 1、按功能逻辑划分
+#### 1.6.10.1. 按功能逻辑划分
 
 普通索引、主键索引、唯一索引、全文索引
 
-#### 2、按物理实现划分
+#### 1.6.10.2. 按物理实现划分
 
 聚集索引、非聚集索引
 
-#### 3、按字段个数划分
+#### 1.6.10.3. 按字段个数划分
 
 单个索引、联合索引
 
-#### 4、按索引结构划分
+#### 1.6.10.4. 按索引结构划分
 
 常见的有：BTREE、RTREE、HASH、FULLTEXT、SPATIAL
 
 > 参考：[MySQL索引方法 - 成九 - 博客园 (cnblogs.com)](https://www.cnblogs.com/luyucheng/p/6289048.html)
 
-### 6.11、什么场景下应该使用索引
+### 1.6.11. 什么场景下应该使用索引
 
-#### 推荐使用
+#### 1.6.11.1. 推荐使用
 
 - WHERE, GROUP BY, ORDER BY 子句中的字段
 
@@ -237,7 +237,7 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 - 当 SELECT 中有不在索引中的字段时，会先通过索引查询出满足条件的主键值，然后通过主键回表查询出所有的 SELECT 中的字段，影响查询效率。因此如果 SELECT 中的内容很少，为了避免回表，可以把 SELECT 中的字段都加到联合索引中，这也就是宽索引的概念。但是需要注意，如果索引字段过多，存储和维护索引的成本也会增加。
 
-#### 不推荐使用或索引失效情况
+#### 1.6.11.2. 不推荐使用或索引失效情况
 
 - 数据量很小的表
 - 有大量重复数据的字段
@@ -248,13 +248,13 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 - 不等于条件 != <>，索引失效
 - LIKE 值以 % 开头，索引失效
 
-### 6.12、分布式id生成器
+### 1.6.12. 分布式id生成器
 
 雪花算法：1bit保留+41bit毫秒时间戳+10bit机器ID+12bit序列号=64bit整数
 
-## 7、其他命令
+## 1.7. 其他命令
 
-### 7.1、`show index from tb_name`查看表索引详细信息
+### 1.7.1. `show index from tb_name`查看表索引详细信息
 
 其中`Cardinality`字段表示这个列有多少种值，这个数是近似的可以用 `ANALYZE TABLE tb_name` or (for `MyISAM` tables)`myisamchk -a`更新
 
@@ -262,7 +262,7 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 >
 > MySQL参考手册：[MySQL 5.7 Reference Manual]([MySQL :: MySQL 5.7 Reference Manual](https://dev.mysql.com/doc/refman/5.7/en/))
 
-### 7.2、`PROCEDURE ANALYSE`优化表结构
+### 1.7.2. `PROCEDURE ANALYSE`优化表结构
 
 ```sql
 SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])

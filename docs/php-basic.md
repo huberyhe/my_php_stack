@@ -1,12 +1,12 @@
 [回到首页](../README.md)
 
-# PHP基础
+# 1. PHP基础
 
 说明
 
 [TOC]
 
-## 1、常用数组函数
+## 1.1. 常用数组函数
 
 array_push\array_pop
 array_shift\array_unshift
@@ -23,7 +23,7 @@ array_fill/array_fill_keys
 
 array_walk
 
-## 2、时间处理
+## 1.2. 时间处理
 
 ```php
 date('Y-m-d H:i:s');// 2021-08-25 00:43:51
@@ -34,7 +34,7 @@ strtotime("+1 day");// 一天前的时间戳
 time();// 1629823534
 ```
 
-## 3、字符串处理
+## 1.3. 字符串处理
 
 substr
 
@@ -42,7 +42,7 @@ strstr
 
 implode \ explode \ join \ unjoin
 
-## 4、文件处理
+## 1.4. 文件处理
 
 fopen
 
@@ -80,19 +80,19 @@ if (is_dir($dir)) {
 
 
 
-## 5、正则函数与正则表达式
+## 1.5. 正则函数与正则表达式
 
 作用：分割、查找、匹配、替换
 
 preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 
-### 5.1 分隔符
+### 1.5.1. 分隔符
 
 经常使用的分隔符是正斜线(`/`)、hash符号(`#`) 以及取反符号(`~`)
 
-### 5.2 元字符
+### 1.5.2. 元字符
 
-#### 1、方括号外的元字符
+#### 1.5.2.1. 方括号外的元字符
 
 | 元字符 | 描述                                                         |
 | :----- | :----------------------------------------------------------- |
@@ -111,7 +111,7 @@ preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 | {      | 自定义量词开始标记                                           |
 | }      | 自定义量词结束标记                                           |
 
-#### 2、方括号内的元字符
+#### 1.5.2.2. 方括号内的元字符
 
 | 元字符 | 描述                                           |
 | :----- | :--------------------------------------------- |
@@ -119,13 +119,13 @@ preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 | ^      | 仅在作为第一个字符(方括号内)时，表明字符类取反 |
 | -      | 标记字符范围                                   |
 
-### 5.3 转义序列(反斜线)
+### 1.5.3. 转义序列(反斜线)
 
-#### 用途1、如果紧接着是一个非字母数字字符，表明取消 该字符所代表的特殊涵义
+#### 1.5.3.1. 用途1、如果紧接着是一个非字母数字字符，表明取消 该字符所代表的特殊涵义
 
-#### 用途2、提供了一种对非打印字符进行可见编码的控制手段
+#### 1.5.3.2. 用途2、提供了一种对非打印字符进行可见编码的控制手段
 
-#### 用途3、用来描述特定的字符类
+#### 1.5.3.3. 用途3、用来描述特定的字符类
 
 | 字符 | 描述               |
 | ---- | ------------------ |
@@ -139,21 +139,21 @@ preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 | *\w* | 任意单词字符       |
 | *\W* | 任意非单词字符     |
 
-### 5.4 Unicode 字符属性
+### 1.5.4. Unicode 字符属性
 
-### 5.5 锚
+### 1.5.5. 锚
 
 脱字符（`^`） 是一个断言当前匹配点位于目标字符串开始处的断言
 
 美元符(`$`)是用于断言当前匹配点位于目标字符串末尾， 或当目标字符串以换行符结尾时当前匹配点位于该换行符位置(默认情况)
 
-### 5.6 句点
+### 1.5.6. 句点
 
-### 5.7 字符类(方括号)
+### 1.5.7. 字符类(方括号)
 
-### 5.8 可选路径(|)
+### 1.5.8. 可选路径(|)
 
-### 5.9 内部选项设置
+### 1.5.9. 内部选项设置
 
 | `i`  | for [PCRE_CASELESS](https://www.php.net/manual/zh/reference.pcre.pattern.modifiers.php) |
 | ---- | ------------------------------------------------------------ |
@@ -164,14 +164,14 @@ preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 | `X`  | for [PCRE_EXTRA](https://www.php.net/manual/zh/reference.pcre.pattern.modifiers.php) |
 | `J`  | for [PCRE_INFO_JCHANGED](https://www.php.net/manual/zh/reference.pcre.pattern.modifiers.php) |
 
-### 5.10 子组(子模式)
+### 1.5.10. 子组(子模式)
 
 将一个模式中的一部分标记为子组(子模式)主要是来做两件事情：
 
 1. 将可选分支局部化。比如，模式`cat(arcat|erpillar|)`匹配 ”cat”， “cataract”， “caterpillar” 中的一个，如果没有圆括号的话，它匹配的则是 ”cataract”， “erpillar” 以及空字符串。
 2. 将子组设定为捕获子组(向上面定义的)。当整个模式匹配后， 目标字符串中匹配子组的部分将会通过 **pcre_exec()()** 的 *ovector* 参数回传给调用者。 左括号从左至右出现的次序就是对应子组的下标(从 1 开始)， 可以通过这些下标数字来获取捕获子模式匹配结果。
 
-### 5.11 重复/量词
+### 1.5.11. 重复/量词
 
 可以紧跟在下面元素之后：
 
@@ -188,21 +188,21 @@ preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 | `+`  | 等价于 `{1,}`  |
 | `?`  | 等价于 `{0,1}` |
 
-### 5.12 后向引用
+### 1.5.12. 后向引用
 
 在一个字符类外面， 反斜线紧跟一个大于 0 (可能还有一位数)的数字就是一个到模式中之前出现的某个捕获组的后向引用。
 
-### 5.13 断言
+### 1.5.13. 断言
 
 一个断言就是一个对当前匹配位置之前或之后的字符的测试， 它不会实际消耗任何字符。简单的断言代码有\b、\B、 \A、 \Z、\z、 ^、$ 等
 
-### 5.14 一次性子组
+### 1.5.14. 一次性子组
 
 对于同时有最大值和最小值量词限制的重复项， 在匹配失败后， 紧接着会以另外一个重复次数重新评估是否能使模式匹配。 当模式的作者明确知道执行上没有问题时， 通过改变匹配的行为或者使其更早的匹配失败以阻止这种行为是很有用的。
 
 语法符号是另外一种特殊的括号， 以 (?> 开始，比如 `(?>\d+)bar`
 
-### 5.15 条件子组
+### 1.5.15. 条件子组
 
 可以使匹配器根据一个断言的结果， 或者之前的一个捕获子组是否匹配来条件式的匹配一个子组或者在两个可选子组中选择。 条件子组的两种语法如下：
 
@@ -211,19 +211,17 @@ preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 (?(condition)yes-pattern|no-pattern)
 ```
 
-### 5.16 注释
+### 1.5.16. 注释
 
 字符序列(?#标记开始一个注释直到遇到一个右括号。不允许嵌套括号。 注释中的字符不会作为模式的一部分参与匹配。
 
-### 5.17 递归模式
+### 1.5.17. 递归模式
 
-### 5.18 性能
-
-
+### 1.5.18. 性能
 
 > 参考：[PHP: PCRE - Manual](https://www.php.net/manual/zh/book.pcre.php)
 
-## 6、php.ini常见配置
+## 1.6. php.ini常见配置
 
 ignore_user_abort：
 
@@ -249,7 +247,7 @@ session.save_path：设置session文件存放的位置（文件夹应该是已�
 
 date.timezone：设置时区。该设置影响PHP中所有的日期、时间函数。
 
-## 7、php-fpm.conf常用配置
+## 1.7. php-fpm.conf常用配置
 
 pm = dynamic
 
@@ -263,11 +261,11 @@ emergency_restart_threshold = 0
 
 emergency_restart_interval = 0
 
-## 8、其他高级
+## 1.8. 其他高级
 
 [PHP Closure(闭包)类详解 - 追风的浪子 - 博客园 (cnblogs.com)](https://www.cnblogs.com/echojson/p/10957362.html)
 
-## 9、PHP7有哪些不同
+## 1.9. PHP7有哪些不同
 
 - 性能可以达到PHP 5.6的3倍：变量、字符串、数组的数据结构优化
 
@@ -309,7 +307,7 @@ emergency_restart_interval = 0
 
 > 参考：[PHP 7 新特性 | 菜鸟教程 (runoob.com)](https://www.runoob.com/php/php7-new-features.html)
 
-## 10、nginx与php-fpm通信过程
+## 1.10. nginx与php-fpm通信过程
 
 （1）当 Nginx 收到 http 请求（动态请求），它会初始化 FastCGI 环境。（如果是 Apache 服务器，则初始化 mode*fastcgi 模块、如果是 Nginx 服务器则初始化 ngx*http_fastcgi_module）
 
@@ -341,7 +339,7 @@ fastcgi_pass unix:/tmp/php-cgi.sock;
 >
 > 2、[Nginx与php-fpm通信原理详解 - shuwoom的博客](https://shuwoom.com/?p=4366)
 
-### 11、PHP8有哪些改进，JIT是什么
+## 1.11. PHP8有哪些改进，JIT是什么
 
 - JIT即时编译
 - 命名参数
@@ -359,7 +357,7 @@ match(){
 
 
 
-### 12、composer自动加载机制，PSR编码规范
+## 1.12. composer自动加载机制，PSR编码规范
 
 ` \<NamespaceName>(\<SubNamespaceNames>)*\<ClassName>`
 
@@ -375,5 +373,5 @@ match(){
 >
 > 3、[PSR-4 自动加载规范 |《PHP PSR 标准规范》](https://learnku.com/docs/psr/psr-4-autoloader/1608)
 
-### 13、php代码运行过程
+## 1.13. php代码运行过程
 

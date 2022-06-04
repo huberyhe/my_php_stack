@@ -1,14 +1,48 @@
 [回到首页](../README.md)
 
-# git常用命令
+# 1. git常用命令
 
 [TOC]
 
-## 1、常见工作流程
+这里仅对常见问题作简要记录，推荐阅读**[廖雪峰的Git教程](https://www.liaoxuefeng.com/wiki/896043488029600)**、[阮一峰的Git 使用规范流程](https://www.ruanyifeng.com/blog/2015/08/git-use-process.html)和[高质量的Git中文教程](https://github.com/geeeeeeeeek/git-recipes)
 
-## 2、撤销改动
+## 1.1. 常见工作流程
 
-### 2.1、修改在工作区：已修改，未add
+一个项目至少应该有三个分支：**master正式分支**，**dev开发分支**，以及属于各个成员的**个人开发分支**（比如dev_heyc）
+
+平时成员在个人分支dev_heyc下开发，功能开发完或者bug修复完提交一个merge request到dev分支，分支由主程审核并合并到dev分支。
+
+项目阶段完成后将dev合并到master分支，并打上标签。
+
+特殊情况下可以增加**feature和bug分支**，以便多人一起完成后一起提交，但多数情况下有个人分支并约定一起提交即可。
+
+dev分支和master分支禁止直接提交代码，只允许合并代码，gitlab可以做这个配置。
+
+为减少合并代码时代码冲突，个人分支在合并前先做一次`git rebase`，将远程dev分支的改动合入到自己的个人分支，再进行push和merge。
+
+所以个人使用git的流程是这样的。
+
+```bash
+# 1、commit本地修改
+git commit -am "some commit"
+
+# 2、拉取远程dev分支
+git fetch origin dev
+
+# 3、将远程dev分支的最新提交并入到本地个人分支，实际上是把整个个人分支的提交移动到dev分支的后面
+git rebase dev
+
+# 4、提交到远程仓库
+git push origin dev_heyc
+
+# 5、在gitlab上提交合并请求
+```
+
+注意：`git rebase`的黄金法则是，绝不要在公共的分支上使用它。
+
+## 1.2. 撤销改动
+
+### 1.2.1. 修改在工作区：已修改，未add
 
 ```
 git checkout -- aaa.txt bbb.txt
@@ -16,7 +50,7 @@ git checkout -- *
 git checkout -- *.txt
 ```
 
-### 2.2、修改在暂存区：已add，未commit
+### 1.2.2. 修改在暂存区：已add，未commit
 
 ```
 git reset HEAD aaa.txt bbb.txt
@@ -24,28 +58,37 @@ git reset HEAD *
 git reset HEAD *.txt
 ```
 
-### 2.3、修改已提交到本地仓库：已commit
+### 1.2.3. 修改已提交到本地仓库：已commit
 
 ```
 #回退到上一个版本
 git reset --hard HEAD^
 #回退到上上次版本
 git reset --hard HEAD^^
-git reset --hard HEAD^^^
+git reset --hard HEAD~2
 
 #回退到指定commitid的版本（git log或git reflog获取）
 git reset --hard  commit-id
 ```
 
+### 1.2.4. 修改已提交到远程仓库，回滚某次的提交并重新提交
+
+```bash
+git revert <commit-id>
+git revert HEAD~2 // 上上次
+
+git commit -a -m "revert to ..."
+```
 
 
-## 3、git客户端
 
-#### 3.1、[GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
+## 1.3. git客户端
+
+### 1.3.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
 
 ![screenshot of gh pr status](../imgs/84171218-327e7a80-aa40-11ea-8cd1-5177fc2d0e72.png)
 
-#### 3.2、[Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
+### 1.3.2. [Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
 
 ![image 1](../imgs/image1Win.jpg)
 

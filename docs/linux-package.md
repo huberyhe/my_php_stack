@@ -1,14 +1,14 @@
 [回到首页](../README.md)
 
-# Linux下打包
+# 1. Linux下打包
 
 说明
 
 [TOC]
 
-## 1、RPM包
+## 1.1. RPM包
 
-### 1.1、常用rpm命令
+### 1.1.1. 常用rpm命令
 
 下载rpm包：`sudo yum install --downloadonly nginx --downloaddir=./ `
 
@@ -20,7 +20,7 @@
 
 查看已安装包的spec：`rpmrebuild -s wget.spec wget`
 
-### 1.2、示例，打包lrzsz
+### 1.1.2. 示例，打包lrzsz
 
 参考[Building and distributing packages](https://developer.ibm.com/tutorials/l-rpm1/)写的，原本是以wget为例，编译不过换成了lrzsz
 
@@ -105,7 +105,7 @@ rpmbuild -v -bb --clean ${build_dir}/SPECS/${dst_spec_filename}
 
 最终输出：`/home/hubery/rpm_pkgs/my_lrzsz/RPMS/x86_64/lrzsz-0.12.20-0.x86_64.rpm`
 
-### 1.3、常用字段介绍
+### 1.1.3. 常用字段介绍
 
 打包过程阶段：
 
@@ -151,7 +151,7 @@ make clean
 # 清理阶段，在制作完成后删除安装的内容
 ```
 
-### 1.4、常见宏介绍
+### 1.1.4. 常见宏介绍
 
 ```
 %{_sysconfdir}        /etc
@@ -188,7 +188,7 @@ $RPM_BUILD_ROOT       %{buildroot}
 
 
 
-### 1.5、其他注意事项
+### 1.1.5. 其他注意事项
 
 1、如何在升级时获取已安装的版本？
 
@@ -216,7 +216,7 @@ rpm包没有直接方法，可以通过写文件实现
 >
 >  8、[rpmbuild - RPM spec file find installed version - Stack Overflow](https://stackoverflow.com/questions/35357916/rpm-spec-file-find-installed-version)
 
-## 2、DEB包
+## 1.2. DEB包
 
-## 3、ssu包（sangfor）
+## 1.3. ssu包（sangfor）
 

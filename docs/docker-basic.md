@@ -1,20 +1,20 @@
 [回到首页](../README.md)
 
-# Docker基础命令
+# 1. Docker基础命令
 
 [TOC]
 
-## Docker官方文档：
+## 1.1. Docker官方文档：
 
 [docker | Docker Documentation](https://docs.docker.com/engine/reference/commandline/docker/)
 
-## 使用镜像运行容器：
+## 1.2. 使用镜像运行容器：
 
 ```bash
 docker run --name c_name -t -i ubuntu:14.04 /bin/bash 
 ```
 
-## 构建镜像：
+## 1.3. 构建镜像：
 
 ```
 $ cat Dockerfile 
@@ -32,13 +32,13 @@ CMD     /usr/sbin/sshd -D
 $ docker build -t runoob/centos:6.7 .
 ```
 
-## 给镜像打上标签：
+## 1.4. 给镜像打上标签：
 
 ```bash
 docker tag 860c279d2fec runoob/centos:dev
 ```
 
-## 列出容器的id：
+## 1.5. 列出容器的id：
 
 ```bash
 # docker ps --format "table {{.ID}} {{.Names}}"
@@ -52,14 +52,14 @@ f03974f382e9 vh_wxwifi
 
 > 支持的占位符：[docker ps | Docker Documentation](https://docs.docker.com/engine/reference/commandline/ps/#formatting)
 
-## 列出容器IP：
+## 1.6. 列出容器IP：
 
 ```bash
 docker inspect -f '{{.Name}} - {{.NetworkSettings.IPAddress }}' $(docker ps -aq)
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_name_or_id
 ```
 
-## 过滤容器：
+## 1.7. 过滤容器：
 
 ```bash
 # docker ps --filter "name=vh_php"
@@ -67,7 +67,7 @@ CONTAINER ID   IMAGE     COMMAND                 CREATED        STATUS        PO
 47ae9866a377   wacc      "/wns/shell/start.sh"   4 months ago   Up 2 months             vh_php
 ```
 
-## 导入导出：
+## 1.8. 导入导出：
 
 ```bash
 # 容器

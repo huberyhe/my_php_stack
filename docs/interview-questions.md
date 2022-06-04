@@ -1,12 +1,12 @@
 [回到首页](../README.md)
 
-# 常见面试题
+# 1. 常见面试题
 
 说明
 
 [TOC]
 
-## 1、抽象类与接口的区别
+## 1.1. 抽象类与接口的区别
 
 - 对接口的使用是通过关键字implements。对抽象类的使用是通过关键字extends。当然接口也可以通过关键字extends继承。
 - 接口中不可以声明成员变量（包括类静态变量），但是可以声明类常量。抽象类中可以声明各种类型成员变量，实现数据的封装。（另JAVA接口中的成员变量都要声明为public static final类型）
@@ -22,7 +22,7 @@
 >
 > 2、[接口和抽象类有什么区别？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/20149818/answer/704355929)
 
-## 2、在浏览器中打开一个url，发生了什么
+## 1.2. 在浏览器中打开一个url，发生了什么
 
 1. 孤单小弟 —— HTTP
 
@@ -47,7 +47,7 @@
 >
 > 1、[电脑上打开浏览器，输入 www.baidu.com，回车，到百度页面出现。中间发生了什么？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/437193010/answer/2065582348)
 
-## 3、七层OSI网络模型与TCP/IP网络模型、五层网络模型
+## 1.3. 七层OSI网络模型与TCP/IP网络模型、五层网络模型
 
 OSI体系结构：物理层、数据链路层、网络层、传输层、会话层、表示层、应用层
 
@@ -57,19 +57,19 @@ TCP/IP体系结构：网络接口层、网际层IP、运输层、应用层
 
 > 参考：[计算机网络的七层结构、五层结构和四层结构 - SegmentFault 思否](https://segmentfault.com/a/1190000039204681)
 
-## 4、缓存穿透、击穿、雪崩
+## 1.4. 缓存穿透、击穿、雪崩
 
 参考：[缓存-常见缓存问题](cache.md)
 
-## 5、并发锁机制
+## 1.5. 并发锁机制
 
-## 6、HTTP是长连接还是短连接
+## 1.6. HTTP是长连接还是短连接
 
 http/1.0中默认使用短连接，从http/1.1开始默认使用长连接
 
 参考：[HTTP长连接、短连接究竟是什么？ - dai.sp - 博客园 (cnblogs.com)](https://www.cnblogs.com/gotodsp/p/6366163.html)
 
-## 7、查询计划字段的含义
+## 1.7. 查询计划字段的含义
 
 ```
 MySQL [mysql]> explain select * from user;
@@ -100,7 +100,7 @@ MySQL [mysql]> explain select * from user;
 >
 > 2、[explain结果每个字段的含义说明 - 简书 (jianshu.com)](https://www.jianshu.com/p/8fab76bbf448)
 
-## 8、xss与csrf
+## 1.8. xss与csrf
 
 XSS：跨站脚本（Cross-site scripting，通常简称为XSS）是一种网站应用程序的安全漏洞攻击，是代码注入的一种。它允许恶意用户将代码注入到网页上，其他用户在观看网页时就会受到影响。**这类攻击通常包含了HTML以及用户端脚本语言**。
 
@@ -108,7 +108,7 @@ CSRF:跨站请求伪造（英语：Cross-site request forgery），也被称为 
 
 >  参考：[用大白话谈谈XSS与CSRF - SegmentFault 思否](https://segmentfault.com/a/1190000007059639)
 
-## 9、text等类型的长度，varchar指定长度有什么作用，与text的区别
+## 1.9. text等类型的长度，varchar指定长度有什么作用，与text的区别
 
 char的上限为255字节，varchar的上限65535字节，text的上限为65535。
 
@@ -136,11 +136,11 @@ varchar与text区别：
 >
 > 3、[InnoDB存储引擎之 行结构-王者之路-青山依舊 (xiangerfer.com)](http://www.xiangerfer.com/?thread-119.htm)
 
-## 10、实际项目中应用到的设计模式
+## 1.10. 实际项目中应用到的设计模式
 
-## 11、动态规划算法
+## 1.11. 动态规划算法
 
-## 12、常见概念：
+## 1.12. 常见概念：
 
 12.1、 微服务：微服务是一种开发软件的架构和组织方法，其中软件由通过明确定义的 API 进行通信的小型独立服务组成。这些服务由各个小型独立团队负责。微服务架构使应用程序更易于扩展和更快地开发，从而加速创新并缩短新功能的上市时间。
 
@@ -152,7 +152,7 @@ varchar与text区别：
 
 12.5、单点登录：又陈SSO（Single Sign On），在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
 
-## 13、PHP数组的底层实现
+## 1.13. PHP数组的底层实现
 
 底层实现为散列表(HashTable，也称作：哈希表)
 
@@ -162,7 +162,7 @@ varchar与text区别：
 >
 > 2、[php7-internal/zend_ht.md at master · pangudashu/php7-internal (github.com)](https://github.com/pangudashu/php7-internal/blob/master/2/zend_ht.md)
 
-## 14、ddos攻击防范
+## 1.14. ddos攻击防范
 
 1、备份网站：最低限度有一个临时主页，可以发出公告
 
@@ -179,13 +179,13 @@ varchar与text区别：
 >  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
 
 
-## 15、如何防止重复提交
+## 1.15. 如何防止重复提交
 
 表单中带上隐藏域内容是这个表单的token，表单提交时判断这个token有没有使用过：1、token信息放到session里；2、token信息放到缓存里
 
-## 16、flask的生命周期
+## 1.16. flask的生命周期
 
-## 17、列举索引失效的情况
+## 1.17. 列举索引失效的情况
 
 ```sql
 create table test {
@@ -204,11 +204,11 @@ create table test {
 - `select * from test where a not in ('jack','mike');  `
 - `select * from test where a is not null;`，`is null`会走索引
 
-## 18、redis中字典与hash表的区别
+## 1.18. redis中字典与hash表的区别
 
 [从HashMap，Redis 字典看【Hash】。。。 - 掘金 (juejin.cn)](https://juejin.cn/post/6844903927524098055)
 
-## 19、大量数据下，如何查最后几条数据
+## 1.19. 大量数据下，如何查最后几条数据
 
 ```sql
 create table user {
@@ -240,7 +240,7 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 >
 > 2、[MySQL 分页查询优化——延迟关联优化 - pufeng - 博客园 (cnblogs.com)](https://www.cnblogs.com/pufeng/p/11750495.html)
 
-## 20、存在大量数据的表，如何添加索引才能不影响业务（锁表）
+## 1.20. 存在大量数据的表，如何添加索引才能不影响业务（锁表）
 
 方法一：创建临时表，导入数据添加索引之后再升级成正式表
 
@@ -264,11 +264,11 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 >
 > 4、[MySQL5.7—在线DDL总结_一个笨小孩](https://blog.51cto.com/fengfeng688/1956827)
 
-## 21、是先导入数据，还是先添加索引
+## 1.21. 是先导入数据，还是先添加索引
 
 先导入数据，避免每条数据都去维护索引
 
-## 22、进程间通信有哪些方式
+## 1.22. 进程间通信有哪些方式
 
 - 管道
 - 消息队列
@@ -276,13 +276,13 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 - 信号量
 - socket
 
-## 23、面试经验
+## 1.23. 面试经验
 
 1、hr要代码截图：直接不要给了，面试官总能挑出毛病，很可能因为代码风格认为不合适
 
 2、面试结束了，面试官问有啥问题要问的：觉得面的还可以的话，问下团队的情况；如果觉得面试一般，可以问下题目的正确答案
 
-## 24、常见web身份认证方式
+## 1.24. 常见web身份认证方式
 
 - Cookie + Session 登录
 - Token 登录，常用[JWT](https://www.ruanyifeng.com/blog/2018/07/json_web_token-tutorial.html)，可用于分布式认证，也可解决跨域的问题
@@ -319,7 +319,7 @@ SSO整体陈述
       6. 系统注册
       7. 接收客户端注销请求，注销所有会话
 
-## 25、系统回答MySQL优化
+## 1.25. 25、系统回答MySQL优化
 
 从一下几个方面回答：
 
@@ -339,9 +339,9 @@ SSO整体陈述
 
 > 参考：[MySQL优化/面试，看这一篇就够了](https://juejin.cn/post/6844903750839058446)
 
-## 26、poll、epoll、select、reactor的IO多路复用
+## 1.26. poll、epoll、select、reactor的IO多路复用
 
-## 27、HTTP2的改进之处
+## 1.27. HTTP2的改进之处
 
 1、对于常见的HTTP头部通过静态表和哈夫曼编码的方式，奖体积缩小了近一半，而且针对后续的请求头部，还可以建立动态表，将体积压缩近90%
 
@@ -349,19 +349,19 @@ SSO整体陈述
 
 3、服务器支持主动推送资源
 
-## 28、如何判断一个二叉树是平衡二叉树
+## 1.28. 如何判断一个二叉树是平衡二叉树
 
 树中每个节点都满⾜左右两个⼦树的⾼度差 <= 1
 
 见[leetcode题目](https://leetcode-cn.com/problems/balanced-binary-tree/)
 
-## 29、谈谈对进程、线程和协程的理解
+## 1.29. 谈谈对进程、线程和协程的理解
 
 [进程、线程、协程常见面试题汇总_技术交流_牛客网 (nowcoder.com)](https://www.nowcoder.com/discuss/600292?type=1)
 
 
 
-## 30、微服务的理解，微服务有哪些缺点
+## 1.30. 微服务的理解，微服务有哪些缺点
 
 https://segmentfault.com/a/1190000020092884
 
@@ -383,9 +383,9 @@ https://segmentfault.com/a/1190000020092884
 - 远程调用延迟
 - 增加了配置部署的工作量
 
-## 31、如何写出高质量的代码
+## 1.31. 如何写出高质量的代码
 
-## 32、MySQL连表查询的原理是什么
+## 1.32. MySQL连表查询的原理是什么
 
 **MySQL的多表查询(笛卡尔积原理)**
 

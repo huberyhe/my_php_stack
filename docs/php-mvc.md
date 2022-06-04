@@ -1,10 +1,10 @@
 [回到首页](../README.md)
 
-# php常见框架
+# 1. php常见框架
 
 [TOC]
 
-## 1、框架级的函数
+## 1.1. 框架级的函数
 
 ```php
 error_reporting();//设置或获取错误报告级别
@@ -23,9 +23,9 @@ ini_set('display_errors', 0);//不显示错误信息
 >
 > 
 
-## 2、MVC框架的理解
+## 1.2. MVC框架的理解
 
-### 2.1、需要关注框架哪些基本功能
+### 1.2.1. 需要关注框架哪些基本功能
 
 - 路由配置
 - 数据库连接
@@ -33,21 +33,21 @@ ini_set('display_errors', 0);//不显示错误信息
 - 运行日志与调试日志，如何开调试模式
 - 全局常量如何定义
 - 全局配置如何定义
-- 参数校验
+- 表单参数校验
 
-## 3、常见框架
+## 1.3. 常见框架
 
-### 3.1、Codeigniter
+### 1.3.1. Codeigniter
 
 [文档地址](https://codeigniter.com/user_guide/index.html)
 
-### 3.2、Laravel
+### 1.3.2. Laravel
 
 [文档地址](https://learnku.com/docs/laravel/8.5)
 
 依赖注入与控制反转：
 
-### 3.3、ThinkPHP
+### 1.3.3. ThinkPHP
 
 [文档地址](https://www.kancloud.cn/manual/thinkphp5_1)
 
@@ -59,25 +59,25 @@ AOP（面向切面编程）：在软件业，AOP为Aspect Oriented Programming�
 
 [Thinkphp5.1中用到的设计模式（依赖注入，容器，Facade门面模式）](https://cloud.tencent.com/developer/article/1795111)
 
-### 3.4、Yii
+### 1.3.4. Yii
 
 [文档地址](https://www.yiiframework.com/doc/guide/2.0/zh-cn)
 
-### 3.5、phalcon
+### 1.3.5. phalcon
 
 [文档地址](https://docs.phalcon.io/4.0/zh-cn/introduction)
 
-### 3.6、yaf
+### 1.3.6. yaf
 
 [文档地址](https://www.php.net/manual/zh/book.yaf.php)
 
 [源码地址](https://github.com/laruence/yaf)
 
-### 3.7、CakePHP
+### 1.3.7. CakePHP
 
 [文档地址]([Contents - 3.10 (cakephp.org)](https://book.cakephp.org/3/zh/contents.html))
 
-## 4、自动加载配置
+## 1.4. 自动加载配置
 
 [laravel的启动过程解析](https://www.cnblogs.com/lpfuture/p/5578274.html)
 

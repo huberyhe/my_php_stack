@@ -1,12 +1,12 @@
 [回到首页](../README.md)
 
-# 搭建PHP运行环境
+# 1. 搭建PHP运行环境
 
 说明
 
 [TOC]
 
-## 1、原生方式
+## 1.1. 原生方式
 
 以alpine系统为例，其他系统类似：
 
@@ -87,7 +87,7 @@ curl 127.0.0.1/test_mysql.php
 
 
 
-## 2、docker快速创建
+## 1.2. docker快速创建
 
 ```bash
 # 下载镜像
@@ -148,6 +148,6 @@ docker run参数解释：
 
 > 参考：[docker 从入门到自动化构建 PHP 环境 | Laravel China 社区 (learnku.com)](https://learnku.com/articles/19504)
 
-## 3、docker compose一键部署
+## 1.3. docker compose一键部署
 
 将上述方案使用docker compose完成部署，详细见[github地址](https://github.com/huberyhe/docker_php_env)。

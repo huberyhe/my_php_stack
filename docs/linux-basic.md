@@ -1,25 +1,25 @@
 [回到首页](../README.md)
 
-# Linux基础使用
+# 1. Linux基础使用
 
 [TOC]
 
-## 1、操作系统
+## 1.1. 操作系统
 
-### 1.1、Alpine
+### 1.1.1. Alpine
 
-#### 1、使用usermod
+#### 1.1.1.1. 使用usermod
 
 ```bash
 echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 apk --no-cache add shadow
 ```
 
-## 
+## 1.2. 
 
-## 2、基础命令
+## 1.3. 基础命令
 
-### 2.1、top命令交互指令
+### 1.3.1. top命令交互指令
 
 ```
 c： 显示完整的命令
@@ -51,9 +51,9 @@ W： 将当前设置写入~/.toprc文件，下次启动自动调用toprc文件�
 1(数字1)： 显示每个CPU的详细情况
 ```
 
-### 2.2、tar归档
+### 1.3.2. tar归档
 
-#### 1、切换到指定目录后打包：
+#### 1.3.2.1. 切换到指定目录后打包：
 
 如果我想打包`/mnt/d/Workspace/业务@云平台/script_tools`目录下的`wac_login`目录，
 
@@ -89,7 +89,7 @@ drwxrwxrwx 1 hubery hubery   4096 Aug 10 17:07 pem_files
 -rw-r--r-- 1 hubery hubery 491520 Aug 12 09:29 /tmp/test_wac_login.tar
 ```
 
-#### 2、查看归档文件内容
+#### 1.3.2.2. 查看归档文件内容
 
 ```bash
 tar -tf test_wac_login.tar
@@ -113,7 +113,7 @@ wac_login/test_wac_login.php
 wac_login/test_wac_login.tar
 ```
 
-#### 3、解压到指定目录
+#### 1.3.2.3. 解压到指定目录
 
 ```bash
 tar xf /tmp/test_wac_login.tar -C ~/
@@ -136,14 +136,14 @@ drwxr-xr-x 1 hubery hubery    512 Aug 10 17:07 pem_files
 -rwxr-xr-x 1 hubery hubery  10240 Aug 12 09:16 test_wac_login.tar
 ```
 
-#### 4、tar.gz格式文件打包与解压
+#### 1.3.2.4. tar.gz格式文件打包与解压
 
 ```bash
 tar cvzf test.tar.gz test
 tar xvzf test.tat.gz
 ```
 
-#### 5、tar.xz格式文件打包与解压
+#### 1.3.2.5. tar.xz格式文件打包与解压
 
 ```bash
 tar cvf test.tar test
@@ -157,7 +157,7 @@ tar xvf node-v8.11.1-linux-x64.tar.xz123
 tar xvJf node-v8.11.1-linux-x64.tar.xz1
 ```
 
-#### 6、利用tar备份文件
+#### 1.3.2.6. 利用tar备份文件
 
 ```bash
  $ tar -cpf - /etc/init.d/README -C / | tar -xpf - -C /tmp
@@ -166,7 +166,7 @@ tar: Removing leading `/' from member names
 /tmp/etc/init.d/README
 ```
 
-#### 7、按行读取文件
+#### 1.3.2.7. 按行读取文件
 
 ```bash
 cat data.dat | while read line
@@ -180,7 +180,7 @@ do
 done < data.dat
 ```
 
-#### 8、指定解压文件的前缀路径
+#### 1.3.2.8. 指定解压文件的前缀路径
 
 ```bash
        --strip-components=NUMBER
@@ -216,7 +216,7 @@ drwxr-xr-x  4 hubery hubery  4096 Apr 14 09:04 sql-bench
 drwxr-xr-x  3 hubery hubery  4096 Apr 14 09:04 support-files
 ```
 
-#### 9、归档时使用绝对路径
+#### 1.3.2.9. 归档时使用绝对路径
 
 ```bash
        -P, --absolute-names
@@ -243,7 +243,7 @@ home/hubery/tar_test/123
 /home/hubery/tar_test/123
 ```
 
-#### 10、归档时修改文件路径
+#### 1.3.2.10. 归档时修改文件路径
 
 ```bash
        --transform=EXPRESSION, --xform=EXPRESSION
@@ -263,7 +263,7 @@ tar -cf archive.tar --transform 's/$/new/'
 
 
 
-### 2.3、iptables四表五链
+### 1.3.3. ptables四表五链
 
 数据包到了该链处，会去对应表中查询设置的规则，然后决定是否放行、丢弃、转发还是修改等等操作。
 
@@ -273,11 +273,11 @@ tar -cf archive.tar --transform 's/$/new/'
 
 命令格式：`iptables [-t 表名] 选项 [链名] [条件] [-j 控制类型]`，默认filter表
 
-### 2.4、zip和unzip
+### 1.3.4. zip和unzip
 
 命令格式：`zip -r <zip name> <files>`
 
-#### 1、排除目录
+#### 1.3.4.1. 排除目录
 
 `-x`参数，参数为文件路径，须用引号
 
@@ -287,38 +287,38 @@ tar -cf archive.tar --transform 's/$/new/'
 zip -r backend_3party.zip /go/gopath/src/ -x '/go/gopath/src/backup_20220107.zip' -x '/go/gopath/src/cloud.google.com/*'
 ```
 
-### 2.5、`free -m`中各字段的意义
+### 1.3.5. `free -m`中各字段的意义
 
-### 2.6、ps使用
+### 1.3.6. ps使用
 
-#### 1、查看程序启动时间
+#### 1.3.6.1. 查看程序启动时间
 
 ```bash
 ps -eo pid,lstart,etime,cmd | grep nginx
 ```
 
-### 2.7、日志截断
+### 1.3.7. 日志截断
 
 ```bash
 truncate -s 0 logfile
 ```
 
-### 2.8、时间和时区设置
+### 1.3.8. 时间和时区设置
 
-#### 1、设置时间
+#### 1.3.8.1. 设置时间
 
 ```bash
 date -s "20220530 11:30:00"
 ```
 
-#### 2、设置硬件时钟
+#### 1.3.8.2. 设置硬件时钟
 
 ```bash
 hwclock --set --date="11/03/17 14:55"
 hwclock --show
 ```
 
-#### 3、设置时区
+#### 1.3.8.3. 设置时区
 
 ```bash
 # 用户环境时区

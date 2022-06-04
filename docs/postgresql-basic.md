@@ -1,14 +1,14 @@
 [回到首页](../README.md)
 
-# postgresql基础
+# 1. postgresql基础
 
 说明
 
 [TOC]
 
-## 1、应用场景
+## 1.1. 应用场景
 
-## 2、基本概念
+## 1.2. 基本概念
 
 1.1、权限控制：角色与用户
 
@@ -30,7 +30,7 @@ psql database_name < database_name_20160527.sql
 
 
 
-## 3、终端使用技巧
+## 1.3. 终端使用技巧
 
 2.1、帮助文档使用`\?`命令
 
@@ -54,7 +54,7 @@ mydb=#
 
 ```
 
-### 4、检查表、表字段是否存在
+## 1.4. 检查表、表字段是否存在
 
 表字段可以通过检查`INFORMATION_SCHEMA.COLUMNS`表，表可以通过`INFORMATION_SCHEMA.TABLES`表或`to_regclass('${tb_name}')`命令
 
