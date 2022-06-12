@@ -97,6 +97,16 @@ test "abc" = "a" && echo "same"
 test -f /etc/passwd && echo "file exist"
 ```
 
+### 1.1.6. 多个条件
+
+```bash
+if [ -n "1" -a -n "2" ] && [ 1 -eq 1 ]; then 
+	echo 1 
+else
+	echo 2
+fi
+```
+
 
 
 > 参考：[shell浅谈之二运算符和IF条件判断](https://blog.csdn.net/taiyang1987912/article/details/38893381)

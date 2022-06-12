@@ -255,6 +255,8 @@ breakpoints/bp
 clear 1
 // 清除所有断点
 clearall
+// 启用禁用断点
+toggle 1
 // 下一步
 next/n
 // 跳入
@@ -266,7 +268,7 @@ continue/c
 // 在断点执行命令
 on 1 p i
 // 有条件中断断点
-condition
+condition 1 i==10
 // 查看函数参数
 args
 // 查看所有局部变量
