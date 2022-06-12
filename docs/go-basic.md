@@ -689,3 +689,122 @@ _ = decoder.Decode(&head)
 >
 > 2、[go - How to read multiple times from same io.Reader - Stack Overflow](https://stackoverflow.com/questions/39791021/how-to-read-multiple-times-from-same-io-reader)
 
+## 1.18. 多协程并发的优秀实现
+
+几个原则：
+
+- 保持自己忙碌或做自己的工作：如果当前方法启动了一个协程并立即等待，则应该让当前方法去做协程里的事情
+- 将并发性留给调用者
+- 永远不要启动一个停止不了的goroutine
+
+```go
+func serve(addr string, handler http.Handler, stop <-chan struct{}) error {
+	s := http.Server{
+		Addr:    addr,
+		Handler: handler,
+	}
+
+	go func() {
+		<-stop // wait for stop signal
+		s.Shutdown(context.Background())
+	}()
+
+	return s.ListenAndServe()
+}
+
+func serveApp(stop <-chan struct{}) error {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
+		fmt.Fprintln(resp, "Hello, QCon!")
+	})
+	return serve("0.0.0.0:8080", mux, stop)
+}
+
+func serveDebug(stop <-chan struct{}) error {
+	return serve("127.0.0.1:8001", http.DefaultServeMux, stop)
+}
+
+func main() {
+	done := make(chan error, 2)
+	stop := make(chan struct{})
+	go func() {
+		done <- serveDebug(stop)
+	}()
+	go func() {
+		done <- serveApp(stop)
+	}()
+
+	var stopped bool
+	for i := 0; i < cap(done); i++ {
+		if err := <-done; err != nil {
+			fmt.Println("error: %v", err)
+		}
+		if !stopped {
+			stopped = true
+			close(stop)
+		}
+	}
+}
+```
+
+该实现中，任何一个服务遇到错误时另外一个服务都能干净地退出，由系统的进程管理器来重启
+
+## 1.19. 错误处理
+
+错误处理注意三点：
+
+- 错误只处理一次，避免出现重复的日志
+- 错误应该包含相关信息，从错误文字上就能大概判断错误位置
+- 使用`github.com/pkg/errors`保留原始错误信息
+
+```go
+package main
+
+import (
+	"log"
+	"os"
+
+	"github.com/pkg/errors"
+)
+
+func testError() error {
+	f, err := os.Open("/tmp/ll")
+	if err != nil {
+		//log.Printf("open failed: %s", err.Error()) // 1、错误交由调用者处理，避免处理/记录多次，此错误在main中已有处理
+		return errors.Wrap(err, "open failed") // 2、为错误添加相关信息；3、另外，errors.Wrap保留了原始错误的信息
+	}
+	f.Close()
+	return nil
+}
+
+func main() {
+	err := testError()
+	if err != nil {
+		log.Printf("testError: %s", err.Error())
+		log.Printf("original error: %T %v\n", errors.Cause(err), errors.Cause(err))
+		log.Printf("stack trace:\n%+v\n", err)
+		os.Exit(1)
+	}
+}
+```
+
+输出：
+
+```bash
+ $ go run test.go
+2022/06/05 00:01:16 testError: open failed: open /tmp/ll: no such file or directory
+2022/06/05 00:01:16 original error: *fs.PathError open /tmp/ll: no such file or directory
+2022/06/05 00:01:16 stack trace:
+open /tmp/ll: no such file or directory
+open failed
+main.testError
+        /Volumes/FILE/Workspace/go_test/terror/test.go:14
+main.main
+        /Volumes/FILE/Workspace/go_test/terror/test.go:21
+runtime.main
+        /usr/local/Cellar/go/1.18.2/libexec/src/runtime/proc.go:250
+runtime.goexit
+        /usr/local/Cellar/go/1.18.2/libexec/src/runtime/asm_amd64.s:1571
+exit status 1
+```
+
