@@ -808,3 +808,20 @@ runtime.goexit
 exit status 1
 ```
 
+## 1.10. go build参数
+
+```
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l" -mod=vendor -o runtime/bin/license-srv cmd/main.go
+```
+
+1、gcflags编译参数：`go tool compile --help`查看可用参数
+
+-N 禁用优化
+
+-l 禁用内联
+
+2、ldflags链接参数：`go tool link –help`查看可用参数
+
+-w 禁用DWARF
+
+-s 禁用符号表
