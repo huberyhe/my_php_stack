@@ -562,3 +562,84 @@ firewall-cmd --zone=public --add-port=443/tcp --permanent
 firewall-cmd --reload
 ```
 
+## 1.13. 查看硬件信息
+
+```bash
+# cpu
+lscpu
+# 内存
+dmidecode -t memory
+# 硬盘
+smartctl -i /dev/sdb
+```
+
+## 1.14. 修改文件描述符数量限制
+
+1、查看限制
+
+```bash
+[root@localhost hubery]# ulimit -n
+1024
+[root@localhost hubery]# ulimit -Sn
+1024
+[root@localhost hubery]# ulimit -Hn
+524288
+[root@localhost hubery]# cat /proc/sys/fs/file-max
+379276
+```
+
+2、临时设置限制
+
+用户级
+
+```bash
+[root@localhost hubery]# ulimit -Sn 4096
+```
+
+内核级
+
+```
+[root@localhost hubery]# sysctl -w fs.file-max=100000
+fs.file-max = 100000
+```
+
+4、设置内核级限制，打开`/etc/sysctl.conf`，加上。`sysctl -p`生效
+
+```bash
+fs.file-max = 100000
+```
+
+验证是否生效
+
+```bash
+cat /proc/sys/fs/file-max
+```
+
+5、设置用户级限制，打开`/etc/security/limits.conf`，加上。重新登录有效
+
+```
+* soft nofile 8192
+* hard nofile 20480
+```
+
+6、除了内核和用户级限制外，应用也会受限制
+
+查看：
+
+```bash
+cat /proc/pid/limits
+```
+
+对于systemd管理的应用，加上字段
+
+```
+[Service]
+LimitNOFILE=65536
+```
+
+应用本身也可能有限制，比如nginx：
+
+```
+worker_rlimit_nofile 20000;
+```
+

@@ -35,3 +35,38 @@ cat /dev/null > access.log
 
 其他方法可能导致不写日志，谨慎操作。例如删除文件或`cat > access.log`
 
+## 1.4. 最大文件打开数量限制
+
+nginx默认只只能打开1024个文件，超出后报错*Too many open files*
+
+查看限制：
+
+```bash
+$ cat /proc/`ps -ef | grep nginx | grep master | awk '{print $2}'`/limits | grep -E "^Limit|open files"
+Limit                     Soft Limit           Hard Limit           Units     
+Max open files            1024                 4096                 files
+```
+
+修改限制：
+
+1、systemd限制，修改nginx的systemd文件，添加字段，然后重新加载
+
+```
+[Service]
+LimitNOFILE=20480
+```
+
+2、nginx限制，修改nginx配置文件，添加全局字段，然后重启服务
+
+```
+worker_rlimit_nofile 20000;
+```
+
+3、为有更好的并发，修改ningx worker的连接数限制
+
+```
+events {
+    worker_connections  10240;
+}
+```
+

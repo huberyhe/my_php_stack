@@ -145,4 +145,6 @@ rdf是数据，schema定义了导入的数据类型
 > 2、[Dgraph QL 入门](https://juejin.cn/post/6844903598581612557)
 >
 > 3、[dgraph实现基本操作](https://www.cnblogs.com/wangha/p/10467915.html)
+>
+> 4、[Dgraph的基本使用经典教程（数据导入，导出，删除，查询等）)](https://codeleading.com/article/41964542945/)
 
