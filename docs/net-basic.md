@@ -8,9 +8,17 @@
 
 ## 1.1. TCP/IP四层，OSI七层协议
 
-TCP/IP四层：数据链路层，网络层，传输层，应用层
+1、TCP/IP四层
 
-OSI七层：物理层，数据链路层，网络层，传输层，会话层，表示层，应用层
+- Network Access Layer网络访问层（以太网、Wi-Fi等）
+
+- Internet Layer网络层（ip、icmp、arp）
+- Transport Layer传输层（tcp、udp）
+- Application Layer应用层（http、ftp、dns、dhcp、telnet）
+
+2、OSI七层
+
+物理层，数据链路层，网络层，传输层，会话层，表示层，应用层
 
 ## 1.2. TCP与UDP区别
 
