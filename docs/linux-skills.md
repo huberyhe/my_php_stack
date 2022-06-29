@@ -547,6 +547,16 @@ cd -
 
 ## 1.11. firewall基本使用
 
+```
+firewall-cmd --add-port=19192/tcp
+firewall-cmd --remove-port=19196/tcp
+firewall-cmd --list-ports
+firewall-cmd --runtime-to-permanent
+firewall-cmd --permanent --list-ports
+```
+
+> 参考：https://docs.fedoraproject.org/en-US/quick-docs/firewalld/
+
 ## 1.12. selinux基本使用
 
 ```bash

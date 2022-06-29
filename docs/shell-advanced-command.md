@@ -128,6 +128,9 @@ find /usr/local/backups -mtime +10 -name "*.html" -exec rm -rf {} \;
 
 # 只在查找当前目录中查找，不查找子目录：-maxdepth \ -mindepth
 find . -maxdepth 1 -name '*.txt'
+
+# 查找文本文件
+find . -type f -exec grep -Iq . {} \; -print
 ```
 
 > 参考：

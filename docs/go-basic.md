@@ -20,7 +20,7 @@
 - 字符：rune
 - 错误：error
 
-符合类型：
+复合类型：
 
 - 指针：pointer
 - 数组：array
@@ -825,3 +825,12 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 -w 禁用DWARF
 
 -s 禁用符号表
+
+## 1.11. go语言中init函数执行顺序
+
+1. 如果一个包导入了其他包，则首先初始化导入的包。
+2. 然后初始化当前包的常量。
+3. 接下来初始化当前包的变量。
+4. 最后，调用当前包的 `init()` 函数。
+
+> 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)

@@ -44,6 +44,14 @@ txn.Commit(ctx)
 
 ### 1.3.2. curl
 
+查看状态：
+
+```
+curl http://localhost:8080/health
+```
+
+
+
 查询：
 
 ```bash

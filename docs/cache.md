@@ -298,7 +298,7 @@ key存在就是加锁了
 为了避免死锁（`setnx`后程序异常，没有`del`）出现，可以在拿到锁之后给个10s过期时间。2.8版本把`setnx`和`expire`组合成一个命令：
 
 ```bash
-> set logck:codehole true ex ex 10 nx
+> set logck:codehole true ex 10 nx
 OK
 ... do something
 > del lock:codehole

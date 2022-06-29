@@ -32,6 +32,8 @@ CMD     /usr/sbin/sshd -D
 $ docker build -t runoob/centos:6.7 .
 ```
 
+> 参考：[Dockerfile 中的 CMD 与 ENTRYPOINT](https://www.cnblogs.com/sparkdev/p/8461576.html)
+
 ## 1.4. 给镜像打上标签
 
 ```bash
