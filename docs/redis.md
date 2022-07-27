@@ -105,7 +105,13 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 3) "redis"
 ```
 
+## 1.2. 事务
 
+开启：`MULTI`
+
+提交：`EXEC`
+
+取消：`DISCARD`
 
 ## 1.2. 常见应用
 
