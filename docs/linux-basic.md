@@ -304,6 +304,19 @@ No errors detected in compressed data of /dockertmp/package/0.130b220616/do_upgr
 
 ### 1.3.5. `free -m`中各字段的意义
 
+``` bash
+ $ free -m
+              total        used        free      shared  buff/cache   available
+Mem:           1837         251        1205          19         380        1422
+Swap:          3071           0        3071
+```
+
+Mem行表示：从操作系统看到总共1837M物理内存，使用了251M，另外进程共享使用19M，缓冲和缓存使用380M，剩余1205M（total=used+free+buff/cache）。以及从应用程序看到的可用内存1422M。
+
+Swap行表示：交换分区总共3701M，使用0M，剩余3701M
+
+> 参考：[Linux free字段解析](https://www.cnblogs.com/likui360/p/6263987.html)
+
 ### 1.3.6. ps使用
 
 #### 1.3.6.1. 查看程序启动时间
