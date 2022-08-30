@@ -349,10 +349,8 @@ hwclock --show
 ### 1.5.3. 设置时区
 
 ```bash
-# 用户环境时区
-tzselect
-# 执行结果
-TZ=’Asia/Shanghai’; export TZ
+# 用户环境时区,tzselect命令帮助生成一个环境变量设置命令
+TZ='Asia/Shanghai'; export TZ
 
 # 系统时区
 echo "ZONE=Asia/Shanghai" >> /etc/sysconfig/clock

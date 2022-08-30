@@ -123,7 +123,13 @@ int64, err := strconv.ParseInt(string, 10, 64)
 string := strconv.Itoa(int)
 
 // int64转成string
-string := strconv.FormatInt(int64,10)
+string := strconv.FormatInt(int64, 10)
+```
+
+注意，go不支持强制转换，使用string()会得到意想不到的结果
+
+```go
+s := string(97) // s == "a"
 ```
 
 
@@ -834,3 +840,86 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 4. 最后，调用当前包的 `init()` 函数。
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
+
+## 1.12. context的使用
+
+### 1.12.1. 停止协程
+
+```go
+package main
+
+import (
+    "context"
+    "log"
+    "os/exec"
+    "sync"
+    "time"
+)
+
+func Run(ctx context.Context) {
+    cmd := exec.CommandContext(ctx, "sleep", "300")
+    err := cmd.Start()
+    if err != nil {
+        // Run could also return this error and push the program
+        // termination decision to the `main` method.
+        log.Fatal(err)
+    }
+
+    err = cmd.Wait()
+    if err != nil {
+        log.Println("waiting on cmd:", err)
+    }
+}
+
+func main() {
+    var wg sync.WaitGroup
+    ctx, cancel := context.WithCancel(context.Background())
+
+    // Increment the WaitGroup synchronously in the main method, to avoid
+    // racing with the goroutine starting.
+    wg.Add(1)
+    go func() {
+        Run(ctx)
+        // Signal the goroutine has completed
+        wg.Done()
+    }()
+
+    <-time.After(3 * time.Second)
+    log.Println("closing via ctx")
+    cancel()
+
+    // Wait for the child goroutine to finish, which will only occur when
+    // the child process has stopped and the call to cmd.Wait has returned.
+    // This prevents main() exiting prematurely.
+    wg.Wait()
+}
+```
+
+> 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
+
+## 1.13. 值类型、引用类型
+
+golang中分为值类型和引用类型
+
+值类型分别有：int系列、float系列、bool、string、数组和结构体
+
+引用类型有：指针、slice切片、管道channel、接口interface、map、函数等
+
+值类型的特点是：变量直接存储值，内存通常在栈中分配
+
+引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
+
+## 1.14. go中函数传参都是值传递
+
+> 参考：https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value
+
+# 2. 第三方包
+
+## 2.1. Gorm
+
+相对更新：
+
+```go
+Db.Model(xy).Where("id = ? ", id).Update("sign_up_num", gorm.Expr("sign_up_num+ ?", 1))
+```
+

@@ -80,15 +80,29 @@ git revert HEAD~2 // 上上次
 git commit -a -m "revert to ..."
 ```
 
+## 1.3. 其他命令
+
+### 1.3.1. 查看任意目录的状态
+
+```bash
+git --git-dir=the/local/repo/.git --work-tree=the/local/repo status
+```
+
+### 1.3.2. 判断当前目录是否为git仓库
+
+```bash
+[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
+```
 
 
-## 1.3. git客户端
 
-### 1.3.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
+## 1.4. git客户端
+
+### 1.4.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
 
 ![screenshot of gh pr status](../imgs/84171218-327e7a80-aa40-11ea-8cd1-5177fc2d0e72.png)
 
-### 1.3.2. [Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
+### 1.4.2. [Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
 
 ![image 1](../imgs/image1Win.jpg)
 
