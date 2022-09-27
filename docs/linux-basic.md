@@ -15,6 +15,17 @@ echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 apk --no-cache add shadow
 ```
 
+### 1.1.2. CentOS
+
+#### 1.1.2.1. 网络管理
+
+```bash
+# 交互式网卡配置修改
+nmtui
+```
+
+
+
 ## 1.2. 
 
 ## 1.3. 基础命令

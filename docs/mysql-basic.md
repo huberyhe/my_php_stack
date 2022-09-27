@@ -160,9 +160,9 @@ innodb_buffer_pool_size
 
 insert_pool
 
-### 1.7.1. 常见的SQL考题
+### 1.8. 常见的SQL考题
 
-#### 1.7.1.1. 有一个学生选修课程的数据表，查询选修了多门课程的人数
+#### 1.8.1. 有一个学生选修课程的数据表，查询选修了多门课程的人数
 
 course：stu_id, course_name
 

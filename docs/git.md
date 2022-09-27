@@ -94,6 +94,15 @@ git --git-dir=the/local/repo/.git --work-tree=the/local/repo status
 [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
 ```
 
+### 1.3.4. 文件可执行权限
+
+```bash
+# 查看权限
+git ls-files --stage test.sh
+# 增加权限
+git update-index --chmod=+x *.sh
+```
+
 
 
 ## 1.4. git客户端

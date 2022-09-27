@@ -653,3 +653,4 @@ LimitNOFILE=65536
 worker_rlimit_nofile 20000;
 ```
 
+>  参考：[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)

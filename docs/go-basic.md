@@ -913,6 +913,10 @@ golang中分为值类型和引用类型
 
 > 参考：https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value
 
+## 1.15. go build缓存目录
+
+缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
+
 # 2. 第三方包
 
 ## 2.1. Gorm

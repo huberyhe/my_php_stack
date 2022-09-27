@@ -121,11 +121,78 @@ curl "localhost:8080/mutate?commitNow=true" --silent --request POST \
 
 ### 1.4.1. 查询
 
+#### 1.  基本示例
+
+```dql
+{
+  me(func: eq(name@en, "Steven Spielberg")) @filter(has(director.film)) {
+    name@en
+    director.film @filter(allofterms(name@en, "jones indiana"))  {
+      name@en
+    }
+  }
+}
+```
+
+me：当前查询的名称
+
+#### 2. 过滤
+
+过滤需要字段类型有index，不同的index类型可以过滤的方式不同，常用的类型有term/hash/fulltext/trigram
+
+- uid(uids) 过滤uid：uids可以是变量或者n个uid值
+- `eq`, `ge`, `gt`, `le`, `lt`比较
+- allofterms(predicate, "space-separated term list")包含所有字符
+- anyofterms(predicate, "space-separated term list")包含任意一个字符
+- regexp(predicate, /regular-expression/)正则判断
+- match(predicate, string, distance)
+- alloftext(predicate, "space-separated text")全文检索
+- between(predicate, startDateValue, endDateValue)范围判断
+- has(predicate)有字段值
+
+#### 3. 排序
+
+定义：`q(func: ..., orderasc: predicate1, orderdesc: predicate2)`
+
+支持：`int`, `float`, `String`, `dateTime`, `default`
+
+#### 4. 分页
+
+定义：`predicate @filter(...) (first: N) { ... }`
+
+#### 5. 计数
+
+定义：`count(predicate)`
+
+#### 6. 分组
+
+定义：`q(func: ...) @groupby(predicate) { min(...) }`
+
 ### 1.4.2. 新增
+
+```dql
+{
+    set {
+		<0x1> <td.relation.group_account> <0x27101> .
+    }
+}
+```
 
 ### 1.4.3. 修改
 
+如果是修改节点属性，直接set即可；如果是修改关系，需要先解除旧关系（delete），再绑定（set）
+
 ### 1.4.4. 删除
+
+```dql
+{
+    delete {
+		<0x1> <td.relation.group_account> <0x27101> .
+    }
+}
+```
+
+
 
 ## 1.5. 数据导出导入
 
@@ -150,6 +217,10 @@ dgraph bulk -r goldendata.rdf -s goldendata.schema --map_shards=4 --reduce_shard
 ```
 
 rdf是数据，schema定义了导入的数据类型
+
+## 1.6. 注意事项
+
+1、[排序](https://dgraph.io/docs/query-language/sorting/)后默认只能查1000条数据，first默认值为1000
 
 
 

@@ -131,11 +131,19 @@ find . -maxdepth 1 -name '*.txt'
 
 # 查找文本文件
 find . -type f -exec grep -Iq . {} \; -print
+
+# 查找没有可执行权限的shell文件
+find /usr/bin -perm -u-x -type f "*.sh"
+
+# 查找空目录
+find ./ -empty -type d
 ```
 
 > 参考：
 >
 > [Linux查找目录下的按时间过滤的文件](https://www.cnblogs.com/hhwww/p/10827558.html)
+>
+> [How To Find Files Based On their Permissions In Linux](https://ostechnix.com/find-files-based-permissions/)
 
 ## 1.2. awk格式化输出
 
@@ -269,6 +277,12 @@ awk 'NR>2{print line}{line=$0} END{print line}' a.txt
 awk 'NR>1{print line}{line=$0}' a.txt
 # 删除首尾两行
 awk 'NR>2{print line}{line=$0}' a.txt
+```
+
+#### 1.2.6.6. 文件md5
+
+```
+ls -1 | xargs md5sum | awk '{print $1 > $2".md5"}'
 ```
 
 

@@ -137,5 +137,38 @@ Total reclaimed space: 0B
 
 > 参考：[如何清理 Docker 占用的磁盘空间](https://segmentfault.com/a/1190000021473320)
 
+## 1.10. 修改容器属性
 
+禁用开机自启：
+
+```bash
+docker update --restart=no topihsdocwork-topihs-1
+```
+
+## 1.11. 时区问题
+
+docker容器默认0时区
+
+1、修改容器时区
+
+```bash
+docker run -it -e TZ=Asia/Shanghai ...
+```
+
+2、共享宿主机时区
+
+```bash
+docker run -it -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro ...
+```
+
+3、制作镜像时指定时区
+
+```dockerfile
+FROM centos
+ENV TZ Asia/Shanghai
+
+RUN ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
+```
+
+> 参考：[Docker 时区调整方案)](https://cloud.tencent.com/developer/article/1626811)
 

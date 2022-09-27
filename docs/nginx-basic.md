@@ -70,3 +70,33 @@ events {
 }
 ```
 
+对于系统级限制可以参考[Linux技巧 1.14. 修改文件描述符数量限制](./linux-sills.md)
+
+## 1.5. url代理去掉前缀
+
+需求：访问http://example.com/v1/api/test，后端接口路由为`/api/test`
+
+1、方法1：
+
+```
+server {
+    location ^~/v1/ {
+    	proxy_pass http://localhost:8080/;
+    }
+}
+```
+
+`^~/v1/`匹配v1开头的url，proxy_pass后加`/`可去掉`/v1/`前缀
+
+2、方法2:
+
+```
+server {
+    location ^~/v1/ {
+    	rewrite ^/v1/(.*)$ /$1 break;
+    	proxy_pass http://localhost:8080;
+    }
+}
+```
+
+> 参考：[Nginx 配置反向代理去除前缀](https://segmentfault.com/a/1190000037601092)
