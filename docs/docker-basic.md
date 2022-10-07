@@ -16,7 +16,7 @@ docker run --name c_name -t -i ubuntu:14.04 /bin/bash
 
 ## 1.3. 构建镜像
 
-```
+```bash
 $ cat Dockerfile 
 FROM    centos:6.7
 MAINTAINER      Fisher "fisher@sudops.com"

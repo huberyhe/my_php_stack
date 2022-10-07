@@ -50,6 +50,7 @@
 - [sqlite](doc/sqlite-basic.md)
 - [postgresql](docs/postgresql-basic.md)
 - [dgraph基础](docs/dgraph-basic.md)
+- [redis基础](docs/redis.md)
 
 ## Nginx
 
@@ -115,6 +116,7 @@
 ## 持续集成CI、CD
 
 - jenkins打包
+- gitlab-runner
 
 ## git与svn
 
