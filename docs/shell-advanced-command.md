@@ -153,6 +153,16 @@ awk [选项参数] 'script' var=value file(s)
 awk [选项参数] -f scriptfile var=value file(s)
 ```
 
+基本用法
+```bash
+awk '[BEGIN{}] {[pattern] action} [END {}]' {filenames}   
+# 行匹配语句 awk '' 只能用单引号
+# BEGIN 这里面放的是执行前的语句
+# END 这里面放的是处理完所有的行后要执行的语句
+# 中间 这里面放的是处理每一行时要执行的语句
+# pattern是过滤选项，例如：$1>2 && $2=="Are" && $3 ~ /th/ ，表示第1列大于2 且 第2列是Are 且 第三列包含th
+```
+
 ### 1.2.1. 多分隔符
 
 ```bash
@@ -178,19 +188,33 @@ awk '/re/ ' log.txt
 awk 'BEGIN{IGNORECASE=1} /this/' log.txt
 ```
 
-### 1.2.4. 常用内置变量
+### 1.2.4. 使用变量
 
--  FS(Field Separator)：输入字段分隔符， 默认为空白字符
--  OFS(Out of Field Separator)：输出字段分隔符， 默认为空白字符
--  RS(Record Separator)：输入记录分隔符(输入换行符)， 指定输入时的换行符
--  ORS(Output Record Separate)：输出记录分隔符（输出换行符），输出时用指定符号代替换行符
--  NF(Number for Field)：当前行的字段的个数(即当前行被分割成了几列)
--  NR(Number of Record)：行号，当前处理的文本行的行号。
--  FNR：各文件分别计数的行号
--  ARGC：命令行参数的个数
--  ARGV：数组，保存的是命令行所给定的各参数
+```bash
+awk -v  # 设置变量
+```
 
-### 1.2.5. awk脚本
+```bash
+ $ awk -va=1 -vb=s '{print $1,$1+a,$1b}' log.txt
+2 3 2s
+3 4 3s
+This's 1 This'ss
+10 11 10s
+```
+
+### 1.2.5. 常用内置变量
+
+-  `FS(Field Separator)`：输入字段分隔符， 默认为空白字符
+-  `OFS(Out of Field Separator)`：输出字段分隔符， 默认为空白字符
+-  `RS(Record Separator)`：输入记录分隔符(输入换行符)， 指定输入时的换行符
+-  `ORS(Output Record Separate)`：输出记录分隔符（输出换行符），输出时用指定符号代替换行符
+-  `NF(Number for Field)`：当前行的字段的个数(即当前行被分割成了几列)
+-  `NR(Number of Record)`：行号，当前处理的文本行的行号。
+-  `FNR`：各文件分别计数的行号
+-  `ARGC`：命令行参数的个数
+-  `ARGV`：数组，保存的是命令行所给定的各参数
+
+### 1.2.6. awk脚本
 
 ```bash
 $ cat score.txt
@@ -236,15 +260,15 @@ Bob    2415     40       57       62      159
 AVERAGE:     63.80    78.60    70.00
 ```
 
-### 1.2.6. 其他实例
+### 1.2.7. 其他实例
 
-#### 1.2.6.1. 最后一列
+#### 1.2.7.1. 最后一列
 
 ```bash
 awk '{print $NF}'
 ```
 
-#### 1.2.6.2. 打印除了第一列的所有列
+#### 1.2.7.2. 打印除了第一列的所有列
 
 ```bash
 awk '{for(i=2;i<=NF;i++) {
@@ -256,19 +280,19 @@ else {print $i}
 awk '{$1="";print}'
 ```
 
-#### 1.2.6.3. 计算文件大小
+#### 1.2.7.3. 计算文件大小
 
 ```bash
 ls -l *.txt | awk '{sum+=$5} END {print sum}'
 ```
 
-#### 1.2.6.4. 打印九九乘法表
+#### 1.2.7.4. 打印九九乘法表
 
 ```bash
 seq 9 | sed 'H;g' | awk -v RS='' '{for(i=1;i<=NF;i++)printf("%dx%d=%d%s", i, NR, i*NR, i==NR?"\n":"\t")}'
 ```
 
-#### 1.2.6.5. 删除首行、尾行
+#### 1.2.7.5. 删除首行、尾行
 
 ```bash
 # 删除首行
@@ -279,7 +303,7 @@ awk 'NR>1{print line}{line=$0}' a.txt
 awk 'NR>2{print line}{line=$0}' a.txt
 ```
 
-#### 1.2.6.6. 文件md5
+#### 1.2.7.6. 文件md5
 
 ```
 ls -1 | xargs md5sum | awk '{print $1 > $2".md5"}'

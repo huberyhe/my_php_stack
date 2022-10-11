@@ -41,7 +41,6 @@
 - [MySQL的基本使用](docs/mysql-basic.md)
 - [MySQL的高级使用-分区分表、主从复制、读写分离等](docs/mysql-advanced.md)
 - [MySQL事务](docs/mysql-transaction.md)
-
 - [MySQL有哪些存储引擎，各自的优缺点，应用场景](https://juejin.im/post/6844903684912971783)
 - mysql常用命令
 
@@ -81,18 +80,12 @@
 ## 软件工程
 
 - 23个设计模式
-
 - [7大设计原则](https://bbs.huaweicloud.com/blogs/312691?utm_campaign=other&utm_source=wechat_session&utm_medium=social&utm_oi=43696514924544)：单一职责原则、开放封闭原则、里氏替换原则、接口隔离原则、依赖倒转原则、组合/聚合复用原则、迪米特原则
-
 - [并发的3个特性](https://zhuanlan.zhihu.com/p/58855599)：原子性、有序性、可见性
-
 - 如何画架构图
-
 - 完整项目开发流程
-
 - 系统设计
 
-  
 
 ## 安全编码
 

@@ -119,6 +119,8 @@ curl "localhost:8080/mutate?commitNow=true" --silent --request POST \
 
 ## 1.4. DQL语法
 
+官方文档：[Get Started - Quickstart Guide (dgraph.io)](https://dgraph.io/docs/get-started/)
+
 ### 1.4.1. 查询
 
 #### 1.  基本示例
@@ -158,7 +160,7 @@ me：当前查询的名称
 
 #### 4. 分页
 
-定义：`predicate @filter(...) (first: N) { ... }`
+定义：`predicate @filter(...) (first: M, offset: N) { ... }`
 
 #### 5. 计数
 
