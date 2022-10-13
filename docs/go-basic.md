@@ -814,7 +814,7 @@ runtime.goexit
 exit status 1
 ```
 
-## 1.10. go build参数
+## 1.20. go build参数
 
 ```
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l" -mod=vendor -o runtime/bin/license-srv cmd/main.go
@@ -832,7 +832,7 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 -s 禁用符号表
 
-## 1.11. go语言中init函数执行顺序
+## 1.21. go语言中init函数执行顺序
 
 1. 如果一个包导入了其他包，则首先初始化导入的包。
 2. 然后初始化当前包的常量。
@@ -841,9 +841,9 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
 
-## 1.12. context的使用
+## 1.22. context的使用
 
-### 1.12.1. 停止协程
+### 1.22.1. 停止协程
 
 ```go
 package main
@@ -897,7 +897,7 @@ func main() {
 
 > 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
 
-## 1.13. 值类型、引用类型
+## 1.23. 值类型、引用类型
 
 golang中分为值类型和引用类型
 
@@ -909,20 +909,92 @@ golang中分为值类型和引用类型
 
 引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
 
-## 1.14. go中函数传参都是值传递
+## 1.24. go中函数传参都是值传递
 
 > 参考：https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value
 
-## 1.15. go build缓存目录
+## 1.25. go build缓存目录
 
 缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
 
-## 1.16. 命名规范
+## 1.26. 命名规范
 
 - 文件名全部小写，除单元测试外避免使用下划线
 - 变量名、常量、函数名使用驼峰式命名，不建议使用下划线和数字
 
 > 参考：[命名规范 | go-zero](https://go-zero.dev/cn/docs/develop/naming-spec/)
+
+## 1.27. error与panic
+### 1.27.1. 自定义error
+error接口定义：
+```go
+type error interface {
+	Error() string
+}
+```
+
+所以只要实现了Error方法，就是一个error
+```go
+type PathExistError struct {
+	path string
+}
+
+func (e *PathExistError)Error() string {
+	return "path exist"
+}
+
+// 目录不存在时创建
+func CheckPath(path string) error {
+	// 判断是否为绝对路径
+	if !filepath.IsAbs(path) {
+		return errors.New("请输入绝对路径")
+	}
+	//存在且为空则创建路径
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		err := os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			return errors.New("创建目录失败")
+		}
+		return nil
+	}
+	dir, _ := ioutil.ReadDir(path)
+	if len(dir) != 0 {
+		return &PathExistError{path: path}
+	}
+	return nil
+}
+```
+
+判断error类型是否是指定的error
+```go
+err := CheckPath("/tmp/1234")
+if pe, ok := err.(*PathExistError); ok { // 是路径存在错误
+	fmt.Println(pe.path)
+}
+
+switch err.(type)
+{
+	case *PathExistError:
+		fmt.Println(err)
+	default:
+		panic(err)
+}
+```
+### 1.27.2. panic恢复
+1. 程序中非致命的问题应避免使用panic，除非目的就是要中断程序（当前协程）
+2. 守护型协程应该使用recover捕获panic并恢复，避免协程由于异常退出
+
+```go
+go func() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("recovered from ", r)
+			debug.PrintStack()
+		}
+	}
+}()
+```
 
 # 2. 第三方包
 
