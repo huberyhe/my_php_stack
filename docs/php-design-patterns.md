@@ -40,7 +40,7 @@
 
 课程：[大话PHP设计模式](https://www.imooc.com/learn/236)
 
-博客：[《汪春波-php技术博客-设计模式》 | Laravel China 社区 (learnku.com)](https://learnku.com/docs/shxdledu)
+博客：[《汪春波-php技术博客-设计模式》](https://learnku.com/docs/shxdledu)
 
 ## 1.2. 设计模式在实际产品中的应用
 

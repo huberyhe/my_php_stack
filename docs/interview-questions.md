@@ -67,7 +67,7 @@ TCP/IP体系结构：网络接口层、网际层IP、运输层、应用层
 
 http/1.0中默认使用短连接，从http/1.1开始默认使用长连接
 
-参考：[HTTP长连接、短连接究竟是什么？ - dai.sp - 博客园 (cnblogs.com)](https://www.cnblogs.com/gotodsp/p/6366163.html)
+参考：[HTTP长连接、短连接究竟是什么？](https://www.cnblogs.com/gotodsp/p/6366163.html)
 
 ## 1.7. 查询计划字段的含义
 
@@ -176,12 +176,14 @@ varchar与text区别：
 >
 >  1、[DDOS 攻击的防范教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2018/06/ddos.html)
 >
->  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法_华为云 (huaweicloud.com)](https://www.huaweicloud.com/zhishi/dyl41.html)
+>  2、[防御DDoS攻击教程_常见DDoS攻击防御方法_DDoS攻击防范方法](https://www.huaweicloud.com/zhishi/dyl41.html)
 
 
 ## 1.15. 如何防止重复提交
 
-表单中带上隐藏域内容是这个表单的token，表单提交时判断这个token有没有使用过：1、token信息放到session里；2、token信息放到缓存里
+表单中带上隐藏域内容是这个表单的token，表单提交时判断这个token有没有使用过：
+1、token信息放到session里；
+2、token信息放到缓存里
 
 ## 1.16. flask的生命周期
 
@@ -236,9 +238,9 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 
 > 参考：
 >
-> 1、[MySQL 延迟关联优化超多分页场景 | Qida's Blog (qidawu.github.io)](http://qidawu.github.io/2019/11/26/mysql-deferred-join/)
+> 1、[MySQL 延迟关联优化超多分页场景](http://qidawu.github.io/2019/11/26/mysql-deferred-join/)
 >
-> 2、[MySQL 分页查询优化——延迟关联优化 - pufeng - 博客园 (cnblogs.com)](https://www.cnblogs.com/pufeng/p/11750495.html)
+> 2、[MySQL 分页查询优化——延迟关联优化](https://www.cnblogs.com/pufeng/p/11750495.html)
 
 ## 1.20. 存在大量数据的表，如何添加索引才能不影响业务（锁表）
 
@@ -295,6 +297,7 @@ header包含签名算法，默认算法是HMAC SHA256（写成 HS256）
 
 - SSO 单点登录
 - OAuth 第三方登录
+- HMAC
 
 > 参考：[前端登录，这一篇就够了](https://juejin.cn/post/6845166891393089544)
 
@@ -343,7 +346,7 @@ SSO整体陈述
 
 ## 1.27. HTTP2的改进之处
 
-1、对于常见的HTTP头部通过静态表和哈夫曼编码的方式，奖体积缩小了近一半，而且针对后续的请求头部，还可以建立动态表，将体积压缩近90%
+1、对于常见的HTTP头部通过静态表和哈夫曼编码的方式，将体积缩小了近一半，而且针对后续的请求头部，还可以建立动态表，将体积压缩近90%
 
 2、HTTP2实现了Stream并发，多个Stream只复用1个TCP连接
 
@@ -357,9 +360,7 @@ SSO整体陈述
 
 ## 1.29. 谈谈对进程、线程和协程的理解
 
-[进程、线程、协程常见面试题汇总_技术交流_牛客网 (nowcoder.com)](https://www.nowcoder.com/discuss/600292?type=1)
-
-
+[进程、线程、协程常见面试题汇总](https://www.nowcoder.com/discuss/600292?type=1)
 
 ## 1.30. 微服务的理解，微服务有哪些缺点
 

@@ -20,7 +20,7 @@ expires 30m;
 
 ## 1.3. 日志清理
 
-方法1：删除日志后，让nginx重新打开日志文件，改操作不会影响nginx业务处理
+方法1：删除日志后，让nginx重新打开日志文件，该操作不会影响nginx业务处理
 
 ```bash
 rm access.log
@@ -35,6 +35,17 @@ cat /dev/null > access.log
 
 其他方法可能导致不写日志，谨慎操作。例如删除文件或`cat > access.log`
 
+定时备份
+```bash
+# 备份
+cp /usr/local/nginx/logs/access.log /usr/local/nginx/logs/access-$(date -d "yesterday" +"%Y%m%d").log
+
+# 清空原来的正常访问日志
+cat /dev/null > /usr/local/nginx/logs/access.log
+
+# 删除七天前的日志文件
+find /usr/local/nginx/logs -mtime 7 -type f -name \*.log | xargs rm -rf
+```
 ## 1.4. 最大文件打开数量限制
 
 nginx默认只只能打开1024个文件，超出后报错*Too many open files*

@@ -33,7 +33,7 @@ redis 127.0.0.1:6379> HGET runoob field2
 "World"
 ```
 
-1.1.3. List（列表）
+### 1.1.3. List（列表）
 
 Redis 列表是简单的字符串列表，按照插入顺序排序。你可以添加一个元素到列表的头部（左边）或者尾部（右边）。
 
@@ -55,8 +55,7 @@ redis 127.0.0.1:6379>
 ```
 
 
-
-1.1.4. Set（集合）
+### 1.1.4. Set（集合）
 
 Redis 的 Set 是 string 类型的无序集合。
 
@@ -81,7 +80,7 @@ redis 127.0.0.1:6379> smembers runoob
 
 
 
-1.1.5. zset(sorted set：有序集合)
+### 1.1.5. zset(sorted set：有序集合)
 
 Redis zset 和 set 一样也是string类型元素的集合,且不允许重复的成员。
 

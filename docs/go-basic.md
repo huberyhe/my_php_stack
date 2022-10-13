@@ -105,7 +105,6 @@ for k, v := range user5 {
 ```
 
 
-
 ### 1.3.2. reflect反射
 
 ## 1.4. 类型转换
@@ -196,8 +195,6 @@ time.Unix(1653194203, 0)
 fmt.Println(time.Parse(TimeFormat, "2022-04-07 06:43:27"))
 ```
 
-
-
 例：
 
 ```go
@@ -221,18 +218,104 @@ fmt.Println(time.Parse("2006-01-02 15:04:05", "2022-04-07 06:43:27"))
 ```
 
 
-
 ## 1.7. 文件
 
-touch文件：
+### 1.7.1. touch文件
 
 ```go
 os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
 ```
 
+### 1.7.2. 读写文件
+```go
 
+// 写入一行
+func writeByLine(fn string, b string) error  {
+	f, err := os.OpenFile(fn, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
 
-## 1.8. 协程
+	if _, err := f.Write([]byte(b + "\n")); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 按行读
+func readByLine(fn string) (bs []string, err error)  {
+	f, err := os.OpenFile(fn, os.O_RDONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	buf := bufio.NewReader(f)
+	for {
+		line, err := buf.ReadString('\n')
+		if err != nil {
+			if err == io.EOF { //读取结束，会报EOF
+				break
+			}
+			return nil, err
+		}
+
+		line = strings.TrimSpace(line)
+		bs = append(bs, line)
+	}
+	return bs, nil
+}
+```
+### 1.7.3. 实例：列出目录文件
+```go
+func main() {
+    dir := os.Args[1]
+    listAll(dir,0)
+}
+
+func listAll(path string, curHier int){
+    fileInfos, err := ioutil.ReadDir(path)
+    if err != nil{fmt.Println(err); return}
+
+    for _, info := range fileInfos{
+        if info.IsDir(){
+            for tmpHier := curHier; tmpHier > 0; tmpHier--{
+                fmt.Printf("|\t")
+            }
+            fmt.Println(info.Name(),"\\")
+            listAll(path + "/" + info.Name(),curHier + 1)
+        }else{
+            for tmpHier := curHier; tmpHier > 0; tmpHier--{
+                fmt.Printf("|\t")
+            }
+            fmt.Println(info.Name())
+        }
+    }
+}
+```
+
+## 1.8. 并发，协程与管道
+
+### 1.8.1. 管道
+
+只有可写的管道才能close，close应该在发送方执行
+
+```go
+// 初始化
+var a chan int
+a = make(chan int, 2)
+
+// 写数据
+a <- 1
+// 读数据
+b := <- a
+```
+
+管道未初始化或已关闭时的读写情况
+- 写未初始化管道：阻塞
+- 读未初始化管道：阻塞
+- 写关闭的管道：panic
+- 读关闭的管道：返回0，ok=false
 
 ## 1.9. dlv调试
 
@@ -243,13 +326,103 @@ dlv debug main.go --output ./bin/license -- -c ./etc/license.json
 dlv exec ./bin/license -- -c ./etc/license.json
 ```
 
-### 1.9.2. 设置字符串可显示长度
+### 协程
+
+协程池示例，用于计算数字各位的和，输入12345，输出15(=1+2+3+4+5)
+```go
+package main
+
+import (  
+    "fmt"
+    "math/rand"
+    "sync"
+    "time"
+)
+
+type Job struct {  
+    id       int
+    randomno int
+}
+type Result struct {  
+    job         Job
+    sumofdigits int
+}
+
+var jobs = make(chan Job, 10)  
+var results = make(chan Result, 10)
+
+// 实际计算方法
+func digits(number int) int {  
+    sum := 0
+    no := number
+    for no != 0 {
+        digit := no % 10
+        sum += digit
+        no /= 10
+    }
+    time.Sleep(2 * time.Second)
+    return sum
+}
+
+// 一个worker
+func worker(wg *sync.WaitGroup) {  
+    for job := range jobs {
+        output := Result{job, digits(job.randomno)}
+        results <- output
+    }
+    wg.Done()
+}
+
+// 创建worker池
+func createWorkerPool(noOfWorkers int) {  
+    var wg sync.WaitGroup
+    for i := 0; i < noOfWorkers; i++ {
+        wg.Add(1)
+        go worker(&wg)
+    }
+    wg.Wait()
+    close(results)
+}
+
+// 分配任务
+func allocate(noOfJobs int) {  
+    for i := 0; i < noOfJobs; i++ {
+        randomno := rand.Intn(999)
+        job := Job{i, randomno}
+        jobs <- job
+    }
+    close(jobs)
+}
+
+// 获取结果
+func result(done chan bool) {  
+    for result := range results {
+        fmt.Printf("Job id %d, input random no %d , sum of digits %d\n", result.job.id, result.job.randomno, result.sumofdigits)
+    }
+    done <- true
+}
+
+func main() {  
+    startTime := time.Now()
+    noOfJobs := 100
+    go allocate(noOfJobs)
+    done := make(chan bool)
+    go result(done)
+    noOfWorkers := 10
+    createWorkerPool(noOfWorkers)
+    <-done
+    endTime := time.Now()
+    diff := endTime.Sub(startTime)
+    fmt.Println("total time taken ", diff.Seconds(), "seconds")
+}
+```
+### 1.8.2. 设置字符串可显示长度
 
 ```
 config max-string-len 99999
 ```
 
-### 1.9.3. 常用命令
+### 1.8.3. 常用命令
 
 ```
 // 打断点
@@ -293,8 +466,7 @@ trace
 ```
 
 
-
-## 1.10. 数据库事务处理
+## 1.9. 数据库事务处理
 
 ```go
 db, err := postgreHelper.Open()
@@ -319,7 +491,7 @@ defer func() {
 
 > 参考：[Golang transaction 事务使用的正确姿势](http://www.mspring.org/2019/03/18/Golang-transaction-事务使用的正确姿势/)
 
-## 1.11. 闭包
+## 1.10. 闭包
 
 ```go
 package main
@@ -342,13 +514,13 @@ func Fun() func(string) string {
 }
 ```
 
-## 1.12. 并发锁 sync.Mutex与sync.RWMutex
+## 1.11. 并发锁 sync.Mutex与sync.RWMutex
 
 Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
 
 RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写
 
-## 1.13. 使用避坑
+## 1.12. 使用避坑
 
 ```go
 package main
@@ -385,7 +557,7 @@ func init() {
 }
 ```
 
-## 1.14. map并发问题
+## 1.13. map并发问题
 
 并发写一个map会出现问题，运行时报错：`fatal error: concurrent map read and map write`
 
@@ -451,7 +623,7 @@ scene.Range(func(k, v interface{}) bool {
 })
 ```
 
-## 1.15. logrus使用
+## 1.14. logrus使用
 
 logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: Structured, pluggable logging for Go](https://github.com/sirupsen/logrus)。其他常用日志库还有[Zerolog](https://github.com/rs/zerolog)、 [Zap](https://github.com/uber-go/zap)和[Apex](https://github.com/apex/log).
 
@@ -459,7 +631,7 @@ logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: St
 
 ![image-20220526100147494](../imgs/image-20220526100147494.png)
 
-### 1.15.1. 配置formater，指定日志输入格式
+### 1.14.1. 配置formater，指定日志输入格式
 
 ```go
 type TopLog struct {
@@ -554,7 +726,7 @@ func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 ```
 
-### 1.15.2. 配置gorm使用logrus
+### 1.14.2. 配置gorm使用logrus
 
 ```go
 type Database struct {
@@ -648,11 +820,11 @@ func (*GormLogger) Print(v ...interface{}) {
 }
 ```
 
-## 1.16. 性能测试pprof
+## 1.15. 性能测试pprof
 
-## 1.17. 性能优化
+## 1.16. 性能优化
 
-### 1.17.1. 读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
+### 1.16.1. 读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
 
 优化前，直接把上传的文件读到内存并解析
 
@@ -695,7 +867,7 @@ _ = decoder.Decode(&head)
 >
 > 2、[go - How to read multiple times from same io.Reader - Stack Overflow](https://stackoverflow.com/questions/39791021/how-to-read-multiple-times-from-same-io-reader)
 
-## 1.18. 多协程并发的优秀实现
+## 1.17. 多协程并发的优秀实现
 
 几个原则：
 
@@ -755,7 +927,7 @@ func main() {
 
 该实现中，任何一个服务遇到错误时另外一个服务都能干净地退出，由系统的进程管理器来重启
 
-## 1.19. 错误处理
+## 1.18. 错误处理
 
 错误处理注意三点：
 
@@ -814,7 +986,7 @@ runtime.goexit
 exit status 1
 ```
 
-## 1.20. go build参数
+## 1.19. go build参数
 
 ```
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l" -mod=vendor -o runtime/bin/license-srv cmd/main.go
@@ -832,7 +1004,7 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 -s 禁用符号表
 
-## 1.21. go语言中init函数执行顺序
+## 1.20. go语言中init函数执行顺序
 
 1. 如果一个包导入了其他包，则首先初始化导入的包。
 2. 然后初始化当前包的常量。
@@ -841,9 +1013,9 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
 
-## 1.22. context的使用
+## 1.21. context的使用
 
-### 1.22.1. 停止协程
+### 1.21.1. 停止协程
 
 ```go
 package main
@@ -897,7 +1069,7 @@ func main() {
 
 > 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
 
-## 1.23. 值类型、引用类型
+## 1.22. 值类型、引用类型
 
 golang中分为值类型和引用类型
 
@@ -909,23 +1081,27 @@ golang中分为值类型和引用类型
 
 引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
 
-## 1.24. go中函数传参都是值传递
+## 1.23. go中函数传参都是值传递
 
-> 参考：https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value
+> 参考：
+> 
+> [Go语言参数传递是传值还是传引用](https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value)
 
-## 1.25. go build缓存目录
+## 1.24. go build缓存目录
 
 缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
 
-## 1.26. 命名规范
+## 1.25. 命名规范
 
 - 文件名全部小写，除单元测试外避免使用下划线
 - 变量名、常量、函数名使用驼峰式命名，不建议使用下划线和数字
 
 > 参考：[命名规范 | go-zero](https://go-zero.dev/cn/docs/develop/naming-spec/)
 
-## 1.27. error与panic
-### 1.27.1. 自定义error
+## 1.26. 错误处理，error与panic
+
+### 1.26.1. 自定义error
+
 error接口定义：
 ```go
 type error interface {
@@ -981,7 +1157,9 @@ switch err.(type)
 		panic(err)
 }
 ```
-### 1.27.2. panic恢复
+
+### 1.26.2. panic恢复
+
 1. 程序中非致命的问题应避免使用panic，除非目的就是要中断程序（当前协程）
 2. 守护型协程应该使用recover捕获panic并恢复，避免协程由于异常退出
 
@@ -989,11 +1167,76 @@ switch err.(type)
 go func() {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("recovered from ", r)
+			fmt.Println("recovered from ", r) // r是panic的原因，即panic()的参数
 			debug.PrintStack()
 		}
 	}
 }()
+```
+
+## 1.27. 内置排序方法
+
+使用内置排序需要实现`sort.Interface`接口
+```go
+type Interface interface {
+        // 获取数据集合元素个数
+        Len() int
+        // 如果 i 索引的数据小于 j 索引的数据，返回 true，且不会调用下面的 Swap()，即数据升序排序。
+        Less(i, j int) bool
+        // 交换 i 和 j 索引的两个元素的位置
+        Swap(i, j int)
+}
+```
+
+使用示例：
+```go
+package main
+
+import (
+    "fmt"
+    "sort"
+)
+
+// 学生成绩结构体
+type StuScore struct {
+    name  string    // 姓名
+    score int   // 成绩
+}
+
+type StuScores []StuScore
+
+//Len()
+func (s StuScores) Len() int {
+    return len(s)
+}
+
+//Less(): 成绩将有低到高排序
+func (s StuScores) Less(i, j int) bool {
+    return s[i].score < s[j].score
+}
+
+//Swap()
+func (s StuScores) Swap(i, j int) {
+    s[i], s[j] = s[j], s[i]
+}
+
+func main() {
+    stus := StuScores{
+                {"alan", 95},
+                {"hikerell", 91},
+                {"acmfly", 96},
+                {"leao", 90},
+                }
+
+    // 打印未排序的 stus 数据
+    fmt.Println("Default:\n\t",stus)
+    //StuScores 已经实现了 sort.Interface 接口 , 所以可以调用 Sort 函数进行排序
+    sort.Sort(stus)
+    // 判断是否已经排好顺序，将会打印 true
+    fmt.Println("IS Sorted?\n\t", sort.IsSorted(stus))
+    // 打印排序后的 stus 数据
+    fmt.Println("Sorted:\n\t",stus)
+}
 ```
 
 # 2. 第三方包

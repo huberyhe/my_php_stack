@@ -11,7 +11,6 @@
 1、TCP/IP四层
 
 - Network Access Layer网络访问层（以太网、Wi-Fi等）
-
 - Internet Layer网络层（ip、icmp、arp）
 - Transport Layer传输层（tcp、udp）
 - Application Layer应用层（http、ftp、dns、dhcp、telnet）
@@ -82,4 +81,4 @@ TCP 是全双工的，在断开连接时两端都需要发送 FIN 和 ACK。
 
 **为什么要四次挥手而不是三次**：因为服务端在收到客户端FIN请求时，可能还有数据要传给客户端，不能立即回复FIN&ACK请求
 
-> 参考：[面试官，不要再问我三次握手和四次挥手 - SegmentFault 思否](https://segmentfault.com/a/1190000020610336)
+> 参考：[面试官，不要再问我三次握手和四次挥手](https://segmentfault.com/a/1190000020610336)
