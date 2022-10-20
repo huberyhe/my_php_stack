@@ -294,6 +294,22 @@ func listAll(path string, curHier int){
 }
 ```
 
+### 1.7.4. 文件名与后缀
+```go
+	fullFilename := "D:/software/Typora/bin/typora.exe"
+	fmt.Println("fullFilename =", fullFilename)
+	//获取文件名带后缀
+	filenameWithSuffix := path.Base(fullFilename)
+	fmt.Println("filenameWithSuffix =", filenameWithSuffix) // typora.exe
+	//获取文件后缀
+	fileSuffix := path.Ext(filenameWithSuffix)
+	fmt.Println("fileSuffix =", fileSuffix) // .exe
+
+	//获取文件名
+	filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
+	fmt.Println("filenameOnly =", filenameOnly) // typora
+```
+
 ## 1.8. 并发，协程与管道
 
 ### 1.8.1. 管道

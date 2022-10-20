@@ -84,3 +84,11 @@ END;
 > 1、[PostgreSQL 角色管理](https://www.cnblogs.com/mchina/archive/2013/04/26/3040440.html)
 >
 > 2、[How to Dump and Restore PostgreSQL Database (netguru.com)](https://www.netguru.com/blog/how-to-dump-and-restore-postgresql-database)
+
+## 1.6. 常用内置函数
+
+### 1.6.1. 格式转换
+
+```sql
+select to_timestamp('2022-10-10 15:37:36.401', 'yyyy-MM-dd hh24:mi:ss.MS')::timestamp at time zone 'Asia/Shanghai' > to_timestamp(1665387456);
+```

@@ -111,7 +111,19 @@ curl "localhost:8080/mutate?commitNow=true" --silent --request POST \
 
 ```
 
-
+旧版：
+```bash
+curl "localhost:19191/mutate" --slient --request POST \
+	--header "X-Dgraph-CommitNow: true" \
+	--header "Content-Type: text/plain" \
+	--data $'
+{
+	delete {
+		<0xf4245> * * . 
+	}
+}
+	'
+```
 
 ### 1.3.3. 图形客户端 ratel
 
@@ -140,17 +152,17 @@ me：当前查询的名称
 
 #### 2. 过滤
 
-过滤需要字段类型有index，不同的index类型可以过滤的方式不同，常用的类型有term/hash/fulltext/trigram
+过滤需要字段类型有index，不同的index类型可以过滤的方式不同，常用的类型有`term/hash/fulltext/trigram`
 
-- uid(uids) 过滤uid：uids可以是变量或者n个uid值
+- `uid(uids)` 过滤uid，uids可以是变量或者n个uid值
 - `eq`, `ge`, `gt`, `le`, `lt`比较
-- allofterms(predicate, "space-separated term list")包含所有字符
-- anyofterms(predicate, "space-separated term list")包含任意一个字符
-- regexp(predicate, /regular-expression/)正则判断
-- match(predicate, string, distance)
-- alloftext(predicate, "space-separated text")全文检索
-- between(predicate, startDateValue, endDateValue)范围判断
-- has(predicate)有字段值
+- `allofterms(predicate, "space-separated term list")`包含所有字符
+- `anyofterms(predicate, "space-separated term list")`包含任意一个字符
+- `regexp(predicate, /regular-expression/)`正则判断
+- `match(predicate, string, distance)`
+- `alloftext(predicate, "space-separated text")`全文检索
+- `between(predicate, startDateValue, endDateValue)`范围判断
+- `has(predicate)`有字段值
 
 #### 3. 排序
 
