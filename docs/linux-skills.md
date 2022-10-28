@@ -656,3 +656,22 @@ worker_rlimit_nofile 20000;
 ```
 
 >  参考：[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)
+
+1.15. 查看和设置默认编辑器
+
+查看：
+```bash
+# 方法1
+sudo update-alternatives --config editor
+
+# 方法2
+echo $EDITOR
+```
+
+设置：
+```bash
+export VISUAL="/usr/bin/nano"
+export EDITOR="$VISUAL"
+```
+
+ctrl+r ctrl+e 查看效果

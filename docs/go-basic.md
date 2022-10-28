@@ -265,8 +265,13 @@ func readByLine(fn string) (bs []string, err error)  {
 	}
 	return bs, nil
 }
+
+// 读取整个文件
+func ioutil.ReadFile(filename string) ([]byte, error)
 ```
-### 1.7.3. 实例：列出目录文件
+### 1.7.3. 实例：
+
+#### 列出目录文件
 ```go
 func main() {
     dir := os.Args[1]
@@ -308,6 +313,27 @@ func listAll(path string, curHier int){
 	//获取文件名
 	filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
 	fmt.Println("filenameOnly =", filenameOnly) // typora
+```
+
+### 1.7.5. 删除文件
+```go
+err := os.Remove(file)
+
+```
+
+### 1.7.6. 路径存在判断
+```go
+func IsExists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	return false
+}
 ```
 
 ## 1.8. 并发，协程与管道
@@ -515,19 +541,28 @@ package main
 import "fmt"
 
 func main() {
-    a := Fun()
-    b:=a("hello ")
-    c:=a("hello ")
-    fmt.Println(b)//worldhello 
-    fmt.Println(c)//worldhello hello 
+	a := Fun()
+	b := a("hello ")
+	c := a("hello ")
+	fmt.Println(b) //worldhello
+	fmt.Println(c) //worldhello hello
+
+	a = Fun()
+	b = a("hi ")
+	c = a("hi")
+	fmt.Println(b) //worldhi 
+	fmt.Println(c) //worldhello hello
+
 }
+
 func Fun() func(string) string {
-    a := "world"
-    return func(args string) string {
-        a += args
-        return  a
-    }
+	a := "world"
+	return func(args string) string {
+		a += args
+		return a
+	}
 }
+
 ```
 
 ## 1.11. 并发锁 sync.Mutex与sync.RWMutex
@@ -537,6 +572,8 @@ Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
 RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写
 
 ## 1.12. 使用避坑
+
+### 1.12.1. 修改全局变量的问题
 
 ```go
 package main
@@ -564,6 +601,7 @@ func main() {
 这里输出 /opt/topsec/topihs，因为init中的AppPath会当作一个局部变量。正确的写法是
 
 ```go
+var AppPath = "/opt/topsec/topihs"
 func init() {
     var err error
     AppPath, err = GetAppPath()
@@ -571,6 +609,44 @@ func init() {
 		panic(err)
 	}
 }
+```
+
+再如：
+```go
+package main
+
+import "fmt"
+
+var b = 1
+var d = 1
+
+func init() {
+	b, c := 2, 3
+	d, c = 4, 5
+	fmt.Println(b, c)
+
+	fmt.Printf("b value: %d, point: %p\n", b, &b)
+	fmt.Printf("d value: %d, point: %p\n", d, &d)
+}
+
+func main() {
+	fmt.Printf("b value: %d, point: %p\n", b, &b)
+	fmt.Printf("d value: %d, point: %p\n", d, &d)
+
+	b, e := 6, 7
+	fmt.Println(b, e)
+	fmt.Printf("b value: %d, point: %p\n", b, &b)
+}
+```
+输出：
+```bash
+2 5
+b value: 2, point: 0xc00009c000
+d value: 4, point: 0x5131d8
+b value: 1, point: 0x5131d0
+d value: 4, point: 0x5131d8
+6 7
+b value: 6, point: 0xc00009c020
 ```
 
 ## 1.13. map并发问题
@@ -1190,6 +1266,44 @@ go func() {
 }()
 ```
 
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func test() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("panic: ", r)
+			// 默认协程会继续执行，子协程不会中止，会继续打印timer
+			// panic(r) // 协程外抛panic
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case <-time.After(1 * time.Second):
+				fmt.Println("timer")
+			}
+		}
+	}()
+
+	time.Sleep(10 * time.Second)
+	panic("test")
+}
+
+func main() {
+	go test()
+	time.Sleep(15 * time.Second)
+}
+
+```
 ## 1.27. 内置排序方法
 
 使用内置排序需要实现`sort.Interface`接口
@@ -1254,6 +1368,7 @@ func main() {
     fmt.Println("Sorted:\n\t",stus)
 }
 ```
+
 
 # 2. 第三方包
 

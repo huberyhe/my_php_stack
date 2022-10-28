@@ -852,3 +852,11 @@ shuf -i LO-HI -n COUNT
 shuf -i 1-100 -n1
 ```
 
+### 1.9.2. 获取临时目录
+
+```bash
+dirname $(mktemp -u --tmpdir)
+#
+echo ${TMPDIR:-/tmp}
+```
+

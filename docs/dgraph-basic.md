@@ -202,6 +202,7 @@ me：当前查询的名称
 {
     delete {
 		<0x1> <td.relation.group_account> <0x27101> .
+		<0xf4245> * * . 
     }
 }
 ```
