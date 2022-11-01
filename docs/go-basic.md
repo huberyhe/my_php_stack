@@ -227,6 +227,7 @@ os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
 ```
 
 ### 1.7.2. 读写文件
+
 ```go
 
 // 写入一行
@@ -269,9 +270,11 @@ func readByLine(fn string) (bs []string, err error)  {
 // 读取整个文件
 func ioutil.ReadFile(filename string) ([]byte, error)
 ```
+
 ### 1.7.3. 实例：
 
 #### 列出目录文件
+
 ```go
 func main() {
     dir := os.Args[1]
@@ -299,7 +302,54 @@ func listAll(path string, curHier int){
 }
 ```
 
+#### 拷贝文件和文件夹
+
+```go
+func CopyDir(src, dst string) error {
+	err := os.MkdirAll(dst, 0777)
+	if err != nil {
+		return err
+	}
+	fis, err := ioutil.ReadDir(src)
+	if err != nil {
+		return err
+	}
+	for _, fi := range fis {
+		err = CopyFile(filepath.Join(dst, fi.Name()), filepath.Join(src, fi.Name()))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func CopyFile(src, dst string) (err error) {
+	var s, d *os.File
+	s, err = os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+	d, err = os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		e := d.Close()
+		if err == nil {
+			err = e
+		}
+	}()
+	_, err = io.Copy(d, s)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+```
+
 ### 1.7.4. 文件名与后缀
+
 ```go
 	fullFilename := "D:/software/Typora/bin/typora.exe"
 	fmt.Println("fullFilename =", fullFilename)
@@ -315,13 +365,16 @@ func listAll(path string, curHier int){
 	fmt.Println("filenameOnly =", filenameOnly) // typora
 ```
 
-### 1.7.5. 删除文件
+### 1.7.5. 删除文件和文件夹
+
 ```go
-err := os.Remove(file)
+err := os.Remove(file) // 文件夹必须为空
+err := os.RemoveAll(path) // 可以删除不为空的文件夹
 
 ```
 
 ### 1.7.6. 路径存在判断
+
 ```go
 func IsExists(path string) bool {
 	_, err := os.Stat(path)
@@ -334,6 +387,13 @@ func IsExists(path string) bool {
 
 	return false
 }
+```
+
+### 1.7.7. 创建目录
+
+```go
+os.Mkdir("abc", os.ModePerm) //创建目录  
+os.MkdirAll("dir1/dir2/dir3", os.ModePerm) //创建多级目录
 ```
 
 ## 1.8. 并发，协程与管道
@@ -357,7 +417,7 @@ b := <- a
 - 写未初始化管道：阻塞
 - 读未初始化管道：阻塞
 - 写关闭的管道：panic
-- 读关闭的管道：返回0，ok=false
+- 读关闭的管道：返回未读完的数据或（0值，ok=false）
 
 ## 1.9. dlv调试
 
