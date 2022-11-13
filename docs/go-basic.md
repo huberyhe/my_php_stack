@@ -195,6 +195,9 @@ time.Now().Format(TimeFormat)
 const TimeFormat = "2006-01-02 15:04:05"
 time.Unix(1653194203, 0)
 fmt.Println(time.Parse(TimeFormat, "2022-04-07 06:43:27"))
+
+ts := time.Now().AddDate(0, 0, -1)
+time.Date(ts.Year(), ts.Month(), ts.Day(), 0, 0, 0, 0, ts.Location()).Unix() // 0点
 ```
 
 例：
@@ -1159,7 +1162,7 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 -s 禁用符号表
 
 ## 1.20. go语言中init函数执行顺序
-
+`import --> const --> var --> init()`
 1. 如果一个包导入了其他包，则首先初始化导入的包。
 2. 然后初始化当前包的常量。
 3. 接下来初始化当前包的变量。
@@ -1432,6 +1435,9 @@ func main() {
     fmt.Println("Sorted:\n\t",stus)
 }
 ```
+
+## 1.28. GMP模型与调度流程
+## 1.29. GC垃圾回收
 
 
 ## 1.28. 变量分配在堆上还是栈上，内存逃逸分析
