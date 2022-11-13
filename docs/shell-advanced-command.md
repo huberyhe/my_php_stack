@@ -306,10 +306,9 @@ awk 'NR>2{print line}{line=$0}' a.txt
 #### 1.2.7.6. 文件md5
 
 ```
+# 为文件生成md5校验文件
 ls -1 | xargs md5sum | awk '{print $1 > $2".md5"}'
 ```
-
-
 
 
 > 参考：

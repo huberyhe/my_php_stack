@@ -860,3 +860,13 @@ dirname $(mktemp -u --tmpdir)
 echo ${TMPDIR:-/tmp}
 ```
 
+## 1.10. 通配符
+
+- `?` 字符
+- `*` 字符
+- `[...]` 模式：`ls [ab].txt [a-c].txt`
+- `[^...]` 和 `[!...]`：`echo report[!1-3].txt`
+- `{...}` 模式：`echo d{a,e,i,u,o}g`
+- `{start..end}`模式：`echo {11..15}`
+
+> 参考：[命令行通配符教程](https://www.ruanyifeng.com/blog/2018/09/bash-wildcards.html)
