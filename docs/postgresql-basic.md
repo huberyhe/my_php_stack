@@ -103,7 +103,7 @@ select (date_trunc('day',now()) - interval '%d d')::timestamp;
 
 ## 1.7. 查询方法
 
-1.7.1. 临时表：`WITH name AS ()`
+### 1.7.1. 临时表：`WITH name AS ()`
 
 ```sql
 WITH prez AS (
@@ -123,7 +123,7 @@ LIMIT ?
 OFFSET ?
 ```
 
-1.7.2. 分组
+### 1.7.2. 分组
 
 GROUP BY 子句必须放在 WHERE 子句中的条件之后，必须放在 ORDER BY 子句之前。
 在 GROUP BY 子句中，你可以对一列或者多列进行分组，但是被分组的列必须存在于列清单中。
@@ -136,4 +136,26 @@ FROM (
 	WHERE to_timestamp(time, 'yyyy-MM-dd hh24:mi:ss')::timestamp at time zone 'Asia/Shanghai' >= (date_trunc('day',now()) - interval '%d d')::timestamp
 	GROUP BY virusname
 ) AS t
+```
+
+## 1.8. 清空表
+
+```sql
+TRUNCATE TABLE table_name;
+
+# 同时重置所关联的序列计数
+TRUNCATE TABLE table_name RESET IDENTITY;
+```
+
+## 1.9. VACUUM
+
+表损坏：
+```bash
+invalid page in block 274198 of relation base/16385/16790
+```
+
+修复，注意此操作可能导致部分数据丢失：
+```sql
+SET zero_damaged_pages = on;
+VACUUM FULL damaged_table;
 ```

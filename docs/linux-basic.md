@@ -336,6 +336,24 @@ Swap行表示：交换分区总共3701M，使用0M，剩余3701M
 ps -eo pid,lstart,etime,cmd | grep nginx
 ```
 
+### 1.3.7. 安装开发常用软件
+
+```bash
+# debian 系
+apt install build-essential 
+
+# redhat 系
+yum groupinstall "Development Tools"
+```
+
+### 1.3.8. 系统强制重启
+
+```bash
+reboot -nf
+```
+
+> 参考：[强制重启Linux系统的几种方法%%%%](https://zohead.com/archives/linux-force-reboot/)
+
 ## 1.4. 日志截断
 
 ```bash

@@ -224,5 +224,21 @@ rpm包没有直接方法，可以通过写文件实现
 
 ## 1.2. DEB包
 
+### 1.2.1. 查看deb包信息
+
+查看包文件：
+
+```bash
+dpkg-deb -x ./test_2.0.0_amd64.deb .
+```
+
+查看包脚本：
+
+```bash
+dpkg -e ./test_2.0.0_amd64.deb
+```
+
+> 参考：[Inspecting and extracting Debian package contents | Packagecloud Blog](https://blog.packagecloud.io/inspect-extract-contents-debian-packages/)
+
 ## 1.3. ssu包（sangfor）
 

@@ -657,6 +657,12 @@ worker_rlimit_nofile 20000;
 
 >  参考：[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)
 
+7、查看文件描述符使用情况
+
+```bash
+lsof | awk '{ print $1 " " $2; }' | sort -rn | uniq -c | sort -rn | head -15
+```
+
 1.15. 查看和设置默认编辑器
 
 查看：
