@@ -237,7 +237,22 @@ rdf是数据，schema定义了导入的数据类型
 
 1、[排序](https://dgraph.io/docs/query-language/sorting/)后默认只能查1000条数据，first默认值为1000
 
+## 1.7. zero与alpha
 
+Dgraph Zero controls the Dgraph cluster, assigns servers to a group, and re-balances data between server groups.
+Dgraph Alpha hosts predicates and indexes. Predicates are either the properties associated with a node or the relationship between two nodes. Indexes are the tokenizers that can be associated with the predicates to enable filtering using appropriate functions.
+Ratel serves the UI to run queries, mutations & altering schema.
+
+zero: grpc占用5080端口，http占用6080端口
+alpha: http占用8080端口，grpc占用9080端口，worker grpc占用内部7080端口
+
+> 参考：[https://dgraph.io/docs/deploy/ports-usage/](https://dgraph.io/docs/deploy/ports-usage/)
+
+## 1.8. 查看状态
+
+```bash
+curl localhost:8080/health
+```
 
 > 参考：
 >

@@ -159,3 +159,9 @@ invalid page in block 274198 of relation base/16385/16790
 SET zero_damaged_pages = on;
 VACUUM FULL damaged_table;
 ```
+
+## 1.10. 查看状态
+
+```bash
+pg_isready -h localhost -p 16543
+```
