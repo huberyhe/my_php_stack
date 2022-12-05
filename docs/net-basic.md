@@ -64,6 +64,10 @@ udp是面向报文的，对应用层交下来的报文即不拆分也不合并�
 
 2、https是先三次tcp握手，再四次tls握手的
 
+
+
+> 相关文章：[信鸽讲解HTTPS](https://www.freecodecamp.org/news/https-explained-with-carrier-pigeons-7029d2193351)和[译文](https://sunwenfei.gitbook.io/sunwenfei/http/https-pigeon)
+
 ## 1.5. tcp三次握手与四次挥手
 
 

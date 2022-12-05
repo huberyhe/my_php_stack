@@ -221,6 +221,10 @@ rpm包没有直接方法，可以通过写文件实现
 >  9、[Directives For the %files list (osuosl.org)](https://ftp.osuosl.org/pub/rpm/max-rpm/s1-rpm-inside-files-list-directives.html)
 >
 >  10、[Fedora Packaging Guidelines :: Fedora Docs (fedoraproject.org)](https://docs.fedoraproject.org/en-US/packaging-guidelines/)
+>
+>  11、[redhat文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/rpm_packaging_guide/index#doc-wrapper)
+>
+>  12、[fedora文档](https://fedoraproject.org/wiki/How_to_create_an_RPM_package/zh-hk#Macros)
 
 ## 1.2. DEB包
 

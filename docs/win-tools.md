@@ -50,3 +50,9 @@
 
 - 冻结屏幕：ctrl+s，阻止屏幕刷新，ctrl+q取消
 
+## 1.11. 大写锁定提醒
+
+这个工具将windows下Caps Lock按键改成了macOS的使用方式，按住1s才会锁定成大写，且在切换时有提醒，对于远程办公来说特别方便
+
+[Download – CapsLock Indicator (jonaskohl.de)](https://cli.jonaskohl.de/!/download)
+

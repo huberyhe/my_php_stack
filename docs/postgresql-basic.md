@@ -77,7 +77,7 @@ END;
 
 导出：`pg_dump -t table_name db_name > db.sql`
 
-导入：`psql -d db_name -f db.sql`或者`pg_restore -d db_name db.sql`
+导入：`psql -d db_name -f db.sql`或者`pg_restore -d db_name db.sql`或者在交互式命令行中`\i db.sql`
 
 > 参考：
 >
