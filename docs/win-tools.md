@@ -30,6 +30,8 @@
 
 ## 1.6. 最好用的markdown编辑器：Typora
 
+免费开发版本官网下载地址：https://typora.io/dev_release.html
+
 ## 1.7. 密码管理工具：KeePass 2
 
 配合OneDrive很方便，iOS推荐使用奇密，Android推荐使用KeePassDX，都是很高质量的app，配合OneDrive或GoogleDrive可以做到多端同步。KeePass2官网下载地址：[Downloads - KeePass](https://keepass.info/download.html)
@@ -41,4 +43,16 @@
 ## 1.9. HTTP调试抓包工具：Fiddler
 
 配合浏览器扩展SwitchyOmega可快速切换到Fiddler代理，相比Postman更适合高级玩家。
+
+## 1.10. 终端工具xshell
+
+记录下使用技巧：
+
+- 冻结屏幕：ctrl+s，阻止屏幕刷新，ctrl+q取消
+
+## 1.11. 大写锁定提醒
+
+这个工具将windows下Caps Lock按键改成了macOS的使用方式，按住1s才会锁定成大写，且在切换时有提醒，对于远程办公来说特别方便
+
+[Download – CapsLock Indicator (jonaskohl.de)](https://cli.jonaskohl.de/!/download)
 

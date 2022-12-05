@@ -118,6 +118,12 @@ SET （最多64个成员）                      64KB
 | DATETIME  | 8               | 1000-01-01 00:00:00/9999-12-31 23:59:59 | YYYY-MM-DD HH:MM:SS | 混合日期和时间值         |
 | TIMESTAMP | 4               | 1970-01-01 00:00:00/2037 年某时         | YYYYMMDD HHMMSS     | 混合日期和时间值，时间戳 |
 
+### 1.3.5. 类型实际应用
+
+1、时间戳应该用什么类型存储：TIMESTAMP 或 INT
+
+> 参考：[前端 - MySQL 中存储时间的最佳实践](https://segmentfault.com/a/1190000040270268)
+
 ## 1.4. MySQL官方示例数据库
 
 [MySQL :: Other MySQL Documentation](https://dev.mysql.com/doc/index-other.html)
@@ -160,9 +166,9 @@ innodb_buffer_pool_size
 
 insert_pool
 
-### 1.7.1. 常见的SQL考题
+### 1.8. 常见的SQL考题
 
-#### 1.7.1.1. 有一个学生选修课程的数据表，查询选修了多门课程的人数
+#### 1.8.1. 有一个学生选修课程的数据表，查询选修了多门课程的人数
 
 course：stu_id, course_name
 

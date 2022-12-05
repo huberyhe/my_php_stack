@@ -121,6 +121,9 @@ $
 
 ## 1.3. 进程管理systemd
 
+[官网]([System and Service Manager (systemd.io)](https://systemd.io/))
+
+
 ### 1.3.1. 入门使用
 
 ```bash
@@ -144,7 +147,6 @@ Service没有指定Type，默认Type=simple，适用于简单的单体应用，�
 Service没有指定ExecStop，systemctl会发送SIGTERM信号来停止服务，超时则发送SIGKILL信号
 
 ### 1.3.2. 官方示例
-
 
 nginx
 
@@ -547,6 +549,16 @@ cd -
 
 ## 1.11. firewall基本使用
 
+```
+firewall-cmd --add-port=19192/tcp
+firewall-cmd --remove-port=19196/tcp
+firewall-cmd --list-ports
+firewall-cmd --runtime-to-permanent
+firewall-cmd --permanent --list-ports
+```
+
+> 参考：https://docs.fedoraproject.org/en-US/quick-docs/firewalld/
+
 ## 1.12. selinux基本使用
 
 ```bash
@@ -562,3 +574,110 @@ firewall-cmd --zone=public --add-port=443/tcp --permanent
 firewall-cmd --reload
 ```
 
+## 1.13. 查看硬件信息
+
+```bash
+# cpu
+lscpu
+# 内存
+dmidecode -t memory
+# 硬盘
+smartctl -i /dev/sdb
+```
+
+## 1.14. 修改文件描述符数量限制
+
+1、查看限制
+
+```bash
+[root@localhost hubery]# ulimit -n
+1024
+[root@localhost hubery]# ulimit -Sn
+1024
+[root@localhost hubery]# ulimit -Hn
+524288
+[root@localhost hubery]# cat /proc/sys/fs/file-max
+379276
+```
+
+2、临时设置限制
+
+用户级
+
+```bash
+[root@localhost hubery]# ulimit -Sn 4096
+```
+
+内核级
+
+```
+[root@localhost hubery]# sysctl -w fs.file-max=100000
+fs.file-max = 100000
+```
+
+4、设置内核级限制，打开`/etc/sysctl.conf`，加上。`sysctl -p`生效
+
+```bash
+fs.file-max = 100000
+```
+
+验证是否生效
+
+```bash
+cat /proc/sys/fs/file-max
+```
+
+5、设置用户级限制，打开`/etc/security/limits.conf`，加上。重新登录有效
+
+```
+* soft nofile 8192
+* hard nofile 20480
+```
+
+6、除了内核和用户级限制外，应用也会受限制
+
+查看：
+
+```bash
+cat /proc/pid/limits
+```
+
+对于systemd管理的应用，加上字段
+
+```
+[Service]
+LimitNOFILE=65536
+```
+
+应用本身也可能有限制，比如nginx：
+
+```
+worker_rlimit_nofile 20000;
+```
+
+>  参考：[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)
+
+7、查看文件描述符使用情况
+
+```bash
+lsof | awk '{ print $1 " " $2; }' | sort -rn | uniq -c | sort -rn | head -15
+```
+
+1.15. 查看和设置默认编辑器
+
+查看：
+```bash
+# 方法1
+sudo update-alternatives --config editor
+
+# 方法2
+echo $EDITOR
+```
+
+设置：
+```bash
+export VISUAL="/usr/bin/nano"
+export EDITOR="$VISUAL"
+```
+
+ctrl+r ctrl+e 查看效果

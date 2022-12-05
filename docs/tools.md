@@ -37,7 +37,7 @@ echo | openssl s_client -servername gj.sundray.com.cn -connect gj.sundray.com.cn
 1、抓https的tls握手包
 
 ```bash
-tcpdump -ni eth0 "tcp port 443 and (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16)"
+tcpdump -ni eth0 "tcp port 443 and (tcp[((tcp[12] & 0xf0) >> 2)] = 0x16)" -w https.pcap
 ```
 
 >  参考：[仅使用tcpdump捕获ssl握手](https://www.thinbug.com/q/39624745)
@@ -139,3 +139,14 @@ done
 ## 1.5. go实现telnet日志服务
 
 TODO
+
+## 1.6. virtualbox
+
+1.6.1. 开启关闭虚拟机的时钟同步
+
+查看虚拟机列表：`VBoxManage list vms`
+
+关闭（虚拟机需关机）：`VBoxManage setextradata "<VM_NAME>" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" "1"`
+
+开启：`VBoxManage setextradata "<VM_NAME>" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" "0"`
+

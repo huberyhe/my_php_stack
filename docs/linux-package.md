@@ -16,6 +16,8 @@
 
 查看包的脚本：`rpm --scripts -qp topihs-server-3.1-0.128b220210.x86_64.rpm`
 
+查看包的文件：`rpm -qlp lrzsz-0.12.20-36.el7.x86_64.rpm`
+
 重新打包rpm：`rpmrebuild --package --notest-install -e wget-1.14-18.el7_6.1.x86_64.rpm`
 
 查看已安装包的spec：`rpmrebuild -s wget.spec wget`
@@ -215,8 +217,32 @@ rpm包没有直接方法，可以通过写文件实现
 >  7、[Transactions and Rollback with RPM | Linux Journal](https://www.linuxjournal.com/article/7034)
 >
 >  8、[rpmbuild - RPM spec file find installed version - Stack Overflow](https://stackoverflow.com/questions/35357916/rpm-spec-file-find-installed-version)
+>
+>  9、[Directives For the %files list (osuosl.org)](https://ftp.osuosl.org/pub/rpm/max-rpm/s1-rpm-inside-files-list-directives.html)
+>
+>  10、[Fedora Packaging Guidelines :: Fedora Docs (fedoraproject.org)](https://docs.fedoraproject.org/en-US/packaging-guidelines/)
+>
+>  11、[redhat文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html-single/rpm_packaging_guide/index#doc-wrapper)
+>
+>  12、[fedora文档](https://fedoraproject.org/wiki/How_to_create_an_RPM_package/zh-hk#Macros)
 
 ## 1.2. DEB包
+
+### 1.2.1. 查看deb包信息
+
+查看包文件：
+
+```bash
+dpkg-deb -x ./test_2.0.0_amd64.deb .
+```
+
+查看包脚本：
+
+```bash
+dpkg -e ./test_2.0.0_amd64.deb
+```
+
+> 参考：[Inspecting and extracting Debian package contents | Packagecloud Blog](https://blog.packagecloud.io/inspect-extract-contents-debian-packages/)
 
 ## 1.3. ssu包（sangfor）
 

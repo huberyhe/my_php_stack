@@ -46,7 +46,6 @@ LIST分区和RANGE分区很相似，只是分区列的值是离散的，不是�
 KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的函数进行分区，KEY分区使用数据库提供的函数进行分区。
 
 
-
 > 参考：[搞懂MySQL分区](https://www.cnblogs.com/GrimMjx/p/10526821.html)
 
 ## 1.2. 分库分表
@@ -104,7 +103,8 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 索引覆盖：只需要在一棵索引树上就能获取SQL所需的所有列数据，无需回表，速度更快。explain的输出结果Extra字段为**Using index**时，能够触发索引覆盖。
 
->  参考：[MySQL优化：如何避免回表查询？什么是索引覆盖？ (转) - myseries - 博客园 (cnblogs.com)](https://www.cnblogs.com/myseries/p/11265849.html)
+>  参考：
+>  [MySQL优化：如何避免回表查询？什么是索引覆盖？ (转) - myseries - 博客园 (cnblogs.com)](https://www.cnblogs.com/myseries/p/11265849.html)
 
 ### 1.6.3. 聚簇索引、非聚簇索引和辅助索引
 
@@ -165,17 +165,17 @@ lock table myisam_lock read;// 显式加表锁
 ...
 unlock tables;
 
-// 查看枷锁情况
+// 查看加锁情况
 show open tables where in_use > 0;
 // 查看表锁
 show status like 'table_locks%';
 ```
 
 > 参考：
->
+> 
 > 1、[MySQL 行锁 表锁机制](https://www.cnblogs.com/itdragon/p/8194622.html)
->
-> 2、[INNODB索引实现原理_bohu83的博客-CSDN博客_innodb的索引实现](https://blog.csdn.net/bohu83/article/details/81104432)
+> 
+> 2、[INNODB索引实现原理](https://blog.csdn.net/bohu83/article/details/81104432)
 
 ### 1.6.8. B+树的结构
 
@@ -183,7 +183,11 @@ B+树的内部节点包括：Key键值，Index索引值
 B+树的叶子节点包括：Key键值，Index索引值，Data数据
 B+树的内部节点也可称为索引节点，叶子节点也可称为外部节点
 
-> 参考：[B+树结构参考 - 简书 (jianshu.com)](https://www.jianshu.com/p/b395a81d04ee)
+> 参考：
+> 
+> [B+树结构参考](https://www.jianshu.com/p/b395a81d04ee)
+> 
+> [InnoDB一棵B+树可以存放多少行数据？](https://www.cnblogs.com/leefreeman/p/8315844.html)
 
 
 
@@ -201,7 +205,8 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 执行返回中的Optimal_fieldtype列是mysql建议采用的列。
 
-> 参考：[Procedure Analyse优化表结构 ](https://www.cnblogs.com/duanxz/p/3968639.html)
+> 参考：
+> [Procedure Analyse优化表结构 ](https://www.cnblogs.com/duanxz/p/3968639.html)
 
 ### 1.6.10. 索引的类型划分
 
@@ -258,6 +263,8 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 其中`Cardinality`字段表示这个列有多少种值，这个数是近似的可以用 `ANALYZE TABLE tb_name` or (for `MyISAM` tables)`myisamchk -a`更新
 
+
+> 参考
 > MySQL核心手册：[MySQL Internals Manual ](https://dev.mysql.com/doc/internals/en/innodb-page-overview.html)
 >
 > MySQL参考手册：[MySQL 5.7 Reference Manual]([MySQL :: MySQL 5.7 Reference Manual](https://dev.mysql.com/doc/refman/5.7/en/))

@@ -97,6 +97,16 @@ test "abc" = "a" && echo "same"
 test -f /etc/passwd && echo "file exist"
 ```
 
+### 1.1.6. 多个条件
+
+```bash
+if [ -n "1" -a -n "2" ] && [ 1 -eq 1 ]; then 
+	echo 1 
+else
+	echo 2
+fi
+```
+
 
 
 > 参考：[shell浅谈之二运算符和IF条件判断](https://blog.csdn.net/taiyang1987912/article/details/38893381)
@@ -842,3 +852,21 @@ shuf -i LO-HI -n COUNT
 shuf -i 1-100 -n1
 ```
 
+### 1.9.2. 获取临时目录
+
+```bash
+dirname $(mktemp -u --tmpdir)
+#
+echo ${TMPDIR:-/tmp}
+```
+
+## 1.10. 通配符
+
+- `?` 字符
+- `*` 字符
+- `[...]` 模式：`ls [ab].txt [a-c].txt`
+- `[^...]` 和 `[!...]`：`echo report[!1-3].txt`
+- `{...}` 模式：`echo d{a,e,i,u,o}g`
+- `{start..end}`模式：`echo {11..15}`
+
+> 参考：[命令行通配符教程](https://www.ruanyifeng.com/blog/2018/09/bash-wildcards.html)

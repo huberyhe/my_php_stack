@@ -15,6 +15,17 @@ echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
 apk --no-cache add shadow
 ```
 
+### 1.1.2. CentOS
+
+#### 1.1.2.1. 网络管理
+
+```bash
+# 交互式网卡配置修改
+nmtui
+```
+
+
+
 ## 1.2. 
 
 ## 1.3. 基础命令
@@ -287,7 +298,35 @@ tar -cf archive.tar --transform 's/$/new/'
 zip -r backend_3party.zip /go/gopath/src/ -x '/go/gopath/src/backup_20220107.zip' -x '/go/gopath/src/cloud.google.com/*'
 ```
 
+#### 1.3.4.2. 不包含路径
+
+```bash
+[root@14148d2ac790 ~]# zip -r /dockertmp/package/0.130b220616/do_upgrade_3-1-0.130b220616.zip /dockertmp/package/0.130b220616/do_upgrade.sh /dockertmp/package/0.130b220616/upgrade_pkgs.tar.gz -j
+  adding: do_upgrade.sh (deflated 65%)
+  adding: upgrade_pkgs.tar.gz (deflated 1%)
+[root@14148d2ac790 ~]# unzip -t /dockertmp/package/0.130b220616/do_upgrade_3-1-0.130b220616.zip 
+Archive:  /dockertmp/package/0.130b220616/do_upgrade_3-1-0.130b220616.zip
+    testing: do_upgrade.sh            OK
+    testing: upgrade_pkgs.tar.gz      OK
+No errors detected in compressed data of /dockertmp/package/0.130b220616/do_upgrade_3-1-0.130b220616.zip.
+```
+
+
+
 ### 1.3.5. `free -m`中各字段的意义
+
+``` bash
+ $ free -m
+              total        used        free      shared  buff/cache   available
+Mem:           1837         251        1205          19         380        1422
+Swap:          3071           0        3071
+```
+
+Mem行表示：从操作系统看到总共1837M物理内存，使用了251M，另外进程共享使用19M，缓冲和缓存使用380M，剩余1205M（total=used+free+buff/cache）。以及从应用程序看到的可用内存1422M。
+
+Swap行表示：交换分区总共3701M，使用0M，剩余3701M
+
+> 参考：[Linux free字段解析](https://www.cnblogs.com/likui360/p/6263987.html)
 
 ### 1.3.6. ps使用
 
@@ -297,34 +336,50 @@ zip -r backend_3party.zip /go/gopath/src/ -x '/go/gopath/src/backup_20220107.zip
 ps -eo pid,lstart,etime,cmd | grep nginx
 ```
 
-### 1.3.7. 日志截断
+### 1.3.7. 安装开发常用软件
+
+```bash
+# debian 系
+apt install build-essential 
+
+# redhat 系
+yum groupinstall "Development Tools"
+```
+
+### 1.3.8. 系统强制重启
+
+```bash
+reboot -nf
+```
+
+> 参考：[强制重启Linux系统的几种方法%%%%](https://zohead.com/archives/linux-force-reboot/)
+
+## 1.4. 日志截断
 
 ```bash
 truncate -s 0 logfile
 ```
 
-### 1.3.8. 时间和时区设置
+## 1.5. 时间和时区设置
 
-#### 1.3.8.1. 设置时间
+### 1.5.1. 设置时间
 
 ```bash
 date -s "20220530 11:30:00"
 ```
 
-#### 1.3.8.2. 设置硬件时钟
+### 1.5.2. 设置硬件时钟
 
 ```bash
 hwclock --set --date="11/03/17 14:55"
 hwclock --show
 ```
 
-#### 1.3.8.3. 设置时区
+### 1.5.3. 设置时区
 
 ```bash
-# 用户环境时区
-tzselect
-# 执行结果
-TZ=’Asia/Shanghai’; export TZ
+# 用户环境时区,tzselect命令帮助生成一个环境变量设置命令
+TZ='Asia/Shanghai'; export TZ
 
 # 系统时区
 echo "ZONE=Asia/Shanghai" >> /etc/sysconfig/clock
@@ -335,6 +390,22 @@ reboot
 timedatectl set-timezone Asia/Shanghai
 reboot
 ```
+
+## 1.6. 网络设置
+
+### 1.6.1. ip配置
+
+### 1.6.2. dns配置
+
+### 1.6.3. 网卡状态
+
+可查看网卡是否接了网线
+
+```bash
+ethtool enp0s3
+```
+
+
 
 
 

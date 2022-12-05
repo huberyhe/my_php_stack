@@ -80,15 +80,70 @@ git revert HEAD~2 // 上上次
 git commit -a -m "revert to ..."
 ```
 
+## 1.3. 代码合并的几种方法
 
+### 1.3.1 git merge
 
-## 1.3. git客户端
+### 1.3.2 git cherry-pick
 
-### 1.3.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
+`git cherry-pick`命令的作用，就是将指定的提交（commit）应用于其他分支
+
+> 参考：[git cherry-pick 教程](https://www.ruanyifeng.com/blog/2020/04/git-cherry-pick.html)
+
+### 1.3.3 git merge --squash
+
+> 参考：
+> 
+> 1. [Git合并那些事——认识几种Merge方法](https://morningspace.github.io/tech/git-merge-stories-1/)
+> 2. [github - What does it mean to squash commits in git?](https://stackoverflow.com/questions/35703556/what-does-it-mean-to-squash-commits-in-git)
+
+## 1.3. 其他命令
+
+### 1.3.1. 查看任意目录的状态
+
+```bash
+git --git-dir=the/local/repo/.git --work-tree=the/local/repo status
+```
+
+### 1.3.2. 判断当前目录是否为git仓库
+
+```bash
+[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
+```
+
+### 1.3.4. 文件可执行权限
+
+```bash
+# 查看权限
+git ls-files --stage test.sh
+# 增加权限
+git update-index --chmod=+x *.sh
+```
+
+### 1.3.5. 换行符问题
+
+core.autocrlf
+- true：提交时转换为LF，检出时转换为CRLF
+- input：提交时转换为LF，检出时不转换
+- false：提交检出均不转换
+
+core.safecrlf
+- true：拒绝提交包含混合换行符的文件
+- false：允许提交包含混合换行符的文件
+- warn：提交包含混合换行符的文件时给出警告
+
+```bash
+git config --global core.autocrlf input
+git config --global core.safecrlf true
+```
+
+## 1.4. git客户端
+
+### 1.4.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
 
 ![screenshot of gh pr status](../imgs/84171218-327e7a80-aa40-11ea-8cd1-5177fc2d0e72.png)
 
-### 1.3.2. [Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
+### 1.4.2. [Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
 
 ![image 1](../imgs/image1Win.jpg)
 
