@@ -167,4 +167,11 @@ TODO
 
 ## 1.8. IDEA
 
+## 1.9. vscode
+
+### 1.9.1. 配置
+
+常用变量：
+
+参考：https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables
 
