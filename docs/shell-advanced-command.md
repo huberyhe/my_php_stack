@@ -446,7 +446,10 @@ port1 8081;
 port2 8080;
 ```
 
-
+#### 1.3.3.8. 去掉前后空白
+```bash
+echo "   PHP and MySQL   " | sed -e 's/^[[:space:]]*//'
+```
 
 > 参考：
 >

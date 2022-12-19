@@ -660,7 +660,39 @@ worker_rlimit_nofile 20000;
 7、查看文件描述符使用情况
 
 ```bash
+# cat /proc/sys/fs/file-nr
+13440	0	9223372036854775807
+# cat  /proc/sys/fs/file-max
+9223372036854775807
+```
+
+```bash
 lsof | awk '{ print $1 " " $2; }' | sort -rn | uniq -c | sort -rn | head -15
+cat /proc/sys/fs/file-nr
+```
+
+`lsof -p <pid>`看到的是pid进程不包含子进程的fd。由于子进程和子线程可能复用父进程的fd，lsof实际查到的会存在重复，参考：[linux - Number of file descriptors: different between /proc/sys/fs/file-nr and /proc/$pid/fd? - Server Fault](https://serverfault.com/questions/485262/number-of-file-descriptors-different-between-proc-sys-fs-file-nr-and-proc-pi)
+
+查看排行：
+```bash
+for pid in /proc/[0-9]*; do p=$(basename $pid); printf "%4d FDs for PID %6d; command=%s\n" $(ls $pid/fd | wc -l) $p "$(ps -p $p -o comm=)"; done | sort -nr | head -10
+
+
+find /proc -maxdepth 1 -type d -name '[0-9]*' \
+     -exec bash -c "ls {}/fd/ | wc -l | tr '\n' ' '" \; \
+     -printf "fds (PID = %P), command: " \
+     -exec bash -c "tr '\0' ' ' < {}/cmdline" \; \
+     -exec echo \; | sort -rn | head
+```
+
+总数：
+```bash
+find /proc -maxdepth 1 -type d -name '[0-9]*' -exec bash -c 'ls {}/fd/ | wc -l' \; | awk '{sum+=$1} END {print sum}'
+
+ps -eL | awk 'NR > 1 { print $1, $2 }' | \
+while read x; do \
+    find /proc/${x% *}/task/${x#* }/fd/ -type l; \
+done | wc -l
 ```
 
 1.15. 查看和设置默认编辑器
