@@ -655,7 +655,10 @@ LimitNOFILE=65536
 worker_rlimit_nofile 20000;
 ```
 
->  参考：[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)
+>  参考：
+>  1、[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)
+>  2、[How to Solve the “Too Many Open Files” Error on Linux](https://www.howtogeek.com/805629/too-many-open-files-linux/)
+>  3、[文件描述符(fd)泄漏排查一篇就够了](https://blog.csdn.net/blankti/article/details/100808475)
 
 7、查看文件描述符使用情况
 
@@ -695,7 +698,7 @@ while read x; do \
 done | wc -l
 ```
 
-1.15. 查看和设置默认编辑器
+## 1.15. 查看和设置默认编辑器
 
 查看：
 ```bash

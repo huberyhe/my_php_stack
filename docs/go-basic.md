@@ -235,6 +235,11 @@ fmt.Println(time.Now().Add(-10 * time.Minute).Format("2006-01-02 15:04:05"))
 fmt.Println(time.Unix(1649313807, 0))
 // 时间字符串生成time
 fmt.Println(time.Parse("2006-01-02 15:04:05", "2022-04-07 06:43:27"))
+
+var cstSh, _ = time.LoadLocation("Asia/Shanghai")
+fmt.Println(time.ParseInLocation("2006-01-02 15:04:05", "2022-04-07 06:43:27", cstSh))
+
+fmt.Println(time.Now().In(cstSh))
 ```
 
 输出结果，注意时区的区别
@@ -244,6 +249,9 @@ fmt.Println(time.Parse("2006-01-02 15:04:05", "2022-04-07 06:43:27"))
 2022-04-07 14:37:58
 2022-04-07 14:43:27 +0800 CST
 2022-04-07 06:43:27 +0000 UTC <nil>
+
+2022-04-07 06:43:27 +0800 CST <nil>
+2022-12-23 17:09:29.9312074 +0800 CST
 ```
 
 
@@ -530,12 +538,16 @@ func result(done chan bool) {
 
 func main() {  
     startTime := time.Now()
+    
     noOfJobs := 100
     go allocate(noOfJobs)
+    
     done := make(chan bool)
     go result(done)
+    
     noOfWorkers := 10
     createWorkerPool(noOfWorkers)
+    
     <-done
     endTime := time.Now()
     diff := endTime.Sub(startTime)
@@ -557,7 +569,7 @@ var wg = sync.WaitGroup{}
 
 func main() {
     userCount := 10
-    ch := make(chan bool, 2)
+    ch := make(chan bool, 2) // 10个协程，并发为2
     for i := 0; i < userCount; i++ {
         wg.Add(1)
         go Read(ch, i)
@@ -1166,6 +1178,14 @@ _ = decoder.Decode(&head)
 >
 > 2、[go - How to read multiple times from same io.Reader - Stack Overflow](https://stackoverflow.com/questions/39791021/how-to-read-multiple-times-from-same-io-reader)
 
+### 1.19.2. 内存泄露问题
+
+> 参考：
+> 
+> 1、[Go程序内存泄露问题快速定位](https://www.hitzhangjie.pro/blog/2021-04-14-go%E7%A8%8B%E5%BA%8F%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E9%97%AE%E9%A2%98%E5%BF%AB%E9%80%9F%E5%AE%9A%E4%BD%8D/)
+> 
+> 2、[内存泄漏的在线排查](https://panzhongxian.cn/cn/2020/12/memory-leak-problem-1/)
+
 ## 1.20. 多协程并发的优秀实现
 
 几个原则：
@@ -1367,6 +1387,28 @@ func main() {
 ```
 
 > 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
+
+### 1.24.2. 协程超时
+
+`context.WithTimeout`返回上下文和一个取消方法。`ctx.Done`会在超时时间到达，或执行取消方法时收到消息。
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+go func(ctx context.Context) {
+    for {
+        select {
+        case <-ctx.Done():
+            done = true
+        default:
+            // do something
+        }
+    }
+}(ctx)
+
+time.Sleep(5*time.Second)
+cancel()
+```
 
 ## 1.25. 值类型、引用类型
 

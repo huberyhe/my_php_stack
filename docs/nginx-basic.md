@@ -6,7 +6,15 @@ nginx基础知识与常用配置
 
 [TOC]
 
-## 1.1. 标题1
+## 1.1. 内置变量
+
+`$uri`
+`$request_uri`
+`$args`返回当前请求的URL参数串
+`$arg_XXX`用来取URI参数
+`$cookie_XXX`用来取cookie值
+`$http_XXX`用来取请求头
+`$send_XXX`用来取响应头
 
 ## 1.2. 常用配置
 
