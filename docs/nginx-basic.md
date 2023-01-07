@@ -119,3 +119,9 @@ server {
 ```
 
 > 参考：[Nginx 配置反向代理去除前缀](https://segmentfault.com/a/1190000037601092)
+
+## 1.6. 请求处理阶段
+
+Nginx 处理请求的过程⼀共划分为 11 个阶段，按照执⾏顺序依次是 post-read、server-
+rewrite、find-config、rewrite、post-rewrite、preaccess、access、post-access、try-
+files、content 以及 log.

@@ -882,6 +882,25 @@ dirname $(mktemp -u --tmpdir)
 echo ${TMPDIR:-/tmp}
 ```
 
+### 1.9.3. 按行读取文件，注意不要丢失最后一行
+
+```bash
+while read line || [[ -n ${line} ]]
+do
+    if [ -z "$line" ]; then
+        continue
+    fi
+
+    # ...
+done < $LIST_FILE
+```
+
+或者
+
+```bash
+IFS=$'\n'; for line in $(cat $LIST_FILE); do echo "$line" ; done
+```
+
 ## 1.10. 通配符
 
 - `?` 字符

@@ -78,7 +78,7 @@ make用于`map, slice,chan` 的内存创建，返回的对象是类型本身。�
 
 连接：`strings.Join()`
 
-查找：`strings.LastIndex()`
+查找：`strings.Index()`和`strings.LastIndex()`
 
 > 参考：[Go内置常用包](https://www.cnblogs.com/52fhy/p/11295090.html)
 
@@ -1248,7 +1248,7 @@ func main() {
 
 ## 1.21. 错误处理
 
-错误处理注意三点：
+### 1.21.1. 错误处理注意三点：
 
 - 错误只处理一次，避免出现重复的日志
 - 错误应该包含相关信息，从错误文字上就能大概判断错误位置
@@ -1305,6 +1305,55 @@ runtime.goexit
 exit status 1
 ```
 
+### 1.21.2. 自定义错误
+
+根据error接口定义，自定义错误只要实现了Error方法即可
+```go
+type error interface {
+	Error() string
+}
+```
+
+例：
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type DivisorZeroError struct {
+	Divisor int
+}
+
+func (e *DivisorZeroError) Error() string {
+	return "除数不能为0"
+}
+
+func div(a, b int) (float64, error) {
+	if b == 0 {
+		return 0, &DivisorZeroError{Divisor: b}
+	}
+
+	return float64(a) / float64(b), nil
+}
+
+func main() {
+	res, err := div(4, 1)
+	if e, ok := err.(*DivisorZeroError); ok {
+		panic(e.Error())
+	}
+	fmt.Println("res: ", res)
+	
+	res, err = div(5, 0)
+	switch err.(type) {
+	case *DivisorZeroError:
+		panic(err.Error())
+	}
+	fmt.Println("res: ", res)
+}
+```
+
 ## 1.22. go build参数
 
 ```
@@ -1324,7 +1373,9 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 -s 禁用符号表
 
 ## 1.23. go语言中init函数执行顺序
+
 `import --> const --> var --> init()`
+
 1. 如果一个包导入了其他包，则首先初始化导入的包。
 2. 然后初始化当前包的常量。
 3. 接下来初始化当前包的变量。
