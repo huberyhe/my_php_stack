@@ -12,11 +12,15 @@
 ```bash
 yum update --exclude=kernel
 ```
+
 或者
+
 ```bash
 yum update -x 'kernel'
 ```
+
 1.2、永久，修改配置`/etc/yum.conf`，添加`exclude=kernel* php*`
+
 1.3、永久，命令添加
 
 ```bash

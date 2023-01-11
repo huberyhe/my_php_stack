@@ -13,7 +13,7 @@
 
 **幻读**：幻读是指当事务不是独立执行时发生的一种现象。事务A读取与搜索条件相匹配的若干行。事务B以插入或删除行等方式来修改事务A的结果集，然后再提交。
 
-简单来说，**幻读是在一个事务中前后两次读的数据不一致**，由于其他事务插入的行。解决方式：innodb加入了间隙锁，在`select ... for update`和`select ... lock in share mode`时阻止行前后前后插入数据。
+简单来说，**幻读是在一个事务中前后两次读的数据不一致**，由于其他事务插入了行。解决方式：innodb加入了间隙锁，在`select ... for update`和`select ... lock in share mode`时阻止行前后插入数据。
 
 参考：[彻底理解事务的4个隔离级别](https://www.cnblogs.com/jycboy/p/transaction.html)
 

@@ -49,16 +49,16 @@ val := 100
 指针类型不会被自动初始化，不能直接使用，比如：
 
 ```go
-	var t1 map[int]int
-	// t1 = make(map[int]int) // 正确初始化
-	t1[2] = 2 // panic
-	fmt.Println("t1", t1)
+var t1 map[int]int
+// t1 = make(map[int]int) // 正确初始化
+t1[2] = 2 // panic
+fmt.Println("t1", t1)
 
 
-	var t5 *int
-	// t5 = new(int) // 正确初始化
-	*t5 = 1 // panic
-	fmt.Println("t5", *t5)
+var t5 *int
+// t5 = new(int) // 正确初始化
+*t5 = 1 // panic
+fmt.Println("t5", *t5)
 ```
 
 ### 1.1.3. var、new与make在初始化时的使用区别
@@ -388,18 +388,18 @@ func CopyFile(src, dst string) (err error) {
 ### 1.9.4. 文件名与后缀
 
 ```go
-	fullFilename := "D:/software/Typora/bin/typora.exe"
-	fmt.Println("fullFilename =", fullFilename)
-	//获取文件名带后缀
-	filenameWithSuffix := path.Base(fullFilename)
-	fmt.Println("filenameWithSuffix =", filenameWithSuffix) // typora.exe
-	//获取文件后缀
-	fileSuffix := path.Ext(filenameWithSuffix)
-	fmt.Println("fileSuffix =", fileSuffix) // .exe
+fullFilename := "D:/software/Typora/bin/typora.exe"
+fmt.Println("fullFilename =", fullFilename)
+//获取文件名带后缀
+filenameWithSuffix := path.Base(fullFilename)
+fmt.Println("filenameWithSuffix =", filenameWithSuffix) // typora.exe
+//获取文件后缀
+fileSuffix := path.Ext(filenameWithSuffix)
+fmt.Println("fileSuffix =", fileSuffix) // .exe
 
-	//获取文件名
-	filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
-	fmt.Println("filenameOnly =", filenameOnly) // typora
+//获取文件名
+filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
+fmt.Println("filenameOnly =", filenameOnly) // typora
 ```
 
 ### 1.9.5. 删除文件和文件夹
@@ -407,7 +407,6 @@ func CopyFile(src, dst string) (err error) {
 ```go
 err := os.Remove(file) // 文件夹必须为空
 err := os.RemoveAll(path) // 可以删除不为空的文件夹
-
 ```
 
 ### 1.9.6. 路径存在判断
@@ -1365,6 +1364,8 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 -N 禁用优化
 
 -l 禁用内联
+
+-m 打印出逃逸分析的优化策略
 
 2、ldflags链接参数：`go tool link –help`查看可用参数
 

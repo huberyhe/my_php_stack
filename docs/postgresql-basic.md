@@ -162,6 +162,52 @@ VACUUM FULL damaged_table;
 
 ## 1.10. 查看状态
 
+### 1.10.1. 是否已就绪
+
 ```bash
 pg_isready -h localhost -p 16543
+```
+
+### 1.10.2. 查看正在执行的sql
+
+```sql
+SELECT   
+    procpid,   
+    start,   
+    now() - start AS lap,   
+    current_query   
+FROM   
+    (SELECT   
+        backendid,   
+        pg_stat_get_backend_pid(S.backendid) AS procpid,   
+        pg_stat_get_backend_activity_start(S.backendid) AS start,   
+        pg_stat_get_backend_activity(S.backendid) AS current_query   
+    FROM   
+        (SELECT pg_stat_get_backend_idset() AS backendid) AS S   
+    ) AS S   
+WHERE
+   current_query <> '<IDLE>'   
+ORDER BY   
+   lap DESC;
+```
+
+procpid：进程id  
+start：进程开始时间  
+lap：经过时间  
+current_query：执行中的sql
+
+停止某个查询：
+
+```sql
+SELECT pg_cancel_backend(进程id);
+```
+或者用系统函数：kill -9 进程id;
+
+1.10.3. 查看表占用空间
+
+```sql
+select relname, pg_size_pretty(pg_relation_size(relid))
+from pg_stat_user_tables
+where schemaname='public'
+order by pg_relation_size(relid) desc;
 ```
