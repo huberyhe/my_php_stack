@@ -751,7 +751,55 @@ defer func() {
 
 > 参考：[Golang transaction 事务使用的正确姿势](http://www.mspring.org/2019/03/18/Golang-transaction-事务使用的正确姿势/)
 
-## 1.13. 闭包
+## 1.13. 匿名函数与闭包
+
+匿名函数中使用外部变量，注意直接使用和通过参数使用的区别
+
+```go
+var wg sync.WaitGroup
+for _, c := range []string{"a", "b", "c"} {
+    go func() {
+        time.Sleep(1 * time.Second)
+        fmt.Println("func 1: ", c) // 运行时的值
+        wg.Done()
+    }()
+    wg.Add(1)
+
+    go func(c string) {
+        time.Sleep(2 * time.Second)
+        fmt.Println("func 2: ", c) // 调用时的值
+        wg.Done()
+    }(c)
+    wg.Add(1)
+
+    func(c string) {
+        go func() {
+            time.Sleep(3 * time.Second)
+            fmt.Println("func 3: ", c)
+            wg.Done()
+        }()
+    }(c)
+    wg.Add(1)
+
+}
+wg.Wait()
+```
+
+以上代码输出：
+
+```bash
+func 1:  c
+func 1:  c
+func 1:  c
+func 2:  a
+func 2:  c
+func 2:  b
+func 3:  c
+func 3:  b
+func 3:  a
+```
+
+闭包有局部变量，并返回一个函数变量，特点是这个函数可以多次使用局部变量，变量的值在闭包生命周期内可以保持。
 
 ```go
 package main
@@ -782,6 +830,8 @@ func Fun() func(string) string {
 }
 
 ```
+
+
 
 ## 1.14. 并发锁 sync.Mutex与sync.RWMutex
 
