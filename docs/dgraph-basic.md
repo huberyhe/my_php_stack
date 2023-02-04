@@ -254,6 +254,12 @@ alpha: http占用8080端口，grpc占用9080端口，worker grpc占用内部7080
 curl localhost:8080/health
 ```
 
+## 1.9. 数据目录
+
+- zw：zero存储WAL文件的目录
+- p：alpha存储`posting lists`的目录
+- w：alpha存储`raft write-ahead logs`的目录
+
 > 参考：
 >
 > 1、[Expand Predicates in DQL - Query language (dgraph.io)](https://dgraph.io/docs/query-language/expand-predicates/)
