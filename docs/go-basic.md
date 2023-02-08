@@ -320,7 +320,10 @@ func main() {
 
 func listAll(path string, curHier int){
     fileInfos, err := ioutil.ReadDir(path)
-    if err != nil{fmt.Println(err); return}
+    if err != nil{
+        fmt.Println(err)
+        return
+    }
 
     for _, info := range fileInfos{
         if info.IsDir(){
@@ -385,7 +388,16 @@ func CopyFile(src, dst string) (err error) {
 }
 ```
 
-### 1.9.4. 文件名与后缀
+### 1.9.4. 移动与复制文件
+
+```go
+// 移动文件
+os.Rename("./aa/bb/c1/file.go", "./aa/bb/c2/file.go")
+
+// 复制文件。没有直接方法，就是读和写文件
+```
+
+### 1.9.5. 文件名与后缀
 
 ```go
 fullFilename := "D:/software/Typora/bin/typora.exe"
@@ -402,14 +414,14 @@ filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
 fmt.Println("filenameOnly =", filenameOnly) // typora
 ```
 
-### 1.9.5. 删除文件和文件夹
+### 1.9.6. 删除文件和文件夹
 
 ```go
 err := os.Remove(file) // 文件夹必须为空
 err := os.RemoveAll(path) // 可以删除不为空的文件夹
 ```
 
-### 1.9.6. 路径存在判断
+### 1.9.7. 路径存在判断
 
 ```go
 func IsExists(path string) bool {
@@ -425,11 +437,142 @@ func IsExists(path string) bool {
 }
 ```
 
-### 1.9.7. 创建目录
+### 1.9.8. 创建目录
 
 ```go
 os.Mkdir("abc", os.ModePerm) //创建目录  
 os.MkdirAll("dir1/dir2/dir3", os.ModePerm) //创建多级目录
+```
+
+### 1.9.9. 临时目录和文件
+
+1.16版本新增
+
+```go
+os.MkdirTemp("", "sampledir")
+os.CreateTemp("", "sample")
+```
+
+### 1.9.10. 文件md5
+
+```go
+func GetFileMD5(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	hash := md5.New()
+	_, _ = io.Copy(hash, file)
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+```
+
+### 1.9.11. zip文件解压
+
+```go
+package fileHelper
+
+import (
+	"archive/zip"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"os"
+	"path"
+	"strings"
+)
+
+type Unzip struct {
+	closer io.Closer
+	files  []*zip.File
+}
+
+// 从页面上传解压
+func NewUnzipFromRequestFile(file *multipart.FileHeader) (uz *Unzip, err error) {
+	f, err := file.Open()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := zip.NewReader(f, file.Size)
+	if err != nil {
+		return nil, err
+	}
+
+	uz = new(Unzip)
+	uz.closer = f
+	uz.files = r.File
+	return uz, nil
+}
+
+// 从文件解压
+func NewUnzipFromFile(file string) (uz *Unzip, err error) {
+	r, err := zip.OpenReader(file)
+	if err != nil {
+		return nil, err
+	}
+
+	uz = new(Unzip)
+	uz.closer = r
+	uz.files = r.File
+	return uz, nil
+}
+
+func (uz *Unzip) Unzip(dest string) error {
+	defer uz.closer.Close()
+
+	os.MkdirAll(dest, 0755)
+
+	// Closure to address file descriptors issue with all the deferred .Close() methods
+	extractAndWriteFile := func(f *zip.File) error {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := rc.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
+		fPath := path.Join(dest, f.Name)
+
+		// Check for ZipSlip (Directory traversal)
+		if !strings.HasPrefix(fPath, path.Clean(dest)+string(os.PathSeparator)) {
+			return fmt.Errorf("illegal file path: %s", fPath)
+		}
+
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(fPath, f.Mode())
+		} else {
+			os.MkdirAll(path.Dir(fPath), f.Mode())
+			f, err := os.OpenFile(fPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if err := f.Close(); err != nil {
+					panic(err)
+				}
+			}()
+
+			_, err = io.Copy(f, rc)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range uz.files {
+		err := extractAndWriteFile(f)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 ```
 
 ## 1.10. 并发，协程与管道
@@ -450,6 +593,7 @@ b := <- a
 ```
 
 管道未初始化或已关闭时的读写情况
+
 - 写未初始化管道：阻塞
 - 读未初始化管道：阻塞
 - 写关闭的管道：panic
