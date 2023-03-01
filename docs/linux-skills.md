@@ -125,7 +125,7 @@ $
 
 ## 1.3. 进程管理systemd
 
-[官网]([System and Service Manager (systemd.io)](https://systemd.io/))
+[官网 System and Service Manager (systemd.io)](https://systemd.io/)
 
 
 ### 1.3.1. 入门使用

@@ -203,7 +203,7 @@ fmt.Println(rep) // Abcd
 ### 1.8.2. 获取当前时间的时间戳
 
 ```go
-time.Now().Unix() // 1653194203
+time.Now().Unix() // 1653194203
 ```
 
 ### 1.8.3. 时间格式化
@@ -1946,6 +1946,162 @@ go build -gcflags "-m -m -l" main.go
 ```
 
 如上包结构的程序，`resources/internal/cpu`和`resources/internal/mem`只能被`resources`包及其子包`resources/input`中的代码导入，不能被`prototype`包里的代码导入。
+
+## 1.35. json struct tag
+
+1）不指定tag
+
+```go
+Field int // “Filed”:0
+```
+
+不指定tag，默认使用变量名称。转换为json时，key为Filed。
+
+（2）直接忽略
+
+```go
+Field int json:"-" //注意：必须为"-"，不能带有opts
+```
+
+转换时不处理。
+
+（3）指定key名
+
+```go
+Field int json:"myName" // “myName”:0
+```
+
+转换为json时，key为myName
+
+（4）"omitempty"零值忽略
+
+```go
+Field int json:",omitempty"
+```
+
+转换为json时，值为零值则忽略，否则key为myName
+
+（5）指定key且零值忽略
+
+```go
+Field int json:"myName,omitempty"
+```
+
+转换为json时，值为零值则忽略，否则key为myName
+
+（6）指定key为"-"
+
+```go
+Field int json:"-," // “-”:0
+```
+
+此项与忽略的区别在于多了个”,“。
+
+（7）“string” opt
+以上提到的用法都是常见的，这个比较特殊。
+
+"string"仅适用于字符串、浮点、整数或布尔类型，表示的意思是：将字段的值转换为字符串；解析时，则是将字符串解析为指定的类型。主要用于与javascript通信时数据的转换。
+
+注意：
+仅且仅有"string"，没有int、number之类的opt。即带"string" opt的字段，编码时仅能将字符串、浮点、整数或布尔类型转换为string类型，反之则不然；解码时可以将string转换为其他类型，反之不然。因为"string"有限制。
+
+```go
+Int64String int64 json:",string" // “Int64String”:“0”
+```
+
+“string” opt的使用可以在Marshal/Unmarshal时自动进行数据类型的转换，减少了手动数据转换的麻烦，但是一定要注意使用的范围，对不满足的类型使用，是会报错的。
+
+## 1.36. 反射reflect的使用
+
+一个ORM的例子，传入对象，生成一个插入sql：
+
+```go
+func MakeCreateSql(in interface{}) (string, error) {
+	var tableName string // 表名
+	var fields []string  // 字段
+	var values string    // 值
+	var sql string
+
+	inType := reflect.TypeOf(in)
+	tableName = inType.Name() // 表名
+
+	if inType.Kind() == reflect.Struct { // 暂时只支持结构体
+		inValue := reflect.ValueOf(in)
+		for i := 0; i < inType.NumField(); i++ {
+			ft := inType.Field(i)
+			fv := inValue.Field(i)
+
+			fieldName := ft.Name // 字段名
+
+			switch fv.Kind() {
+			case reflect.String:
+				values = fmt.Sprintf(`%s,'%s'`, values, fv.String())
+			case reflect.Int, reflect.Int32:
+				values = fmt.Sprintf(`%s,%d`, values, fv.Int())
+			default:
+				return "", errors.New("type not support: " + fieldName)
+			}
+
+			fields = append(fields, fieldName)
+			fmt.Printf("idx: %d, field: %s, value: %v, kind: %s, tag: %s\n", i, fieldName, fv, fv.Kind().String(), ft.Tag) // idx: 0, field: id, value: 1, kind: int, tag: json:"id"
+		}
+	}
+
+	if len(fields) > 0 {
+		sql = fmt.Sprintf(`insert into %s (%s) values (%s)`, tableName, strings.Join(fields, ","), strings.TrimLeft(values, ","))
+	}
+
+	return sql, nil
+}
+
+type account struct {
+	id   int    `json:"id"`
+	name string `json:"name" gorm:"column:name"`
+}
+
+func TestMakeCreateSql(t *testing.T) {
+	in := account{
+		1,
+		"jack",
+	}
+	get, err := MakeCreateSql(in) // insert into account (id,name) values (1,'jack')
+	if err != nil {
+		t.Errorf("err: %s", err.Error())
+	}
+	expect := ""
+	if get != expect {
+		t.Errorf("expect: %s, get: %s", expect, get)
+	}
+}
+```
+## 1.37. unsafe的使用
+
+`unsafe.Pointer`表示任意类型且可寻址的指针值，可以在不同的指针类型之间进行转换（类似 C 语言的 void * 的用途）。其包含四种核心操作：
+
+-   任何类型的指针值都可以转换为 Pointer
+-   Pointer 可以转换为任何类型的指针值
+-   uintptr 可以转换为 Pointer
+-   Pointer 可以转换为 uintptr
+
+```go
+type Num struct{
+    i string
+    j int64
+}
+
+func main(){
+    n := Num{i: "EDDYCJY", j: 1}
+    nPointer := unsafe.Pointer(&n)
+
+    niPointer := (*string)(unsafe.Pointer(nPointer))
+    *niPointer = "煎鱼"
+
+    njPointer := (*int64)(unsafe.Pointer(uintptr(nPointer) + unsafe.Offsetof(n.j)))
+    *njPointer = 2
+
+    fmt.Printf("n.i: %s, n.j: %d", n.i, n.j) // n.i: 煎鱼, n.j: 2
+}
+```
 
 # 2. 第三方包
 

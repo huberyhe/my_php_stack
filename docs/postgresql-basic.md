@@ -99,7 +99,9 @@ select (now() - interval '1 d')::timestamp;
 select (date_trunc('day',now()) - interval '%d d')::timestamp;
 ```
 
-> 参考：[PostgreSQL 时间/日期函数和操作符](https://www.runoob.com/postgresql/postgresql-datetime.html)
+> 参考：
+> 1、[PostgreSQL 时间/日期函数和操作符](https://www.runoob.com/postgresql/postgresql-datetime.html)
+> 2、[时间/日期函数和操作符](http://www.postgres.cn/docs/9.6/functions-datetime.html)
 
 ## 1.7. 查询方法
 
