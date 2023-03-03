@@ -6,7 +6,11 @@
 
 ## 1.1. Docker官方文档
 
-[docker | Docker Documentation](https://docs.docker.com/engine/reference/commandline/docker/)
+优先查阅官方文档
+
+1、[手册，概念性知识](https://docs.docker.com/desktop/)
+
+2、[参考，命令和API等](https://docs.docker.com/engine/reference/commandline/docker/)
 
 ## 1.2. 使用镜像运行容器
 
@@ -173,3 +177,11 @@ RUN ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezon
 > 参考：[Docker 时区调整方案)](https://cloud.tencent.com/developer/article/1626811)
 
 ## 1.12. 网络驱动
+
+1.12.1. bridge桥接网络。使用NAT转发端口流量
+
+1.12.2. overlay多机覆盖网络
+
+1.12.3. host主机共享网络
+
+1.12.4. macvlan网络。直接接入虚拟网卡，可划分vlan

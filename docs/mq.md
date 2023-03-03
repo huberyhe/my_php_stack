@@ -41,6 +41,10 @@
 - Kafka消息队列，负责日志数据的接收，存储和转发
 - 日志处理应用：订阅并消费kafka队列中的日志数据
 
+> 参考：
+> 
+> 1、[消息队列使用的四种场景介绍](https://www.cnblogs.com/yanglang/p/9259172.html)
+
 ### 1.1.5. 消息通讯
 
 ## 1.2. 常用消息队列
@@ -87,8 +91,4 @@ rabbitmq：重量级，高可靠，异步，不保证实时；
 > 参考：[Redis 与 MQ 的区别](https://www.cnblogs.com/dengguangxue/p/11537466.html)
 
 ## 1.3. 应用实例
-
-> 参考：
-> 
-> 1、[消息队列使用的四种场景介绍](https://www.cnblogs.com/yanglang/p/9259172.html)
 

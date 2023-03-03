@@ -12,11 +12,15 @@
 ```bash
 yum update --exclude=kernel
 ```
+
 或者
+
 ```bash
 yum update -x 'kernel'
 ```
+
 1.2、永久，修改配置`/etc/yum.conf`，添加`exclude=kernel* php*`
+
 1.3、永久，命令添加
 
 ```bash
@@ -121,7 +125,7 @@ $
 
 ## 1.3. 进程管理systemd
 
-[官网]([System and Service Manager (systemd.io)](https://systemd.io/))
+[官网 System and Service Manager (systemd.io)](https://systemd.io/)
 
 
 ### 1.3.1. 入门使用
@@ -655,15 +659,50 @@ LimitNOFILE=65536
 worker_rlimit_nofile 20000;
 ```
 
->  参考：[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)
+>  参考：
+>  1、[Fixing the “Too many open files” Error in Linux](https://www.baeldung.com/linux/error-too-many-open-files)
+>  2、[How to Solve the “Too Many Open Files” Error on Linux](https://www.howtogeek.com/805629/too-many-open-files-linux/)
+>  3、[文件描述符(fd)泄漏排查一篇就够了](https://blog.csdn.net/blankti/article/details/100808475)
 
 7、查看文件描述符使用情况
 
 ```bash
-lsof | awk '{ print $1 " " $2; }' | sort -rn | uniq -c | sort -rn | head -15
+# cat /proc/sys/fs/file-nr
+13440	0	9223372036854775807
+# cat  /proc/sys/fs/file-max
+9223372036854775807
 ```
 
-1.15. 查看和设置默认编辑器
+```bash
+lsof | awk '{ print $1 " " $2; }' | sort -rn | uniq -c | sort -rn | head -15
+cat /proc/sys/fs/file-nr
+```
+
+`lsof -p <pid>`看到的是pid进程不包含子进程的fd。由于子进程和子线程可能复用父进程的fd，lsof实际查到的会存在重复，参考：[linux - Number of file descriptors: different between /proc/sys/fs/file-nr and /proc/$pid/fd? - Server Fault](https://serverfault.com/questions/485262/number-of-file-descriptors-different-between-proc-sys-fs-file-nr-and-proc-pi)
+
+查看排行：
+```bash
+for pid in /proc/[0-9]*; do p=$(basename $pid); printf "%4d FDs for PID %6d; command=%s\n" $(ls $pid/fd | wc -l) $p "$(ps -p $p -o comm=)"; done | sort -nr | head -10
+
+
+find /proc -maxdepth 1 -type d -name '[0-9]*' \
+     -exec bash -c "ls {}/fd/ | wc -l | tr '\n' ' '" \; \
+     -printf "fds (PID = %P), command: " \
+     -exec bash -c "tr '\0' ' ' < {}/cmdline" \; \
+     -exec echo \; | sort -rn | head
+```
+
+总数：
+```bash
+find /proc -maxdepth 1 -type d -name '[0-9]*' -exec bash -c 'ls {}/fd/ | wc -l' \; | awk '{sum+=$1} END {print sum}'
+
+ps -eL | awk 'NR > 1 { print $1, $2 }' | \
+while read x; do \
+    find /proc/${x% *}/task/${x#* }/fd/ -type l; \
+done | wc -l
+```
+
+## 1.15. 查看和设置默认编辑器
 
 查看：
 ```bash

@@ -49,16 +49,16 @@ val := 100
 指针类型不会被自动初始化，不能直接使用，比如：
 
 ```go
-	var t1 map[int]int
-	// t1 = make(map[int]int) // 正确初始化
-	t1[2] = 2 // panic
-	fmt.Println("t1", t1)
+var t1 map[int]int
+// t1 = make(map[int]int) // 正确初始化
+t1[2] = 2 // panic
+fmt.Println("t1", t1)
 
 
-	var t5 *int
-	// t5 = new(int) // 正确初始化
-	*t5 = 1 // panic
-	fmt.Println("t5", *t5)
+var t5 *int
+// t5 = new(int) // 正确初始化
+*t5 = 1 // panic
+fmt.Println("t5", *t5)
 ```
 
 ### 1.1.3. var、new与make在初始化时的使用区别
@@ -78,13 +78,28 @@ make用于`map, slice,chan` 的内存创建，返回的对象是类型本身。�
 
 连接：`strings.Join()`
 
-查找：`strings.LastIndex()`
+查找：`strings.Index()`和`strings.LastIndex()`
 
 > 参考：[Go内置常用包](https://www.cnblogs.com/52fhy/p/11295090.html)
 
-## 1.3. 类型判断
+## 1.3. 整型浮点型
 
-### 1.3.1. switch
+### 1.3.1. 四舍五入
+
+go没有原生四舍五入的支持，只有向上取整`math.Floor`和向下取整`math.Ceil`。
+
+```go
+// Round 四舍五入，ROUND_HALF_UP 模式实现
+// 返回将 val 根据指定精度 precision（十进制小数点后数字的数目）进行四舍五入的结果。precision 也可以是负数或零。
+func Round(val float64, precision int) float64 {
+    p := math.Pow10(precision)
+    return math.Floor(val*p+0.5) / p
+}
+```
+
+## 1.4. 类型判断
+
+### 1.4.1. switch
 
 ```go
 for k, v := range user5 {
@@ -107,11 +122,11 @@ for k, v := range user5 {
 ```
 
 
-### 1.3.2. reflect反射
+### 1.4.2. reflect反射
 
-## 1.4. 类型转换
+## 1.5. 类型转换
 
-### 1.4.1. 整型与字符串互转
+### 1.5.1. 整型与字符串互转
 
 ```go
 // string转成int
@@ -133,11 +148,20 @@ string := strconv.FormatInt(int64, 10)
 s := string(97) // s == "a"
 ```
 
+## 1.6. 常用常量
+
+### 1.6.1. 整型最值
+
+```go
+math.MaxInt32
+math.MinInt32
+```
 
 
-## 1.5. 正则
 
-### 1.5.1. 正则匹配
+## 1.7. 正则
+
+### 1.7.1. 正则匹配
 
 ```go
 name := regexp.MustCompile("[\u4e00-\u9fa5~!@#$%^&*(){}|<>\\\\/+\\-【】:\"?'：；‘’“”，。、《》\\]\\[`]")
@@ -146,7 +170,7 @@ if name.MatchString(param["username"]) {
 }
 ```
 
-### 1.5.2. 正则查找子串
+### 1.7.2. 正则查找子串
 
 ```go
 re := regexp.MustCompile(`<!--{{TPL_LIST_ITEM_START}}-->([\s\S]*?)<!--{{TPL_LIST_ITEM_END}}-->`)
@@ -160,7 +184,7 @@ if len(matches) > 1 {
 }
 ```
 
-### 1.5.3. 替换
+### 1.7.3. 替换
 
 ```go
 re, _ := regexp.Compile("a");
@@ -170,26 +194,26 @@ fmt.Println(rep) // Abcd
 
 
 
-## 1.6. 时间
+## 1.8. 时间
 
-### 1.6.1. `time.Now()`返回的是什么？
+### 1.8.1. `time.Now()`返回的是什么？
 
 返回的是当前时间的`time.Time`对象。
 
-### 1.6.2. 获取当前时间的时间戳
+### 1.8.2. 获取当前时间的时间戳
 
 ```go
-time.Now().Unix() // 1653194203
+time.Now().Unix() // 1653194203
 ```
 
-### 1.6.3. 时间格式化
+### 1.8.3. 时间格式化
 
 ```go
 const TimeFormat = "2006-01-02 15:04:05"
 time.Now().Format(TimeFormat)
 ```
 
-### 1.6.4. 时间字符串生成时间对象，时间戳生成时间对象
+### 1.8.4. 时间字符串生成时间对象，时间戳生成时间对象
 
 ```go
 const TimeFormat = "2006-01-02 15:04:05"
@@ -211,6 +235,11 @@ fmt.Println(time.Now().Add(-10 * time.Minute).Format("2006-01-02 15:04:05"))
 fmt.Println(time.Unix(1649313807, 0))
 // 时间字符串生成time
 fmt.Println(time.Parse("2006-01-02 15:04:05", "2022-04-07 06:43:27"))
+
+var cstSh, _ = time.LoadLocation("Asia/Shanghai")
+fmt.Println(time.ParseInLocation("2006-01-02 15:04:05", "2022-04-07 06:43:27", cstSh))
+
+fmt.Println(time.Now().In(cstSh))
 ```
 
 输出结果，注意时区的区别
@@ -220,18 +249,21 @@ fmt.Println(time.Parse("2006-01-02 15:04:05", "2022-04-07 06:43:27"))
 2022-04-07 14:37:58
 2022-04-07 14:43:27 +0800 CST
 2022-04-07 06:43:27 +0000 UTC <nil>
+
+2022-04-07 06:43:27 +0800 CST <nil>
+2022-12-23 17:09:29.9312074 +0800 CST
 ```
 
 
-## 1.7. 文件
+## 1.9. 文件
 
-### 1.7.1. touch文件
+### 1.9.1. touch文件
 
 ```go
 os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
 ```
 
-### 1.7.2. 读写文件
+### 1.9.2. 读写文件
 
 ```go
 
@@ -276,9 +308,9 @@ func readByLine(fn string) (bs []string, err error)  {
 func ioutil.ReadFile(filename string) ([]byte, error)
 ```
 
-### 1.7.3. 实例：
+### 1.9.3. 实例：
 
-#### 1.7.3.1. 列出目录文件
+#### 1.9.3.1. 列出目录文件
 
 ```go
 func main() {
@@ -288,7 +320,10 @@ func main() {
 
 func listAll(path string, curHier int){
     fileInfos, err := ioutil.ReadDir(path)
-    if err != nil{fmt.Println(err); return}
+    if err != nil{
+        fmt.Println(err)
+        return
+    }
 
     for _, info := range fileInfos{
         if info.IsDir(){
@@ -307,7 +342,7 @@ func listAll(path string, curHier int){
 }
 ```
 
-#### 1.7.3.2. 拷贝文件和文件夹
+#### 1.9.3.2. 拷贝文件和文件夹
 
 ```go
 func CopyDir(src, dst string) error {
@@ -353,32 +388,40 @@ func CopyFile(src, dst string) (err error) {
 }
 ```
 
-### 1.7.4. 文件名与后缀
+### 1.9.4. 移动与复制文件
 
 ```go
-	fullFilename := "D:/software/Typora/bin/typora.exe"
-	fmt.Println("fullFilename =", fullFilename)
-	//获取文件名带后缀
-	filenameWithSuffix := path.Base(fullFilename)
-	fmt.Println("filenameWithSuffix =", filenameWithSuffix) // typora.exe
-	//获取文件后缀
-	fileSuffix := path.Ext(filenameWithSuffix)
-	fmt.Println("fileSuffix =", fileSuffix) // .exe
+// 移动文件
+os.Rename("./aa/bb/c1/file.go", "./aa/bb/c2/file.go")
 
-	//获取文件名
-	filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
-	fmt.Println("filenameOnly =", filenameOnly) // typora
+// 复制文件。没有直接方法，就是读和写文件
 ```
 
-### 1.7.5. 删除文件和文件夹
+### 1.9.5. 文件名与后缀
+
+```go
+fullFilename := "D:/software/Typora/bin/typora.exe"
+fmt.Println("fullFilename =", fullFilename)
+//获取文件名带后缀
+filenameWithSuffix := path.Base(fullFilename)
+fmt.Println("filenameWithSuffix =", filenameWithSuffix) // typora.exe
+//获取文件后缀
+fileSuffix := path.Ext(filenameWithSuffix)
+fmt.Println("fileSuffix =", fileSuffix) // .exe
+
+//获取文件名
+filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
+fmt.Println("filenameOnly =", filenameOnly) // typora
+```
+
+### 1.9.6. 删除文件和文件夹
 
 ```go
 err := os.Remove(file) // 文件夹必须为空
 err := os.RemoveAll(path) // 可以删除不为空的文件夹
-
 ```
 
-### 1.7.6. 路径存在判断
+### 1.9.7. 路径存在判断
 
 ```go
 func IsExists(path string) bool {
@@ -394,16 +437,147 @@ func IsExists(path string) bool {
 }
 ```
 
-### 1.7.7. 创建目录
+### 1.9.8. 创建目录
 
 ```go
 os.Mkdir("abc", os.ModePerm) //创建目录  
 os.MkdirAll("dir1/dir2/dir3", os.ModePerm) //创建多级目录
 ```
 
-## 1.8. 并发，协程与管道
+### 1.9.9. 临时目录和文件
 
-### 1.8.1. 管道
+1.16版本新增
+
+```go
+os.MkdirTemp("", "sampledir")
+os.CreateTemp("", "sample")
+```
+
+### 1.9.10. 文件md5
+
+```go
+func GetFileMD5(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	hash := md5.New()
+	_, _ = io.Copy(hash, file)
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+```
+
+### 1.9.11. zip文件解压
+
+```go
+package fileHelper
+
+import (
+	"archive/zip"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"os"
+	"path"
+	"strings"
+)
+
+type Unzip struct {
+	closer io.Closer
+	files  []*zip.File
+}
+
+// 从页面上传解压
+func NewUnzipFromRequestFile(file *multipart.FileHeader) (uz *Unzip, err error) {
+	f, err := file.Open()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := zip.NewReader(f, file.Size)
+	if err != nil {
+		return nil, err
+	}
+
+	uz = new(Unzip)
+	uz.closer = f
+	uz.files = r.File
+	return uz, nil
+}
+
+// 从文件解压
+func NewUnzipFromFile(file string) (uz *Unzip, err error) {
+	r, err := zip.OpenReader(file)
+	if err != nil {
+		return nil, err
+	}
+
+	uz = new(Unzip)
+	uz.closer = r
+	uz.files = r.File
+	return uz, nil
+}
+
+func (uz *Unzip) Unzip(dest string) error {
+	defer uz.closer.Close()
+
+	os.MkdirAll(dest, 0755)
+
+	// Closure to address file descriptors issue with all the deferred .Close() methods
+	extractAndWriteFile := func(f *zip.File) error {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := rc.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
+		fPath := path.Join(dest, f.Name)
+
+		// Check for ZipSlip (Directory traversal)
+		if !strings.HasPrefix(fPath, path.Clean(dest)+string(os.PathSeparator)) {
+			return fmt.Errorf("illegal file path: %s", fPath)
+		}
+
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(fPath, f.Mode())
+		} else {
+			os.MkdirAll(path.Dir(fPath), f.Mode())
+			f, err := os.OpenFile(fPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if err := f.Close(); err != nil {
+					panic(err)
+				}
+			}()
+
+			_, err = io.Copy(f, rc)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range uz.files {
+		err := extractAndWriteFile(f)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+```
+
+## 1.10. 并发，协程与管道
+
+### 1.10.1. 管道
 
 只有可写的管道才能close，close应该在发送方执行
 
@@ -419,15 +593,16 @@ b := <- a
 ```
 
 管道未初始化或已关闭时的读写情况
+
 - 写未初始化管道：阻塞
 - 读未初始化管道：阻塞
 - 写关闭的管道：panic
 - 读关闭的管道：返回未读完的数据或（0值，ok=false）
 
 
-### 1.8.2. 协程
+### 1.10.2. 协程
 
-#### 1.8.2.1. 协程池示例，用于计算数字各位的和
+#### 1.10.2.1. 协程池示例，用于计算数字各位的和
 
 输入12345，输出15(=1+2+3+4+5)
 
@@ -506,12 +681,16 @@ func result(done chan bool) {
 
 func main() {  
     startTime := time.Now()
+    
     noOfJobs := 100
     go allocate(noOfJobs)
+    
     done := make(chan bool)
     go result(done)
+    
     noOfWorkers := 10
     createWorkerPool(noOfWorkers)
+    
     <-done
     endTime := time.Now()
     diff := endTime.Sub(startTime)
@@ -519,7 +698,7 @@ func main() {
 }
 ```
 
-#### 1.8.2.2. 控制协程数量
+#### 1.10.2.2. 控制协程数量
 
 ```go
 package main
@@ -533,7 +712,7 @@ var wg = sync.WaitGroup{}
 
 func main() {
     userCount := 10
-    ch := make(chan bool, 2)
+    ch := make(chan bool, 2) // 10个协程，并发为2
     for i := 0; i < userCount; i++ {
         wg.Add(1)
         go Read(ch, i)
@@ -597,7 +776,7 @@ func main() {
 
 
 
-#### 1.8.2.3. 面试题：交替输出
+#### 1.10.2.3. 面试题：交替输出
 
 ```go
 package main
@@ -632,22 +811,22 @@ func main() {
 
 
 
-## 1.9. dlv调试
+## 1.11. dlv调试
 
-### 1.9.1. 调试时带上命令行参数，`--`后带上参数
+### 1.11.1. 调试时带上命令行参数，`--`后带上参数
 
 ```bash
 dlv debug main.go --output ./bin/license -- -c ./etc/license.json
 dlv exec ./bin/license -- -c ./etc/license.json
 ```
 
-### 1.9.2. 设置字符串可显示长度
+### 1.11.2. 设置字符串可显示长度
 
 ```
 config max-string-len 99999
 ```
 
-### 1.9.3. 常用命令
+### 1.11.3. 常用命令
 
 ```
 // 打断点
@@ -691,7 +870,7 @@ trace
 ```
 
 
-## 1.10. 数据库事务处理
+## 1.12. 数据库事务处理
 
 ```go
 db, err := postgreHelper.Open()
@@ -716,7 +895,55 @@ defer func() {
 
 > 参考：[Golang transaction 事务使用的正确姿势](http://www.mspring.org/2019/03/18/Golang-transaction-事务使用的正确姿势/)
 
-## 1.11. 闭包
+## 1.13. 匿名函数与闭包
+
+匿名函数中使用外部变量，注意直接使用和通过参数使用的区别
+
+```go
+var wg sync.WaitGroup
+for _, c := range []string{"a", "b", "c"} {
+    go func() {
+        time.Sleep(1 * time.Second)
+        fmt.Println("func 1: ", c) // 运行时的值
+        wg.Done()
+    }()
+    wg.Add(1)
+
+    go func(c string) {
+        time.Sleep(2 * time.Second)
+        fmt.Println("func 2: ", c) // 调用时的值
+        wg.Done()
+    }(c)
+    wg.Add(1)
+
+    func(c string) {
+        go func() {
+            time.Sleep(3 * time.Second)
+            fmt.Println("func 3: ", c)
+            wg.Done()
+        }()
+    }(c)
+    wg.Add(1)
+
+}
+wg.Wait()
+```
+
+以上代码输出：
+
+```bash
+func 1:  c
+func 1:  c
+func 1:  c
+func 2:  a
+func 2:  c
+func 2:  b
+func 3:  c
+func 3:  b
+func 3:  a
+```
+
+闭包有局部变量，并返回一个函数变量，特点是这个函数可以多次使用局部变量，变量的值在闭包生命周期内可以保持。
 
 ```go
 package main
@@ -748,15 +975,17 @@ func Fun() func(string) string {
 
 ```
 
-## 1.12. 并发锁 sync.Mutex与sync.RWMutex
+
+
+## 1.14. 并发锁 sync.Mutex与sync.RWMutex
 
 Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
 
 RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写
 
-## 1.13. 使用避坑
+## 1.15. 使用避坑
 
-### 1.13.1. 修改全局变量的问题
+### 1.15.1. 修改全局变量的问题
 
 ```go
 package main
@@ -832,7 +1061,7 @@ d value: 4, point: 0x5131d8
 b value: 6, point: 0xc00009c020
 ```
 
-## 1.14. map并发问题
+## 1.16. map并发问题
 
 并发写一个map会出现问题，运行时报错：`fatal error: concurrent map read and map write`
 
@@ -898,7 +1127,7 @@ scene.Range(func(k, v interface{}) bool {
 })
 ```
 
-## 1.15. logrus使用
+## 1.17. logrus使用
 
 logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: Structured, pluggable logging for Go](https://github.com/sirupsen/logrus)。其他常用日志库还有[Zerolog](https://github.com/rs/zerolog)、 [Zap](https://github.com/uber-go/zap)和[Apex](https://github.com/apex/log).
 
@@ -906,7 +1135,7 @@ logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: St
 
 ![image-20220526100147494](../imgs/image-20220526100147494.png)
 
-### 1.15.1. 配置formater，指定日志输入格式
+### 1.17.1. 配置formater，指定日志输入格式
 
 ```go
 type TopLog struct {
@@ -1001,7 +1230,7 @@ func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 ```
 
-### 1.15.2. 配置gorm使用logrus
+### 1.17.2. 配置gorm使用logrus
 
 ```go
 type Database struct {
@@ -1095,11 +1324,11 @@ func (*GormLogger) Print(v ...interface{}) {
 }
 ```
 
-## 1.16. 性能测试pprof
+## 1.18. 性能测试pprof
 
-## 1.17. 性能优化
+## 1.19. 性能优化
 
-### 1.17.1. 读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
+### 1.19.1. 读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
 
 优化前，直接把上传的文件读到内存并解析
 
@@ -1142,7 +1371,15 @@ _ = decoder.Decode(&head)
 >
 > 2、[go - How to read multiple times from same io.Reader - Stack Overflow](https://stackoverflow.com/questions/39791021/how-to-read-multiple-times-from-same-io-reader)
 
-## 1.18. 多协程并发的优秀实现
+### 1.19.2. 内存泄露问题
+
+> 参考：
+> 
+> 1、[Go程序内存泄露问题快速定位](https://www.hitzhangjie.pro/blog/2021-04-14-go%E7%A8%8B%E5%BA%8F%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E9%97%AE%E9%A2%98%E5%BF%AB%E9%80%9F%E5%AE%9A%E4%BD%8D/)
+> 
+> 2、[内存泄漏的在线排查](https://panzhongxian.cn/cn/2020/12/memory-leak-problem-1/)
+
+## 1.20. 多协程并发的优秀实现
 
 几个原则：
 
@@ -1202,9 +1439,9 @@ func main() {
 
 该实现中，任何一个服务遇到错误时另外一个服务都能干净地退出，由系统的进程管理器来重启
 
-## 1.19. 错误处理
+## 1.21. 错误处理
 
-错误处理注意三点：
+### 1.21.1. 错误处理注意三点：
 
 - 错误只处理一次，避免出现重复的日志
 - 错误应该包含相关信息，从错误文字上就能大概判断错误位置
@@ -1261,7 +1498,56 @@ runtime.goexit
 exit status 1
 ```
 
-## 1.20. go build参数
+### 1.21.2. 自定义错误
+
+根据error接口定义，自定义错误只要实现了Error方法即可
+```go
+type error interface {
+	Error() string
+}
+```
+
+例：
+```go
+package main
+
+import (
+	"fmt"
+)
+
+type DivisorZeroError struct {
+	Divisor int
+}
+
+func (e *DivisorZeroError) Error() string {
+	return "除数不能为0"
+}
+
+func div(a, b int) (float64, error) {
+	if b == 0 {
+		return 0, &DivisorZeroError{Divisor: b}
+	}
+
+	return float64(a) / float64(b), nil
+}
+
+func main() {
+	res, err := div(4, 1)
+	if e, ok := err.(*DivisorZeroError); ok {
+		panic(e.Error())
+	}
+	fmt.Println("res: ", res)
+	
+	res, err = div(5, 0)
+	switch err.(type) {
+	case *DivisorZeroError:
+		panic(err.Error())
+	}
+	fmt.Println("res: ", res)
+}
+```
+
+## 1.22. go build参数
 
 ```
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l" -mod=vendor -o runtime/bin/license-srv cmd/main.go
@@ -1273,14 +1559,18 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 -l 禁用内联
 
+-m 打印出逃逸分析的优化策略
+
 2、ldflags链接参数：`go tool link –help`查看可用参数
 
 -w 禁用DWARF
 
 -s 禁用符号表
 
-## 1.21. go语言中init函数执行顺序
+## 1.23. go语言中init函数执行顺序
+
 `import --> const --> var --> init()`
+
 1. 如果一个包导入了其他包，则首先初始化导入的包。
 2. 然后初始化当前包的常量。
 3. 接下来初始化当前包的变量。
@@ -1288,9 +1578,9 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
 
-## 1.22. context的使用
+## 1.24. context的使用
 
-### 1.22.1. 停止协程
+### 1.24.1. 停止协程
 
 ```go
 package main
@@ -1344,7 +1634,29 @@ func main() {
 
 > 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
 
-## 1.23. 值类型、引用类型
+### 1.24.2. 协程超时
+
+`context.WithTimeout`返回上下文和一个取消方法。`ctx.Done`会在超时时间到达，或执行取消方法时收到消息。
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+go func(ctx context.Context) {
+    for {
+        select {
+        case <-ctx.Done():
+            done = true
+        default:
+            // do something
+        }
+    }
+}(ctx)
+
+time.Sleep(5*time.Second)
+cancel()
+```
+
+## 1.25. 值类型、引用类型
 
 golang中分为值类型和引用类型
 
@@ -1356,28 +1668,28 @@ golang中分为值类型和引用类型
 
 引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
 
-## 1.24. go中函数传参都是值传递
+## 1.26. go中函数传参都是值传递
 
 > 参考：
 > 
 > [Go语言参数传递是传值还是传引用](https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value)
 
-## 1.25. go build缓存目录
+## 1.27. go build缓存目录
 
 缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
 
-## 1.26. 编码规范
+## 1.28. 编码规范
 
-### 1.26.1. 命名规范
+### 1.28.1. 命名规范
 
 - 文件名全部小写，除单元测试外避免使用下划线
 - 变量名、常量、函数名使用驼峰式命名，不建议使用下划线和数字
 
 > 参考：[命名规范 | go-zero](https://go-zero.dev/cn/docs/develop/naming-spec/)
 
-## 1.27. 错误处理，error与panic
+## 1.29. 错误处理，error与panic
 
-### 1.27.1. 自定义error
+### 1.29.1. 自定义error
 
 error接口定义：
 ```go
@@ -1435,7 +1747,7 @@ switch err.(type)
 }
 ```
 
-### 1.27.2. panic恢复
+### 1.29.2. panic恢复
 
 1. 程序中非致命的问题应避免使用panic，除非目的就是要中断程序（当前协程）
 2. 守护型协程应该使用recover捕获panic并恢复，避免协程由于异常退出
@@ -1489,7 +1801,7 @@ func main() {
 }
 
 ```
-## 1.28. 内置排序方法
+## 1.30. 内置排序方法
 
 使用内置排序需要实现`sort.Interface`接口
 ```go
@@ -1554,15 +1866,15 @@ func main() {
 }
 ```
 
-## 1.29. GMP模型与调度流程
+## 1.31. GMP模型与调度流程
 
-### 1.29.1. GMP模型
+### 1.31.1. GMP模型
 
 - G（Goroutine）：协程
 - M（Machine）：对内核级线程的封装
 - P（Processor）：即为G和M的调度对象，用来调度G和M之间的关联关系，其数量可通过GoMAXPROCS()来设置，默认为核心数
 
-### 1.29.2. 调度流程
+### 1.31.2. 调度流程
 
 1. 存在一个全局G队列
 2. 每个P有一个局部G队列，
@@ -1572,20 +1884,20 @@ func main() {
 
 
 
-## 1.30. GC垃圾回收
+## 1.32. GC垃圾回收
 
-### 1.30.1. 三色标记法
+### 1.32.1. 三色标记法
 
-### 1.30.2. GC触发时机
+### 1.32.2. GC触发时机
 
-### 1.30.3. GC流程
-
-
+### 1.32.3. GC流程
 
 
-## 1.31. 变量分配在堆上还是栈上，内存逃逸分析
 
-### 1.31.1. 哪些情况会分配到堆上
+
+## 1.33. 变量分配在堆上还是栈上，内存逃逸分析
+
+### 1.33.1. 哪些情况会分配到堆上
 
 1. Go 中声明一个函数内局部变量时，当编译器发现变量的作用域没有逃出函数范围时，就会在栈上分配内存，反之则分配在堆上，逃逸分析由编译器完成，作用于编译阶段
 2. 指针类型的变量
@@ -1593,7 +1905,7 @@ func main() {
 4. 动态类型：返回返回一个interface{}类型
 5. 闭包引用对象
 
-### 1.31.2. 检查该变量是在栈上分配还是堆上分配
+### 1.33.2. 检查该变量是在栈上分配还是堆上分配
 
 有两种方式可以确定变量是在堆还是在栈上分配内存:
 -   通过编译后生成的汇编函数来确认，在堆上分配内存的变量都会调用 runtime 包的 `newobject` 函数；
@@ -1610,7 +1922,7 @@ go build -gcflags "-m -m -l" main.go
 > 参考：
 > 1. [Frequently Asked Questions (FAQ) - The Go Programming Language](https://go.dev/doc/faq#stack_or_heap)
 > 2. [golang 中函数使用值返回与指针返回的区别，底层原理分析](https://cloud.tencent.com/developer/article/1890639)
-## 1.32. 内部包internal
+## 1.34. 内部包internal
 
 内部包的规范约定：导出路径包含`internal`关键字的包，只允许`internal`的父级目录及父级目录的子包导入，其它包无法导入。
 
@@ -1635,6 +1947,162 @@ go build -gcflags "-m -m -l" main.go
 
 如上包结构的程序，`resources/internal/cpu`和`resources/internal/mem`只能被`resources`包及其子包`resources/input`中的代码导入，不能被`prototype`包里的代码导入。
 
+## 1.35. json struct tag
+
+1）不指定tag
+
+```go
+Field int // “Filed”:0
+```
+
+不指定tag，默认使用变量名称。转换为json时，key为Filed。
+
+（2）直接忽略
+
+```go
+Field int json:"-" //注意：必须为"-"，不能带有opts
+```
+
+转换时不处理。
+
+（3）指定key名
+
+```go
+Field int json:"myName" // “myName”:0
+```
+
+转换为json时，key为myName
+
+（4）"omitempty"零值忽略
+
+```go
+Field int json:",omitempty"
+```
+
+转换为json时，值为零值则忽略，否则key为myName
+
+（5）指定key且零值忽略
+
+```go
+Field int json:"myName,omitempty"
+```
+
+转换为json时，值为零值则忽略，否则key为myName
+
+（6）指定key为"-"
+
+```go
+Field int json:"-," // “-”:0
+```
+
+此项与忽略的区别在于多了个”,“。
+
+（7）“string” opt
+以上提到的用法都是常见的，这个比较特殊。
+
+"string"仅适用于字符串、浮点、整数或布尔类型，表示的意思是：将字段的值转换为字符串；解析时，则是将字符串解析为指定的类型。主要用于与javascript通信时数据的转换。
+
+注意：
+仅且仅有"string"，没有int、number之类的opt。即带"string" opt的字段，编码时仅能将字符串、浮点、整数或布尔类型转换为string类型，反之则不然；解码时可以将string转换为其他类型，反之不然。因为"string"有限制。
+
+```go
+Int64String int64 json:",string" // “Int64String”:“0”
+```
+
+“string” opt的使用可以在Marshal/Unmarshal时自动进行数据类型的转换，减少了手动数据转换的麻烦，但是一定要注意使用的范围，对不满足的类型使用，是会报错的。
+
+## 1.36. 反射reflect的使用
+
+一个ORM的例子，传入对象，生成一个插入sql：
+
+```go
+func MakeCreateSql(in interface{}) (string, error) {
+	var tableName string // 表名
+	var fields []string  // 字段
+	var values string    // 值
+	var sql string
+
+	inType := reflect.TypeOf(in)
+	tableName = inType.Name() // 表名
+
+	if inType.Kind() == reflect.Struct { // 暂时只支持结构体
+		inValue := reflect.ValueOf(in)
+		for i := 0; i < inType.NumField(); i++ {
+			ft := inType.Field(i)
+			fv := inValue.Field(i)
+
+			fieldName := ft.Name // 字段名
+
+			switch fv.Kind() {
+			case reflect.String:
+				values = fmt.Sprintf(`%s,'%s'`, values, fv.String())
+			case reflect.Int, reflect.Int32:
+				values = fmt.Sprintf(`%s,%d`, values, fv.Int())
+			default:
+				return "", errors.New("type not support: " + fieldName)
+			}
+
+			fields = append(fields, fieldName)
+			fmt.Printf("idx: %d, field: %s, value: %v, kind: %s, tag: %s\n", i, fieldName, fv, fv.Kind().String(), ft.Tag) // idx: 0, field: id, value: 1, kind: int, tag: json:"id"
+		}
+	}
+
+	if len(fields) > 0 {
+		sql = fmt.Sprintf(`insert into %s (%s) values (%s)`, tableName, strings.Join(fields, ","), strings.TrimLeft(values, ","))
+	}
+
+	return sql, nil
+}
+
+type account struct {
+	id   int    `json:"id"`
+	name string `json:"name" gorm:"column:name"`
+}
+
+func TestMakeCreateSql(t *testing.T) {
+	in := account{
+		1,
+		"jack",
+	}
+	get, err := MakeCreateSql(in) // insert into account (id,name) values (1,'jack')
+	if err != nil {
+		t.Errorf("err: %s", err.Error())
+	}
+	expect := ""
+	if get != expect {
+		t.Errorf("expect: %s, get: %s", expect, get)
+	}
+}
+```
+## 1.37. unsafe的使用
+
+`unsafe.Pointer`表示任意类型且可寻址的指针值，可以在不同的指针类型之间进行转换（类似 C 语言的 void * 的用途）。其包含四种核心操作：
+
+-   任何类型的指针值都可以转换为 Pointer
+-   Pointer 可以转换为任何类型的指针值
+-   uintptr 可以转换为 Pointer
+-   Pointer 可以转换为 uintptr
+
+```go
+type Num struct{
+    i string
+    j int64
+}
+
+func main(){
+    n := Num{i: "EDDYCJY", j: 1}
+    nPointer := unsafe.Pointer(&n)
+
+    niPointer := (*string)(unsafe.Pointer(nPointer))
+    *niPointer = "煎鱼"
+
+    njPointer := (*int64)(unsafe.Pointer(uintptr(nPointer) + unsafe.Offsetof(n.j)))
+    *njPointer = 2
+
+    fmt.Printf("n.i: %s, n.j: %d", n.i, n.j) // n.i: 煎鱼, n.j: 2
+}
+```
+
 # 2. 第三方包
 
 ## 2.1. Gorm
@@ -1644,4 +2112,36 @@ go build -gcflags "-m -m -l" main.go
 ```go
 Db.Model(xy).Where("id = ? ", id).Update("sign_up_num", gorm.Expr("sign_up_num+ ?", 1))
 ```
+
+# 3. 开发环境
+
+## 3.1. vscode
+
+### 3.1.1. 配置调试当前go文件
+
+```json
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug with dlv",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "args": [],
+            "showLog": true
+        }
+    ]
+}
+```
+
+
+
+
 

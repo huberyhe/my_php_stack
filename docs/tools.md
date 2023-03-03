@@ -150,3 +150,28 @@ TODO
 
 开启：`VBoxManage setextradata "<VM_NAME>" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" "0"`
 
+## 1.7. vim
+
+### 1.7.1. 查找替换
+
+```
+:{作用范围}s/{目标}/{替换}/{替换标志}
+```
+
+全文
+```
+:%s/foo/bar/g
+```
+
+> 参考：[在 Vim 中优雅地查找和替换](https://harttle.land/2016/08/08/vim-search-in-file.html)
+
+## 1.8. IDEA
+
+## 1.9. vscode
+
+### 1.9.1. 配置
+
+常用变量：
+
+参考：https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables
+

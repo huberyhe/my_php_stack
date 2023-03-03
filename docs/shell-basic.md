@@ -376,7 +376,7 @@ done
 >
 > 2、[Bash 中常见的字符串操作](https://www.cnblogs.com/sparkdev/p/10006970.html)
 
-## 1.4. 数组使用
+## 1.4. 数组的使用
 
 ### 1.4.1. 定义一个数组变量
 
@@ -463,9 +463,68 @@ else
 fi
 ```
 
+## 1.5. map的使用
+
+### 1.5.1. 声明
+
+```bash
+declare -A map
+```
+
+### 1.5.2. 初始化
+
+```bash
+map=(["aa"]="11" ["bb"]="22")
+map["name"]="val"
+map["apple"]="pen"
+```
+
+### 1.5.3. 输出与遍历
+
+```bash
+# 输出所有key
+echo ${!map[@]}
+
+# 输出所有value
+echo ${map[@]}
+
+# 输出长度
+echo ${#map[@]}
+
+# 遍历
+for key in ${!map[*]};do
+    echo "$key => ${map[$key]}"
+done
+```
+
+#### 1.5.3.1. 判断map是否有某个key
+
+```bash
+declare -A upgrade_funcs
+upgrade_funcs=(
+["3.1.0.126"]="conv__v31_0126b"
+["3.1.0.128"]="conv__v31_0128b"
+["3.1.0.129"]="conv__v31_0129b"
+["3.1.0.130"]="conv__v31_0130b"
+["3.1.0.131"]="conv__v31_0131b"
+["3.1.0.132"]="conv__v31_0132b"
+["3.1.0.133"]="conv__v31_0133b"
+)
+key=3.1.0.1301
+if [[ -n "${upgrade_funcs[${key}]:-}" ]] ; then
+  echo "${key} is set"
+else
+  echo "${key} not set"
+fi
+
+```
+
+> 参考：
+>
+> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
 
 
-## 1.5. 命令行输入
+## 1.6. 命令行输入
 
 例如命令行：
 
@@ -477,7 +536,7 @@ fi
 
 --prefix是一个长选项，需要一个参数，使用等号连接（非必需）
 
-### 1.5.1. 手工处理
+### 1.6.1. 手工处理
 
   \*  $0 ： ./test.sh,即命令本身，相当于C/C++中的argv[0]
   \*  $1 ： -f,第一个参数.
@@ -487,7 +546,7 @@ fi
   \*  $@ ：参数本身的列表，也不包括命令本身，如上例为 -f config.conf -v --prefix=/home
   \*  $* ：和$@相同，但"$*" 和 "$@"(加引号)并不同，"$*"将所有的参数解释成一个字符串，而"$@"是一个参数数组。
 
-### 1.5.2. getopts，不支持长选项，但使用非常简单，满足大部分场景
+### 1.6.2. getopts，不支持长选项，但使用非常简单，满足大部分场景
 
 ```bash
 #!/bin/bash
@@ -610,7 +669,7 @@ fi
 1. 加双引号是防止参数中可能有空格，空格会被shell自动视为分隔符
 2. "$@"会将每个参数用双引号括起来传递进去，而"@*"则是所有参数括在双引号中，作为一个参数传入函数
 
-### 1.5.3. getopt，支持长选项
+### 1.6.3. getopt，支持长选项
 
 ```bash
 #!/bin/bash
@@ -682,43 +741,6 @@ done
 >
 > [Bash Shell中命令行选项/参数处理](https://www.cnblogs.com/FrankTan/archive/2010/03/01/1634516.html)
 
-## 1.6. map的使用
-
-### 1.6.1. 声明
-
-```bash
-declare -A map
-```
-
-### 1.6.2. 初始化
-
-```bash
-map=(["aa"]="11" ["bb"]="22")
-map["name"]="val"
-map["apple"]="pen"
-```
-
-### 1.6.3. 输出与遍历
-
-```bash
-# 输出所有key
-echo ${!map[@]}
-
-# 输出所有value
-echo ${map[@]}
-
-# 输出长度
-echo ${#map[@]}
-
-# 遍历
-for key in ${!map[*]};do
-    echo "$key => ${map[$key]}"
-done
-```
-
-> 参考：
->
-> [Shell中map的使用 - 大坑水滴](https://www.cnblogs.com/qq931399960/p/10786362.html)
 
 ## 1.7. 数值运算
 
@@ -858,6 +880,25 @@ shuf -i 1-100 -n1
 dirname $(mktemp -u --tmpdir)
 #
 echo ${TMPDIR:-/tmp}
+```
+
+### 1.9.3. 按行读取文件，注意不要丢失最后一行
+
+```bash
+while read line || [[ -n ${line} ]]
+do
+    if [ -z "$line" ]; then
+        continue
+    fi
+
+    # ...
+done < $LIST_FILE
+```
+
+或者
+
+```bash
+IFS=$'\n'; for line in $(cat $LIST_FILE); do echo "$line" ; done
 ```
 
 ## 1.10. 通配符

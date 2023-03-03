@@ -116,7 +116,7 @@ char的上限为255字节，varchar的上限65535字节，text的上限为65535�
 
 2、varchar，存变长，速度慢，不存在空间浪费，不处理尾部空格，上限65535，但是有存储长度实际65532最大可用。
 
-3、text，存变长大数据，速度慢，不存在空间浪费，不处理尾部空格，上限65535，会用额外空间存放数据长度，顾可以全部使用65535。
+3、text，存变长大数据，速度慢，不存在空间浪费，不处理尾部空格，上限65535，会用额外空间存放数据长度，故可以全部使用65535。
 
 varchar与text区别：
 
@@ -150,7 +150,7 @@ varchar与text区别：
 
 12.4、hash表：**散列表**（**Hash table**，也叫**哈希表**），是根据键（Key）而直接访问在内存储存位置的数据结构。也就是说，它通过计算出一个键值的函数，将所需查询的数据映射到表中一个位置来让人访问，这加快了查找速度。这个映射函数称做散列函数，存放记录的数组称做**散列表**。
 
-12.5、单点登录：又陈SSO（Single Sign On），在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
+12.5、单点登录：又称SSO（Single Sign On），在多个应用系统中，用户只需要登录一次就可以访问所有相互信任的应用系统。
 
 ## 1.13. PHP数组的底层实现
 
@@ -182,8 +182,9 @@ varchar与text区别：
 ## 1.15. 如何防止重复提交
 
 表单中带上隐藏域内容是这个表单的token，表单提交时判断这个token有没有使用过：
-1、token信息放到session里；
-2、token信息放到缓存里
+
+1. token信息放到session里；
+2. token信息放到缓存里
 
 ## 1.16. flask的生命周期
 
@@ -204,7 +205,7 @@ create table test {
 - `select * from test where a like '%hhh';`
 - `select * from test where date(b) = '2021-11-02';`
 - `select * from test where a not in ('jack','mike');  `
-- `select * from test where a is not null;`，`is null`会走索引
+- `select * from test where a is not null;` // `is null`会走索引
 
 ## 1.18. redis中字典与hash表的区别
 
@@ -376,7 +377,7 @@ https://segmentfault.com/a/1190000020092884
 - 独立部署
 - 故障隔离
 - 混合技术栈
-- 粒度缩放，组件已扩展
+- 粒度缩放，组件易扩展
 
 缺点：
 
