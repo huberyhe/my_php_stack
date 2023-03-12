@@ -18,6 +18,8 @@
 
 查看包的文件：`rpm -qlp lrzsz-0.12.20-36.el7.x86_64.rpm`
 
+解压包：`rpm2cpio kchmviewer-3.1-1.el5.5.x86_64.rpm | cpio -div`
+
 重新打包rpm：`rpmrebuild --package --notest-install -e wget-1.14-18.el7_6.1.x86_64.rpm`
 
 查看已安装包的spec：`rpmrebuild -s wget.spec wget`
