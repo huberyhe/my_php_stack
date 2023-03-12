@@ -2113,6 +2113,36 @@ func main(){
 Db.Model(xy).Where("id = ? ", id).Update("sign_up_num", gorm.Expr("sign_up_num+ ?", 1))
 ```
 
+## 2.2. grpc-gateway
+
+[grpc-gateway](https://link.segmentfault.com/?enc=IiOARw%2FsDGNqscUzUzwHcw%3D%3D.rS7Vg97osGOKT4igbY52nEs7DaK4M2QHhyaxkrfkoYZgHMBU7tgWk3gR4PDkgVJi)是protoc的一个插件。它读取gRPC服务定义，并生成一个反向代理服务器，将RESTful JSON API转换为gRPC
+
+```bash
+go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+```
+
+> 参考：[go - Grpc+Grpc Gateway实践一 介绍与环境安装](https://segmentfault.com/a/1190000013339403)
+
+## 2.3. fvbock/endless
+
+http服务的平滑重启
+
+```bash
+go get -u github.com/fvbock/endless
+```
+
+## 2.4. cron定时任务
+
+```bash
+go get github.com/robfig/cron/v3@v3.0.0
+```
+
+## 2.5. pkg/errors
+
+使用 `github.com/pkg/errors` 包装 `errors`
+
+> 参考：[GitHub - llitfkitfk/go-best-practice: Go语言实战: 编写可维护Go语言代码建议](https://github.com/llitfkitfk/go-best-practice#72-错误只处理一次)
+
 # 3. 开发环境
 
 ## 3.1. vscode
