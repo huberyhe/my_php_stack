@@ -428,8 +428,43 @@ reboot
 ethtool enp0s3
 ```
 
+## 1.7. 文件权限
 
+最常见的，每个文件有ugo三类，每类rwx共九个属性
 
+### 1.7.1. 隐藏属性
+
+通过`lsattr`查看隐藏属性，`chattr`修改隐藏属性。例如i属性让文件不能删除和修改
+
+```bash
+ $ cd /tmp                                                                                                              
+ $ touch 123
+ $ sudo chattr +i 123
+ $ sudo rm 123
+rm: cannot remove ‘123’: Operation not permitted
+```
+
+### 1.7.2. 文件特殊权限： SUID, SGID, SBIT
+
+SUID：普通用户没有`/etc/passwd`的修改权限，但是可以通过`passwd`修改自己的密码
+SGID：普通用户没有`/var/lib/mlocate/mlocate.db`的可读权限，但是可以通过`locate`找到这个文件
+SBIT：普通用户可以在`/tmp`目录下创建文件，但不能删除其他人创建的文件
+
+```bash
+ $ ls -l /usr/bin/passwd 
+-rwsr-xr-x. 1 root root 27856 Apr  1  2020 /usr/bin/passwd
+ $ ls -l /etc/passwd
+-rw-r--r-- 1 root root 1384 Oct 24 14:30 /etc/passwd
+
+# ll /usr/bin/locate /var/lib/mlocate/mlocate.db
+-rwx--s--x. 1 root slocate   40496 Jun 10  2014 /usr/bin/locate
+-rw-r-----. 1 root slocate 2349055 Jun 15 03:44 /var/lib/mlocate/mlocate.db
+
+ $ ls -ld /tmp      
+drwxrwxrwt. 11 root root 4096 Apr  7 14:58 /tmp
+```
+
+> 参考：《鸟哥的私房菜》
 
 
 
