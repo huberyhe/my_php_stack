@@ -65,10 +65,15 @@ fmt.Println("t5", *t5)
 
 var用于类型声明，对于基本类型会被初始化为零值，包括整型、字符串、array、struct等
 
-new用于指定类型的内存创建，同时把内存置为零值，返回的是内存地址。`map, slice,chan`的零值是nil
+new用于指定类型（也包括整形、字符串等）的内存创建，同时把内存置为零值，返回的是内存地址。`map, slice,chan`的零值是nil
 
 make用于`map, slice,chan` 的内存创建，返回的对象是类型本身。创建内存不会初始化为零值，意味着对象一定不是nil
 
+### 1.1.4. map需要初始化吗，使用new和make创建的区别
+
+map的声明的时候默认值是nil ，此时进行取值，返回的是对应类型的零值（不存在也是返回零值）；对nil的map赋值会panic，需要先make
+
+使用**new**来创建**map**时，返回的内容是一个指针，这个指针指向了一个所有字段全为0的值**map**对象，需要初始化后才能使用，而使用**make**来创建**map**时，返回的内容是一个引用，可以直接使用。
 
 ## 1.2. 字符串
 
@@ -977,11 +982,17 @@ func Fun() func(string) string {
 
 
 
-## 1.14. 并发锁 sync.Mutex与sync.RWMutex
+## 1.14. 锁
+
+### 1.14.1. 并发锁 sync.Mutex与sync.RWMutex
 
 Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
 
 RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写
+
+### 1.14.2. 锁的实现原理
+
+### 1.14.3. channel实现互斥锁
 
 ## 1.15. 使用避坑
 
@@ -2103,6 +2114,14 @@ func main(){
 }
 ```
 
+## 1.38. runtime包的使用
+
+### 1.38.1. 打印堆栈
+
+```go
+debug.PrintStack()
+```
+
 # 2. 第三方包
 
 ## 2.1. Gorm
@@ -2142,6 +2161,66 @@ go get github.com/robfig/cron/v3@v3.0.0
 使用 `github.com/pkg/errors` 包装 `errors`
 
 > 参考：[GitHub - llitfkitfk/go-best-practice: Go语言实战: 编写可维护Go语言代码建议](https://github.com/llitfkitfk/go-best-practice#72-错误只处理一次)
+
+## 2.6. trylock
+
+非阻塞拿锁，非阻塞获取锁状态
+
+```go
+package trylock
+
+import (
+	"sync"
+	"sync/atomic"
+	"unsafe"
+)
+
+const (
+	LockedFlag   int32 = 1
+	UnlockedFlag int32 = 0
+)
+
+type Mutex struct {
+	in     sync.Mutex
+	status *int32
+}
+
+func NewMutex() *Mutex {
+	status := UnlockedFlag
+	return &Mutex{
+		status: &status,
+	}
+}
+
+func (m *Mutex) Lock() {
+	m.in.Lock()
+}
+
+func (m *Mutex) Unlock() {
+	m.in.Unlock()
+	atomic.StoreInt32(m.status, UnlockedFlag)
+}
+
+func (m *Mutex) TryLock() bool {
+	if atomic.CompareAndSwapInt32((*int32)(unsafe.Pointer(&m.in)), UnlockedFlag, LockedFlag) {
+		atomic.StoreInt32(m.status, LockedFlag)
+		return true
+	}
+	return false
+}
+
+func (m *Mutex) IsLocked() bool {
+	return (*(*int32)(unsafe.Pointer(&m.in)) & LockedFlag) == LockedFlag
+}
+```
+
+> 参考：[扩展golang的sync mutex的trylock及islocked](https://xiaorui.cc/archives/5084)
+
+## 2.7. 获取系统信息
+
+```bash
+go get github.com/shirou/gopsutil
+```
 
 # 3. 开发环境
 

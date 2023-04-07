@@ -95,6 +95,7 @@
 - sql注入
 - sdl安全开发：[【软件安全设计】安全开发生命周期（SDL）](http://blog.nsfocus.net/sdl/)
 - nginx和php中安全相关的配置：[Linux服务器下nginx的安全配置](https://www.cnblogs.com/chenpingzhao/p/5785416.html)
+- 腾讯Go安全指南：[secguide/Go安全指南.md](https://github.com/Tencent/secguide/blob/main/Go%E5%AE%89%E5%85%A8%E6%8C%87%E5%8D%97.md)
 
 ## 网络基础
 

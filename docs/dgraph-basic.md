@@ -236,6 +236,10 @@ rdf是数据，schema定义了导入的数据类型
 ## 1.6. 注意事项
 
 1、[排序](https://dgraph.io/docs/query-language/sorting/)后默认只能查1000条数据，first默认值为1000
+2、时区：dgraph都是utc时区，存放应是utc时间字符串
+```dgraph
+<%s> <td.attribute.lastmodifytime> "2023-03-28T16:39:15Z"^^<xs:dateTime> .
+```
 
 ## 1.7. zero与alpha
 
