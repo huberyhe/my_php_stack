@@ -253,6 +253,8 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 - 不等于条件 != <>，索引失效
 - LIKE 值以 % 开头，索引失效
 
+查询条件与字段类型不匹配，可能（分情况）造成索引失效，所以sql语句一般严格要求类型一致。参考：[WHRER条件里的数据类型必须和字段数据类型一致](http://blog.itpub.net/22418990/viewspace-1302080/)
+
 ### 1.6.12. 分布式id生成器
 
 雪花算法：1bit保留+41bit毫秒时间戳+10bit机器ID+12bit序列号=64bit整数

@@ -1335,11 +1335,313 @@ func (*GormLogger) Print(v ...interface{}) {
 }
 ```
 
-## 1.18. 性能测试pprof
+## 1.18. 性能问题分析与相关工具
 
-## 1.19. 性能优化
+### 1.18.1. pprof
 
-### 1.19.1. 读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
+#### 1. 修改代码启用pprof
+
+```go
+package data
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+type PprofServer struct{}
+
+func (PprofServer) Start() {
+	addr := "0.0.0.0:6060"
+	fmt.Printf("Start pprof server, listen addr %s\n", addr)
+	err := http.ListenAndServe(addr, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (PprofServer) Stop() {
+	fmt.Printf("Stop pprof server\n")
+}
+```
+
+```go
+import _ "net/http/pprof"
+
+func main() {
+    pp := PprofServer{}
+	go pp.Start()
+	defer pp.Stop()
+    
+    // ...
+}
+```
+
+#### 2. 页面查看pprof
+
+[192.168.56.103:6060/debug/pprof/heap?debug=1](http://192.168.56.103:6060/debug/pprof/heap?debug=1)
+
+#### 4. go tool pprof 命令行查看
+
+```bash
+go tool pprof -inuse_space  http://127.0.0.1:6060/debug/pprof/heap
+```
+
+#### 5. go tool pprof 图形化查看
+
+```bash
+go tool pprof -http=0.0.0.0:8081  http://127.0.0.1:6060/debug/pprof/heap
+```
+
+类型：
+
+- inuse_space: 分析应用程序的常驻内存占用情况
+- alloc_objects: 分析应用程序的内存临时分配情况
+- inuse_objects: 查看每个函数所分别的对象数量
+- alloc_space: 查看分配的内存空间大小
+
+> 参考：[golang 内存分析/动态追踪](https://lrita.github.io/2017/05/26/golang-memory-pprof/#go-tool)
+
+
+### 1.18.2. gops
+
+在go 1.17以上版本下安装
+
+```bash
+go get github.com/google/gops
+```
+
+且和pprof一样需要改动项目代码，监听一个端口
+
+```go
+package main
+
+import (
+	"log"
+	"time"
+
+	"github.com/google/gops/agent"
+)
+
+func main() {
+	if err := agent.Listen(agent.Options{}); err != nil {
+		log.Fatal(err)
+	}
+	time.Sleep(time.Hour)
+}
+```
+
+
+
+```bash
+ $ gops help
+gops is a tool to list and diagnose Go processes.
+
+Usage:
+  gops [flags]
+  gops [command]
+
+Examples:
+  gops <cmd> <pid|addr> ...
+  gops <pid> # displays process info
+  gops help  # displays this help message
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  gc          Runs the garbage collector and blocks until successful.
+  help        Help about any command
+  memstats    Prints the allocation and garbage collection stats.
+  pprof-cpu   Reads the CPU profile and launches "go tool pprof".
+  pprof-heap  Reads the heap profile and launches "go tool pprof".
+  process     Prints information about a Go process.
+  setgc       Sets the garbage collection target percentage. To completely stop GC, set to 'off'
+  stack       Prints the stack trace.
+  stats       Prints runtime stats.
+  trace       Runs the runtime tracer for 5 secs and launches "go tool trace".
+  tree        Display parent-child tree for Go processes.
+  version     Prints the Go version used to build the program.
+
+Flags:
+  -h, --help   help for gops
+
+Use "gops [command] --help" for more information about a command.
+```
+
+> 参考：[Go 进程诊断工具 gops](https://golang2.eddycjy.com/posts/ch6/06-gops/)
+
+
+### 1.18.3. 开启gc状态打印
+
+```bash
+GODEBUG=gctrace=1 /opt/topsec/topihs/TopIHS/debug/patch-srv
+```
+
+显示的gc日志
+
+```
+gc 43 @811.799s 0%: 0.011+22+0.004 ms clock, 0.089+0/11/18+0.038 ms cpu, 39->39->2 MB, 64 MB goal, 8 P
+```
+
+日志字段含义如下
+
+```
+    gc # @#s #%: #+#+# ms clock, #+#/#/#+# ms cpu, #->#-># MB, # MB goal, # P
+where the fields are as follows:
+    gc #        the GC number, incremented at each GC
+    @#s         time in seconds since program start
+    #%          percentage of time spent in GC since program start
+    #+...+#     wall-clock/CPU times for the phases of the GC
+    #->#-># MB  heap size at GC start, at GC end, and live heap
+    # MB goal   goal heap size
+    # P         number of processors used
+```
+
+内存占用
+
+```bash
+ $ cat /proc/`ps aux | grep '/opt/topsec/topihs/TopIHS/debug/patch-srv' | grep -v 'grep' | awk '{print $2}'`/status | grep '^Vm'
+VmPeak:	 1475668 kB
+VmSize:	 1475668 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	  762044 kB
+VmRSS:	  762044 kB
+VmData:	 1459848 kB
+VmStk:	     132 kB
+VmExe:	    6696 kB
+VmLib:	       0 kB
+VmPTE:	    1584 kB
+VmSwap:	       0 kB
+```
+
+主动触发gc：`runtime.GC`
+触发将内存归还给操作系统的行为：`debug.FreeOSMemory`
+
+### 1.18.4. 打印内存状态
+
+```go
+func print_heap_info() {
+    var m runtime.MemStats
+    runtime.ReadMemStats(&m)
+    fmt.Printf("env: %v, sys: %4d MB, alloc: %4d MB, idel: %4d MB, released: %4d MB, inuse: %4d MB\n",
+               os.Getenv("GODEBUG"), m.HeapSys/meg, m.HeapAlloc/meg, m.HeapIdle/meg, m.HeapReleased/meg, m.HeapInuse/meg)
+}
+```
+
+### 1.18.5. 竞态检测，提前发现内存并发问题
+
+```bash
+go run -race mysrc.go
+```
+
+> 参考：[Go 译文之竞态检测器 race](https://juejin.cn/post/6844903918233714695)
+
+### 1.18.6. 内存逃逸分析
+
+```bash
+# 通过编译器指令
+go build -gcflags '-m -l' main.go
+
+# 通过反编译命令
+go tool compile -S main.go
+```
+
+> 参考：[1.9 我要在栈上。不，你应该在堆上](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)
+
+## 1.19. 高并发与性能优化
+
+### 1.19.1. sync.Pool
+
+```go
+package main
+import (
+	"fmt"
+	"sync"
+)
+
+var pool *sync.Pool
+
+type Person struct {
+	Name string
+}
+
+func initPool() {
+	pool = &sync.Pool {
+		New: func()interface{} {
+			fmt.Println("Creating a new Person")
+			return new(Person)
+		},
+	}
+}
+
+func main() {
+	initPool()
+
+	p := pool.Get().(*Person)
+	fmt.Println("首次从 pool 里获取：", p)
+
+	p.Name = "first"
+	fmt.Printf("设置 p.Name = %s\n", p.Name)
+
+	pool.Put(p)
+
+	fmt.Println("Pool 里已有一个对象：&{first}，调用 Get: ", pool.Get().(*Person))
+	fmt.Println("Pool 没有对象了，调用 Get: ", pool.Get().(*Person))
+}
+
+```
+
+> 参考：[深度解密 Go 语言之 sync.Pool](https://www.cnblogs.com/qcrao-2018/p/12736031.html)
+
+### 1.19.2. sync.Map，支持线程安全的map
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main()  {
+	var m sync.Map
+	// 1. 写入
+	m.Store("qcrao", 18)
+	m.Store("stefno", 20)
+
+	// 2. 读取
+	age, _ := m.Load("qcrao")
+	fmt.Println(age.(int))
+
+	// 3. 遍历
+	m.Range(func(key, value interface{}) bool {
+		name := key.(string)
+		age := value.(int)
+		fmt.Println(name, age)
+		return true
+	})
+
+	// 4. 删除
+	m.Delete("qcrao")
+	age, ok := m.Load("qcrao")
+	fmt.Println(age, ok)
+
+	// 5. 读取或写入
+	m.LoadOrStore("stefno", 100)
+	age, _ = m.Load("stefno")
+	fmt.Println(age)
+}
+
+```
+
+> 参考：[深度解密 Go 语言之 sync.map](https://www.cnblogs.com/qcrao-2018/p/12833787.html)
+
+
+### 1.19.3. bytes.Buffer
+
+
+### 实例：读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
 
 优化前，直接把上传的文件读到内存并解析
 
@@ -1382,7 +1684,7 @@ _ = decoder.Decode(&head)
 >
 > 2、[go - How to read multiple times from same io.Reader - Stack Overflow](https://stackoverflow.com/questions/39791021/how-to-read-multiple-times-from-same-io-reader)
 
-### 1.19.2. 内存泄露问题
+
 
 > 参考：
 > 
@@ -1590,6 +1892,8 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
 
 ## 1.24. context的使用
+
+context 用来解决 goroutine 之间*退出通知*、*元数据传递*的功能。
 
 ### 1.24.1. 停止协程
 
@@ -1893,7 +2197,7 @@ func main() {
 4. 若P中局部G队列为空，则从全局G队列获取或从其他P的局部G队列偷取
 5. 
 
-
+> 参考：[用 GODEBUG 看调度跟踪](https://golang2.eddycjy.com/posts/ch6/04-godebug-sched/)
 
 ## 1.32. GC垃圾回收
 
@@ -1901,10 +2205,16 @@ func main() {
 
 ### 1.32.2. GC触发时机
 
+自动GC
+
+可以通过设置 GOGC 变量来调整初始垃圾收集器的目标百分比值，其对比的规则为当新分配的数值与上一次收集后剩余的实时数值的比例达到设置的目标百分比时，就会触发 GC。而 GOGC 的默认值为 GOGC=100，如果将其设置为 GOGC=off 可以完全禁用垃圾回收器。
+
+手动GC：`runtime.GC`
+
 ### 1.32.3. GC流程
 
 
-
+> 参考：[用 GODEBUG 看 GC](https://golang2.eddycjy.com/posts/ch6/05-godebug-gc/)
 
 ## 1.33. 变量分配在堆上还是栈上，内存逃逸分析
 

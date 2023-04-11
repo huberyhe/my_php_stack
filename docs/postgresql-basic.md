@@ -140,6 +140,54 @@ FROM (
 ) AS t
 ```
 
+### 1.7.3. 序列
+
+创建序列：
+
+```sql
+CREATE SEQUENCE public.td_servermgr_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.td_servermgr_id_seq OWNER TO sim;
+
+--
+-- Name: td_servermgr_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sim
+--
+
+ALTER SEQUENCE public.td_servermgr_id_seq OWNED BY public.td_servermgr.id;
+
+
+--
+-- Name: td_servermgr id; Type: DEFAULT; Schema: public; Owner: sim
+--
+
+ALTER TABLE ONLY public.td_servermgr ALTER COLUMN id SET DEFAULT nextval('public.td_servermgr_id_seq'::regclass);
+```
+
+查看序列的下一个值：
+
+```sql
+select nextval('td_antivirusfiles_id_seq');
+```
+
+重置序列值：
+
+```sql
+alter sequence td_antivirusfiles_id_seq restart with 1
+```
+
+重置序列值为表中最大id：
+
+```sql
+select setval('td_antivirusfiles_id_seq', max(id)) from td_antivirusfiles;
+```
+
 ## 1.8. 清空表
 
 ```sql
@@ -213,3 +261,6 @@ from pg_stat_user_tables
 where schemaname='public'
 order by pg_relation_size(relid) desc;
 ```
+
+> 其他好文章：
+> 1、[PostgreSQL的并行查询](https://www.cnblogs.com/abclife/p/13952833.html)
