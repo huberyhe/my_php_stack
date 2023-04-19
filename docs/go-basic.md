@@ -1880,7 +1880,21 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 -s 禁用符号表
 
-## 1.23. go语言中init函数执行顺序
+### 1.22.1. cgo交叉编译
+
+在[Index of /x86_64-linux-musl/](https://more.musl.cc/x86_64-linux-musl/)下载对应平台的`*-linux-musl-cross.tgz / `，解压后添加到PATH。
+
+编译时需要指定对应平台的c编译器，另外要添加`--extldflags "-static -fpic"`以实现静态链接。
+
+```bash
+CGO_ENABLED=1 CC=aarch64-linux-musl-gcc CXX=aarch64-linux-musl-g++ GOOS=linux GOARCH=arm64 go build -o server -ldflags '-s -w --extldflags "-static -fpic"' main.go
+```
+
+> 参考：[CGO 交叉静态编译 · Issue #27 · eyasliu/blog (github.com)](https://github.com/eyasliu/blog/issues/27)
+
+## 1.23. init函数
+
+### 1.23.1. 执行顺序
 
 `import --> const --> var --> init()`
 
@@ -1890,6 +1904,24 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 4. 最后，调用当前包的 `init()` 函数。
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
+
+### 1.23.2. 使用原则
+
+init 函数通常用于：
+
+-   变量初始化
+-   检查 / 修复状态
+-   注册器
+-   运行计算
+
+使用原则：
+
+1.  一个包的 `init()` 不应该依赖包外的环境
+2.  一个包的 `init()` 不应该对包外的环境造成影响
+
+尽量避免使用init，只在必要的时候使用，init应该放到显眼的位置，一个包只应出现一次init。
+
+> 参考：[答应我，别在go项目中用init()了](https://studygolang.com/articles/34488)
 
 ## 1.24. context的使用
 
@@ -1969,6 +2001,34 @@ go func(ctx context.Context) {
 
 time.Sleep(5*time.Second)
 cancel()
+```
+
+### 1.24.3. 元数据传递
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+)
+
+func main() {
+	ctx := context.Background()
+	process(ctx)
+
+	ctx = context.WithValue(ctx, "traceId", "qcrao-2019")
+	process(ctx)
+}
+
+func process(ctx context.Context) {
+	traceId, ok := ctx.Value("traceId").(string)
+	if ok {
+		fmt.Printf("process over. trace_id=%s\n", traceId)
+	} else {
+		fmt.Printf("process over. no trace_id\n")
+	}
+}
 ```
 
 ## 1.25. 值类型、引用类型

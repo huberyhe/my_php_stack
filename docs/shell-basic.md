@@ -928,3 +928,17 @@ IFS=$'\n'; for line in $(cat $LIST_FILE); do echo "$line" ; done
 - `{start..end}`模式：`echo {11..15}`
 
 > 参考：[命令行通配符教程](https://www.ruanyifeng.com/blog/2018/09/bash-wildcards.html)
+
+## 1.11. 创建临时文件和目录
+
+```bash
+#!/bin/bash
+
+trap 'rm -f "$TMPFILE" "$TMPDIR"' EXIT
+
+TMPFILE=$(mktemp) || exit 1
+echo "Our temp file is $TMPFILE"
+
+TMPDIR=$(mktemp -p /home/ruanyf/) || exit 1
+echo "Our temp dir is $TMPDIR"
+```

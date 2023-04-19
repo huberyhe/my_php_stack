@@ -358,3 +358,76 @@ min-slaves-max-lag 10
 - volatile-random: 随机
 - allkeys-lru: 所有key中最少使用的key
 - allkeys-random: 随机
+
+## 1.8. lua脚本
+
+调用lua脚本可以实现原子操作，作用就类似于加了MULTI/EXEC
+
+命令格式：
+
+```bash
+EVAL script numkeys key [key ...] arg [arg ...]
+```
+
+注意：脚本不允许操作传参以外的key
+
+实例，检查key存在，存在则设置某个hash字段
+
+```bash
+eval "if redis.call('exists', KEYS[1]) == 1 then redis.call('hset', KEYS[1], ARGV[1], 1) end" 1 59205FE8-3ADB-9A25-2755-72A8F6EC2CBE Reload
+```
+
+> 参考：[Scripting with Lua | Redis](https://redis.io/docs/manual/programmability/eval-intro/)
+
+## 1.9. 系统命令
+
+### 1. 查看状态 info
+
+```
+127.0.0.1:17490> info memory
+# Memory
+used_memory:1168904
+used_memory_human:1.11M
+used_memory_rss:2777088
+used_memory_rss_human:2.65M
+used_memory_peak:1234360
+used_memory_peak_human:1.18M
+total_system_memory:8200286208
+total_system_memory_human:7.64G
+used_memory_lua:37888
+used_memory_lua_human:37.00K
+maxmemory:0
+maxmemory_human:0B
+maxmemory_policy:noeviction
+mem_fragmentation_ratio:2.38
+mem_allocator:libc
+
+```
+
+### 2. 生成快照 SAVE/BGSAVE
+
+### 3. 查看配置 config 
+
+查看安装目录
+
+```
+127.0.0.1:17490> config get dir
+1) "dir"
+2) "/opt/topsec/topihs/redis/var/lib/redis"
+```
+
+查看认证配置
+
+```
+127.0.0.1:17490> CONFIG get requirepass
+1) "requirepass"
+2) ""
+```
+
+查看自动快照配置
+
+```
+127.0.0.1:17490> config get save
+1) "save"
+2) "900 1 300 10 60 10000"
+```
