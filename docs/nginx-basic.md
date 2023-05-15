@@ -125,3 +125,25 @@ server {
 Nginx 处理请求的过程⼀共划分为 11 个阶段，按照执⾏顺序依次是 post-read、server-
 rewrite、find-config、rewrite、post-rewrite、preaccess、access、post-access、try-
 files、content 以及 log.
+
+## 1.7. 工具
+
+查看证书：
+```bash
+openssl s_client -connect www.godaddy.com:443
+```
+
+## 1.8. 限流
+
+```
+http {
+    limit_req_zone $binary_remote_addr zone=iplimit:10m rate=20r/s;
+    server {
+        limit_req zone=iplimit burst=40 nodelay;# tag:web_limit_req
+    }
+}
+```
+
+> 参考：
+> 1、[死磕nginx系列--nginx 限流配置](https://www.cnblogs.com/biglittleant/p/8979915.html)
+> 2、[NGINX Rate Limiting](https://www.nginx.com/blog/rate-limiting-nginx/)

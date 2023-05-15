@@ -39,3 +39,17 @@ sudo systemctl restart docker
 sudo usermod -aG docker hubery
 ```
 
+## 1.4. 使用多阶段Dockerfile对Go服务容器化
+
+```Dockerfile
+FROM golang:1.11 as builder
+# ...
+RUN CGO_ENABLED=0 GOOS=linux go build -o /link_service -a -tags netgo -ldflags '-s -w'
+
+FROM scratch
+COPY --from=builder /link_service /app/link_service
+EXPOSE 7070
+ENTRYPOINT ["/app/link_service"]
+```
+
+得到了一个最小、最安全的镜像。

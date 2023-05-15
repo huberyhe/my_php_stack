@@ -1640,6 +1640,11 @@ func main()  {
 
 ### 1.19.3. bytes.Buffer
 
+```
+# 丢弃一个io.Reader
+io.Copy(ioutil.Discard, dataIn)
+```
+
 
 ### 实例：读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
 
@@ -2043,6 +2048,40 @@ golang中分为值类型和引用类型
 
 引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
 
+值类型在函数传递后不会修改原数据，而值类型会同时修改
+
+```go
+package main
+
+import "fmt"
+
+type ts struct {
+    A int
+}
+
+func t(st ts, s []int, m map[string]int) {
+    st.A = 11
+    s[0] = 11
+    m["a"] = 11
+
+    return
+}
+
+func main() {
+    st := ts{
+        A: 1,
+    }
+    s := []int{1,2,3}
+    m := map[string]int{
+        "a": 1,
+        "b": 2,
+        "c": 3,
+    }
+    t(st, s, m)
+    fmt.Println(st, s, m) // {1} [11 2 3] map[a:11 b:2 c:3]
+}
+```
+
 ## 1.26. go中函数传参都是值传递
 
 > 参考：
@@ -2295,14 +2334,15 @@ func main() {
 ```
 -   编译时通过指定选项显示编译优化信息，编译器会输出逃逸的变量；
 ```bash
-go tool compile -l -m -m main.go
+go tool compile -l -m main.go
 # 或者
-go build -gcflags "-m -m -l" main.go
+go build -gcflags "-m -l" main.go
 ```
 
 > 参考：
 > 1. [Frequently Asked Questions (FAQ) - The Go Programming Language](https://go.dev/doc/faq#stack_or_heap)
 > 2. [golang 中函数使用值返回与指针返回的区别，底层原理分析](https://cloud.tencent.com/developer/article/1890639)
+
 ## 1.34. 内部包internal
 
 内部包的规范约定：导出路径包含`internal`关键字的包，只允许`internal`的父级目录及父级目录的子包导入，其它包无法导入。
@@ -2492,15 +2532,88 @@ func main(){
 debug.PrintStack()
 ```
 
+## 1.39. http包的使用
+
+### 1.39.1. 转发请求
+
+```go
+func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
+    u, err := url.Parse("https://target.com/path/to/uri")
+    if nil != err {
+        log.Println(err)
+        return
+    }
+
+    proxy := httputil.ReverseProxy{
+        Director: func(request *http.Request) {
+            request.URL = u
+        },
+    }
+
+    proxy.ServeHTTP(writer, request)
+}
+
+func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
+    u := &url.URL{
+        Scheme: "https",
+        Host:   "target.com",
+    }
+
+    proxy := httputil.NewSingleHostReverseProxy(u)
+    request.URL.Path = "/path/to/uri"
+    proxy.ServeHTTP(writer, request)
+}
+```
+
 # 2. 第三方包
 
 ## 2.1. Gorm
 
-相对更新：
+### 2.1.1. 相对更新：
 
 ```go
 Db.Model(xy).Where("id = ? ", id).Update("sign_up_num", gorm.Expr("sign_up_num+ ?", 1))
 ```
+
+### 2.1.2. 查询，不存在则创建
+
+```go
+var licTmp model.CascadeLic
+// 根据where条件查询记录，未找到则根据lic创建。实际会执行两条sql
+txn.Where(model.CascadeLic{Type: "lower", LowerTAG: lic.LowerTAG, UUID: lic.UUID}).Attrs(lic).FirstOrCreate(&licTmp)
+```
+
+### 2.1.3. 复用通用的逻辑
+
+```go
+whereScopeFuncs := make([]func(db *gorm.DB) *gorm.DB, 0)
+for _, lic := range recycleLics {
+    if lic.LowerTAG != req.LocalTag {
+        continue
+    }
+
+    recycleTags = append(recycleTags, lic.LowerTAG)
+    whereScopeFuncs = append(whereScopeFuncs, func(db *gorm.DB) *gorm.DB {
+        return db.Or("type='lower' and lowertag = ? and uuid = ?", lic.LowerTAG, lic.UUID)
+    })
+}
+if len(whereScopeFuncs) > 0 {
+    var cnt int
+    txn.Scopes(whereScopeFuncs...).Count(&cnt)
+    txn.Scopes(whereScopeFuncs...).Delete(&model.CascadeLic{})
+}
+```
+
+### 2.1.4. 查询后判断错误为未找到
+
+```go
+errors.Is(err, gorm.ErrRecordNotFound)
+```
+
+### 2.1.5. 日志
+
+
+> 参考：[Logger | GORM - The fantastic ORM library for Golang, aims to be developer friendly.](https://gorm.io/zh_CN/docs/logger.html)
 
 ## 2.2. grpc-gateway
 
@@ -2591,6 +2704,17 @@ func (m *Mutex) IsLocked() bool {
 ```bash
 go get github.com/shirou/gopsutil
 ```
+
+github.com/prometheus/procfs
+
+## 2.8. 日志组件
+
+### 2.8.1. logrus
+
+### 2.8.2. zap
+
+### 2.8.3. seelog
+
 
 # 3. 开发环境
 

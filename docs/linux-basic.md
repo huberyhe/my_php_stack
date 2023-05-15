@@ -440,6 +440,8 @@ ethtool enp0s3
  $ cd /tmp                                                                                                              
  $ touch 123
  $ sudo chattr +i 123
+ $ lsattr 123
+----i----------- 123
  $ sudo rm 123
 rm: cannot remove ‘123’: Operation not permitted
 ```

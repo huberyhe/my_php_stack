@@ -253,7 +253,7 @@ SELECT pg_cancel_backend(进程id);
 ```
 或者用系统函数：kill -9 进程id;
 
-1.10.3. 查看表占用空间
+### 1.10.3. 查看表占用空间
 
 ```sql
 select relname, pg_size_pretty(pg_relation_size(relid))
@@ -261,6 +261,14 @@ from pg_stat_user_tables
 where schemaname='public'
 order by pg_relation_size(relid) desc;
 ```
+
+## 1.11. 报错问题记录
+
+```
+pq: current transaction is aborted, commands ignored until end of transaction block
+```
+
+事务中一次查询出错，则事务应该退出，事务中后面的查询不会执行。参考：[postgresql - PSQLException: current transaction is aborted, commands ignored until end of transaction block - Stack Overflow](https://stackoverflow.com/questions/10399727/psqlexception-current-transaction-is-aborted-commands-ignored-until-end-of-tra)
 
 > 其他好文章：
 > 1、[PostgreSQL的并行查询](https://www.cnblogs.com/abclife/p/13952833.html)

@@ -8,8 +8,8 @@
 
 ## 1.1. 常用数组函数
 
-array_push\array_pop
-array_shift\array_unshift
+array_push/array_pop
+array_shift/array_unshift
 array_merge
 array_unique
 
