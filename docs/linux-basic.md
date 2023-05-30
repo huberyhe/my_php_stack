@@ -24,6 +24,16 @@ apk --no-cache add shadow
 nmtui
 ```
 
+### 1.1.3. Ubuntu
+
+#### 1.1.3.1. 安装指定版本的包
+
+```bash
+apt-get install openssh-client=1:6.6p1-2ubuntu1
+# 查找版本
+apt-cache madison openssh-client
+```
+
 
 
 ## 1.2. 
@@ -467,7 +477,6 @@ drwxrwxrwt. 11 root root 4096 Apr  7 14:58 /tmp
 ```
 
 > 参考：《鸟哥的私房菜》
-
 
 
 
