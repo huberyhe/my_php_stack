@@ -37,7 +37,7 @@ redis 127.0.0.1:6379> HGET runoob field2
 
 Redis 列表是简单的字符串列表，按照插入顺序排序。你可以添加一个元素到列表的头部（左边）或者尾部（右边）。
 
-列表最多可存储 232 - 1 元素 (4294967295, 每个列表可存储40多亿)。
+列表最多可存储 2^32 - 1 元素 (4294967295, 每个列表可存储40多亿)。
 
 ```
 redis 127.0.0.1:6379> DEL runoob
@@ -106,7 +106,7 @@ redis 127.0.0.1:6379> ZRANGEBYSCORE runoob 0 1000
 
 ## 1.2. 事务
 
-redis的事务不具备“原子性”，而仅仅满足了事务的“隔离性”中的串行化，保证当前执行的事务部呗其他事务打断
+redis的事务不具备“原子性”，而仅仅满足了事务的“隔离性”中的串行化，保证当前执行的事务部不被其他事务打断
 
 开启：`MULTI`
 
@@ -377,7 +377,9 @@ EVAL script numkeys key [key ...] arg [arg ...]
 eval "if redis.call('exists', KEYS[1]) == 1 then redis.call('hset', KEYS[1], ARGV[1], 1) end" 1 59205FE8-3ADB-9A25-2755-72A8F6EC2CBE Reload
 ```
 
-> 参考：[Scripting with Lua | Redis](https://redis.io/docs/manual/programmability/eval-intro/)
+> 参考：
+> 1、[Scripting with Lua | Redis](https://redis.io/docs/manual/programmability/eval-intro/)
+> 2、[EVAL – Redis (cndoc.github.io)](https://cndoc.github.io/redis-doc-cn/cn/commands/eval.html)
 
 ## 1.9. 系统命令
 

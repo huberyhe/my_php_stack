@@ -15,7 +15,15 @@
 
 简单来说，**幻读是在一个事务中前后两次读的数据不一致**，由于其他事务插入了行。解决方式：innodb加入了间隙锁，在`select ... for update`和`select ... lock in share mode`时阻止行前后插入数据。
 
-参考：[彻底理解事务的4个隔离级别](https://www.cnblogs.com/jycboy/p/transaction.html)
+MySQL InnoDB 引擎的可重复读隔离级别（默认隔离级），根据不同的查询方式，分别提出了避免幻读的方案：
+
+-   针对**快照读**（普通 select 语句），是通过 MVCC 方式解决了幻读。
+-   针对**当前读**（select ... for update 等语句），是通过 next-key lock（记录锁+间隙锁）方式解决了幻读。
+
+> 参考：
+> 1、[彻底理解事务的4个隔离级别](https://www.cnblogs.com/jycboy/p/transaction.html)
+> 2、[MySQL是如何实现可重复读的?](https://juejin.cn/post/6844904180440629262)
+> 3、[MySQL 可重复读隔离级别，完全解决幻读了吗？](https://xiaolincoding.com/mysql/transaction/phantom.html#%E5%BD%93%E5%89%8D%E8%AF%BB%E6%98%AF%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E5%B9%BB%E8%AF%BB%E7%9A%84)
 
 **事务的四个特性（ACID）**：
 

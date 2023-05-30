@@ -602,6 +602,8 @@ smartctl -i /dev/sdb
 524288
 [root@localhost hubery]# cat /proc/sys/fs/file-max
 379276
+[root@localhost hubery]# sysctl fs.file-max
+379276
 ```
 
 2、临时设置限制
@@ -690,6 +692,9 @@ find /proc -maxdepth 1 -type d -name '[0-9]*' \
      -printf "fds (PID = %P), command: " \
      -exec bash -c "tr '\0' ' ' < {}/cmdline" \; \
      -exec echo \; | sort -rn | head
+     
+find /proc -maxdepth 1 -type d -name '[0-9]*' | xargs -I {} ls {}/fd | wc -l
+find /proc -maxdepth 1 -type d -name '[0-9]*' -exec bash -c 'ls {}/fd/ | wc -l' \; | awk '{sum+=$1} END {print sum}'
 ```
 
 总数：
@@ -701,6 +706,10 @@ while read x; do \
     find /proc/${x% *}/task/${x#* }/fd/ -type l; \
 done | wc -l
 ```
+
+> 参考：
+> 1、[不要使用 lsof 检查打开的文件描述符 file descriptor 数量](https://www.cnblogs.com/nnylee/p/14932524.html)
+
 
 ## 1.15. 查看和设置默认编辑器
 
