@@ -137,6 +137,13 @@ git config --global core.autocrlf input
 git config --global core.safecrlf true
 ```
 
+### 1.3.6. git log
+
+`git log --name-only` 显示每次提交修改的文件名
+`git log --name-status`显示每次提交修改的文件名和状态
+`git log --stat`显示每次提交修改的文件名和修改统计
+
+
 ## 1.4. git客户端
 
 ### 1.4.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具

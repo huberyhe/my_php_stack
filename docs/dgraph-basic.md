@@ -217,6 +217,8 @@ me：当前查询的名称
 curl localhost:8080/admin/export
 ```
 
+默认导出到`/export`目录
+
 2、json格式导出
 
 ```bash
@@ -232,6 +234,12 @@ dgraph bulk -r goldendata.rdf -s goldendata.schema --map_shards=4 --reduce_shard
 ```
 
 rdf是数据，schema定义了导入的数据类型
+
+或开启zero和alpha服务
+
+```bash
+dgraph live -z localhost:16191 -d localhost:20191 --rdfs g01.rdf --schema g01.schema
+```
 
 ## 1.6. 注意事项
 

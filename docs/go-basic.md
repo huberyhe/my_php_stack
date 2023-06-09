@@ -65,9 +65,9 @@ fmt.Println("t5", *t5)
 
 var用于类型声明，对于基本类型会被初始化为零值，包括整型、字符串、array、struct等
 
-new用于指定类型（也包括整形、字符串等）的内存创建，同时把内存置为零值，返回的是内存地址。`map, slice,chan`的零值是nil
+new用于指定类型（也包括整型、字符串等）的内存创建，同时把内存置为零值，返回的是内存地址。`map, slice,chan`的零值是nil
 
-make用于`map, slice,chan` 的内存创建，返回的对象是类型本身。创建内存不会初始化为零值，意味着对象一定不是nil
+make用于`map,slice,chan` 的内存创建，返回的对象是类型本身。创建内存不会初始化为零值，意味着对象一定不是nil
 
 ### 1.1.4. map需要初始化吗，使用new和make创建的区别
 
@@ -97,7 +97,7 @@ go没有原生四舍五入的支持，只有向上取整`math.Floor`和向下取
 // Round 四舍五入，ROUND_HALF_UP 模式实现
 // 返回将 val 根据指定精度 precision（十进制小数点后数字的数目）进行四舍五入的结果。precision 也可以是负数或零。
 func Round(val float64, precision int) float64 {
-    p := math.Pow10(precision)
+    p := math.Pow10(precision) // 10^precision
     return math.Floor(val*p+0.5) / p
 }
 ```
@@ -259,6 +259,12 @@ fmt.Println(time.Now().In(cstSh))
 2022-12-23 17:09:29.9312074 +0800 CST
 ```
 
+### 1.8.5. 判断是否时零值
+
+```go
+tn := time.Now()
+tn.IsZero()
+```
 
 ## 1.9. 文件
 
@@ -874,6 +880,8 @@ threads
 trace
 ```
 
+> 参考：[delve/README.md at master · go-delve/delve · GitHub](https://github.com/go-delve/delve/blob/master/Documentation/cli/README.md)
+
 
 ## 1.12. 数据库事务处理
 
@@ -992,7 +1000,84 @@ RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会�
 
 ### 1.14.2. 锁的实现原理
 
+原子的比较交换操作：`atomic.CompareAndSwapInt32`
+
 ### 1.14.3. channel实现互斥锁
+
+使用缓冲长度为1的channel，加锁为读，解锁为写。
+
+```go
+package main
+
+import (
+    "sync"
+)
+
+// Lock 锁结构
+type Lock struct {
+    c chan struct{}
+}
+
+// NewLock 生成一个锁
+func NewLock() Lock {
+    var l Lock
+    l.c = make(chan struct{}, 1)
+    l.c <- struct{}{} // 放入一把锁用于获取
+    return l
+}
+
+// TryLock 尝试加锁,成功返回true,失败返回false，不会阻塞等待
+func (l Lock) TryLock() bool {
+    var lockResult bool
+    select {
+    case <-l.c:
+        lockResult = true
+    default:
+    }
+    return lockResult
+}
+
+// 加锁,会阻塞竞争
+func (l Lock) Lock() {
+    <-l.c
+}
+
+// 解锁,重复解锁会阻塞
+func (l Lock) Unlock() {
+    l.c <- struct{}{}
+}
+
+var counter int
+
+func main() {
+    l := NewLock()
+    var wg sync.WaitGroup
+    for i := 0; i < 10; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            if !l.TryLock() {
+                println("lock failed")
+                return
+            }
+            counter++
+            println("try lock counter ", counter)
+            l.Unlock()
+        }()
+    }
+    for i := 0; i < 10; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            l.Lock()
+            counter++
+            println("lock counter ", counter)
+            l.Unlock()
+        }()
+    }
+    wg.Wait()
+}
+```
 
 ## 1.15. 使用避坑
 
@@ -1404,7 +1489,7 @@ go tool pprof -http=0.0.0.0:8081  http://127.0.0.1:6060/debug/pprof/heap
 > 参考：[golang 内存分析/动态追踪](https://lrita.github.io/2017/05/26/golang-memory-pprof/#go-tool)
 
 
-### 1.18.2. gops
+### 1.18.2. gops进程诊断工具
 
 在go 1.17以上版本下安装
 
@@ -1539,13 +1624,28 @@ go run -race mysrc.go
 
 ### 1.18.6. 内存逃逸分析
 
+1. 内存分配到堆上的影响
+
+- 垃圾回收（GC）的压力不断增大
+- 申请、分配、回收内存的系统开销增大（相对于栈）
+- 动态分配产生一定量的内存碎片
+
+2. 分析内存逃逸的方法
+
 ```bash
 # 通过编译器指令
 go build -gcflags '-m -l' main.go
+```
 
+- `-m` 会打印出逃逸分析的优化策略，实际上最多总共可以用 4 个 `-m`，但是信息量较大，一般用 1 个就可以了
+- `-l` 会禁用函数内联，在这里禁用掉 inline 能更好的观察逃逸情况，减少干扰
+
+```
 # 通过反编译命令
 go tool compile -S main.go
 ```
+
+看是否执行了 `runtime.newobject` 方法
 
 > 参考：[1.9 我要在栈上。不，你应该在堆上](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)
 
@@ -1594,7 +1694,18 @@ func main() {
 
 > 参考：[深度解密 Go 语言之 sync.Pool](https://www.cnblogs.com/qcrao-2018/p/12736031.html)
 
-### 1.19.2. sync.Map，支持线程安全的map
+### 1.19.2. 变量的线程安全问题
+
+对于变量的并发访问往往会产生竞态问题，不同类型由于实现方式不同产生竞态问题的条件也不同，具体可在运行或编译时加`--race`参数检测
+
+对于竞态问题，通用的解决办法时加锁，但加锁后性能会有较大损失，更好的方式时使用atomic包来进行原子化操作
+
+> 参考：[go - Can I concurrently write different slice elements - Stack Overflow](https://stackoverflow.com/questions/49879322/can-i-concurrently-write-different-slice-elements)
+
+#### 1.19.2.1. sync/atomic
+
+
+#### 1.19.2.2. sync.Map，支持线程安全的map
 
 ```go
 package main
