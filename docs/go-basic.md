@@ -2726,6 +2726,38 @@ errors.Is(err, gorm.ErrRecordNotFound)
 
 > 参考：[Logger | GORM - The fantastic ORM library for Golang, aims to be developer friendly.](https://gorm.io/zh_CN/docs/logger.html)
 
+### 2.1.6. 生成sql语句
+
+开启调试模式后，gorm会打印执行的sql语句，但这个语句不一定是实际执行的sql，特别是在参数经过预处理之后，比如
+
+```sql
+SELECT * FROM "td_osloginfo"  WHERE ((logtype LIKE '%'%' or items LIKE '%'%')) AND (agentid ='59E95EDD-5082-9DE8-AFF1-B1C81A63C853') LIMIT 10 OFFSET 0
+```
+
+这条语句是gorm生成的，直接放到终端执行是查不到数据的，而实际能查到数据，实际pg的查询日志为
+
+```
+2023-06-16 09:41:26.634 CST [9372] LOG:  execute <unnamed>: SELECT * FROM "td_osloginfo"  WHERE ((logtype LIKE $1 or items LIKE $2)) AND (agentid =$3)
+2023-06-16 09:41:26.634 CST [9372] DETAIL:  parameters: $1 = '%''%', $2 = '%''%', $3 = '59E95EDD-5082-9DE8-AFF1-B1C81A63C853'
+```
+
+对比之下，gorm生成的sql为
+
+```sql
+SELECT * FROM "td_osloginfo"  WHERE ((logtype LIKE '%''%' or items LIKE '%''%')) AND (agentid ='59E95EDD-5082-9DE8-AFF1-B1C81A63C853') LIMIT 10 OFFSET 0
+```
+
+这条语句看起来是对的，但就是查不到数据，实际pg的查询日志是
+
+```
+2023-06-16 09:43:54.911 CST [20235] LOG:  execute <unnamed>: SELECT * FROM "td_osloginfo"  WHERE ((logtype LIKE $1 or items LIKE $2)) AND (agentid =$3) LIMIT 10 OFFSET 0
+2023-06-16 09:43:54.911 CST [20235] DETAIL:  parameters: $1 = '%''''%', $2 = '%''''%', $3 = '59E95EDD-5082-9DE8-AFF1-B1C81A63C853'
+```
+
+**结论：** 
+- 预处理时不需要对单引号转义，数据库会自动转义；sprintf拼接的则需要转义。
+- gorm的ToSQL生成的sql不安全，官方不建议用于生产环境
+
 ## 2.2. grpc-gateway
 
 [grpc-gateway](https://link.segmentfault.com/?enc=IiOARw%2FsDGNqscUzUzwHcw%3D%3D.rS7Vg97osGOKT4igbY52nEs7DaK4M2QHhyaxkrfkoYZgHMBU7tgWk3gR4PDkgVJi)是protoc的一个插件。它读取gRPC服务定义，并生成一个反向代理服务器，将RESTful JSON API转换为gRPC

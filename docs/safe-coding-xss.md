@@ -13,3 +13,4 @@
 > 参考：
 >
 > 1、[Content Security Policy 入门教程](http://www.ruanyifeng.com/blog/2016/09/csp.html)
+> 2、[Content-Security-Policy - HTTP | MDN (mozilla.org)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)

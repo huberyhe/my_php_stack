@@ -131,6 +131,7 @@ find . -maxdepth 1 -name '*.txt'
 
 # 查找文本文件
 find . -type f -exec grep -Iq . {} \; -print
+find . | xargs  file | grep "text" | cut -d: -f1
 
 # 查找没有可执行权限的shell文件
 find /usr/bin -perm -u-x -type f "*.sh"
