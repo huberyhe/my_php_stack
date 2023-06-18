@@ -85,6 +85,7 @@
 - 如何画架构图
 - 完整项目开发流程
 - 系统设计
+- 部署策略：大爆炸（Big Bang）部署、蓝绿（Blue-Green）部署、滚动（Rolling）部署、灰度部署（金丝雀Canary部署）、功能开关（Feature Toggle）发布
 
 
 ## 安全编码
