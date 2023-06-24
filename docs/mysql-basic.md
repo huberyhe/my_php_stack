@@ -182,3 +182,9 @@ having count(course_name) > 1
 ## 1.9. 日志
 
 错误日志、查询、慢查询日志、redo log、undo log、binlog
+
+## 1.10. DDL与DML
+
+DDL（Data Definition Language）数据定义语言，用于定义和管理数据库的结构和模式，包括表、列、索引、视图等。
+
+DML（Data Manipulation Language）数据操纵语言，用于操作和处理数据库中的数据。

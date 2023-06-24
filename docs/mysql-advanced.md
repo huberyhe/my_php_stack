@@ -298,3 +298,83 @@ mysql 8.0使用`uuid_to_bin`转换成二进制保存后，解决了**无序性�
 SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 ```
 
+### 1.7.3. explain执行计划
+
+```sql
+MariaDB [gf_test]> explain select * from Orders\G
+*************************** 1. row ***************************
+           id: 1
+  select_type: SIMPLE
+        table: Orders
+         type: ALL
+possible_keys: NULL
+          key: NULL
+      key_len: NULL
+          ref: NULL
+         rows: 6
+        Extra:
+1 row in set (0.000 sec)
+```
+
+- id: The `SELECT` identifier
+- select_type: The `SELECT` type
+- table: The table for the output row
+- partitions: The matching partitions
+- type: The join type
+- possible_keys: The possible indexes to choose
+- key: The index actually chosen
+- key_len: The length of the chosen key
+- ref: The columns compared to the index
+- rows: Estimate of rows to be examined
+- filtered: Percentage of rows filtered by table condition
+- Extra: 	Additional information
+
+> 参考：[MySQL :: MySQL 8.0 Reference Manual :: 8.8.2 EXPLAIN Output Format](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
+
+#### 1.7.3.1. select_type表示查询的类型或操作方式
+
+1. SIMPLE： 表示简单查询，不包含子查询或连接操作。
+2. PRIMARY： 表示外层查询或主查询。
+3. SUBQUERY： 表示子查询，嵌套在主查询中进行。
+4. DERIVED： 表示派生表，即在查询过程中创建的临时表。
+5. UNION： 表示 UNION 操作，将多个查询结果合并。
+6. UNION RESULT： 表示 UNION 查询结果的临时表。
+7. DEPENDENT SUBQUERY： 表示依赖于外部查询的子查询。
+8. DEPENDENT UNION： 表示依赖于外部查询的 UNION 查询。
+9. DEPENDENT UNION RESULT： 表示依赖于外部查询的 UNION 查询结果。
+10. MATERIALIZED： 表示使用了临时表来存储中间结果。
+11. UNCACHEABLE SUBQUERY： 表示无法缓存的子查询。
+
+#### 1.7.3.2. type表示了查询所使用的访问方法（Access Method），即用于获取数据的方式
+
+1. const： 表示使用常量值进行查询，通常用于对主键或唯一索引的等值查询。
+2. eq_ref： 表示等值连接（Equi-Join），即使用索引进行连接操作，索引的每个值只匹配一行。
+3. ref： 表示非唯一索引的等值查询或范围查询，索引的每个值可能匹配多行。
+4. range： 表示使用索引进行范围查询，例如使用 BETWEEN、IN、>、< 等操作符。
+5. index： 表示全索引扫描，即直接扫描整个索引树来获取结果。
+6. all： 表示全表扫描，即扫描整个表来获取结果。
+7. unique_subquery： 表示使用子查询进行唯一性检查。
+8. index_subquery： 表示使用子查询进行索引扫描。
+9. index_merge： 表示使用多个索引进行扫描，然后将结果进行合并。
+10. materialized： 表示使用了临时表来存储中间结果。
+
+#### 1.7.3.3. Extra额外信息
+
+1. Using index： 表示查询使用了覆盖索引（Covering Index），即查询所需的列都包含在了索引中，无需再访问表的数据页。
+2. Using where： 表示查询使用了 WHERE 子句进行过滤。
+3. Using temporary： 表示查询需要创建临时表来存储中间结果。通常出现在排序、分组、多表连接等操作中。
+4. Using filesort： 表示查询需要进行排序操作，但无法使用索引完成排序，需要在内存或磁盘上进行排序。
+5. Using join buffer： 表示使用了连接缓冲区（Join Buffer）来处理连接操作。
+6. Using index condition： 表示查询使用了索引条件推送优化，即通过索引的筛选条件来减少需要读取的数据行数。
+7. Distinct： 表示查询使用了 DISTINCT 关键字，去除重复的结果。
+8. Full scan on NULL key： 表示查询在一个或多个索引列的值为 NULL 的情况下，需要全表扫描。
+9. Impossible WHERE： 表示查询的 WHERE 条件不可能为真，整个查询将返回空结果。
+10. Select tables optimized away： 表示查询可以被优化器简化，不需要访问任何表。
+
+### 1.7.4. 查看mysql和innodb版本
+
+```sql
+SELECT VERSION();
+SHOW VARIABLES LIKE 'innodb_version';
+```
+
