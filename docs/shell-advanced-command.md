@@ -337,8 +337,7 @@ sed [-nefr] [动作]
 动作说明： [n1[,n2]]function
 n1, n2 ：不见得会存在，一般代表『选择进行动作的行数』，举例来说，如果我的动作是需要在 10 到 20 行之间进行的，则『 10,20[动作行为] 』
 
-- 
-  a ：新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～
+- a ：新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～
 - c ：取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
 - d ：删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
 - i ：插入， i 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)；
@@ -450,6 +449,33 @@ port2 8080;
 #### 1.3.3.8. 去掉前后空白
 ```bash
 echo "   PHP and MySQL   " | sed -e 's/^[[:space:]]*//'
+```
+
+#### 1.3.3.9. 包含换行、空格和引号时的处理
+
+```bash
+lines_to_insert=$(cat<<'EOF'
+
+location /soft {
+    proxy_pass   http://127.0.0.1:19188;
+    if ($request_method !~* GET|POST) {
+        return 403;
+    }
+}
+        
+EOF
+)
+
+nl=$'\n' bsnl=$'\\\n'
+sed -i "\#location /register#i ${lines_to_insert//$nl/$bsnl}" /etc/nginx.conf
+
+new_policy=$(cat<<'EOF'
+add_header Content-Security-Policy "default-src 'self';font-src 'self' data:;style-src 'self' 'unsafe-inline';script-src 'self' 'unsafe-inline' 'unsafe-eval';img-src 'self' data:;frame-ancestors 'self';worker-src 'self' 'unsafe-inline' 'unsafe-eval' blob:";
+EOF
+)
+nl=$'\n' bsnl=$'\\\n'
+sed -i "\#^\s*add_header Content-Security-Policy#c\t${new_policy//$nl/$bsnl}" /etc/nginx.conf
+
 ```
 
 > 参考：

@@ -2676,6 +2676,45 @@ func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
 }
 ```
 
+## 1.40. switch
+
+1、switch后可不跟变量
+2、case隐式break，只要匹配上就break不再匹配。如果需要匹配多个case，可使用fallthrough
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	today := 6
+
+	switch {
+	case today < 5:
+		fmt.Println("Clean your house.")
+	case today < 8:
+		fmt.Println("Clean your house.")
+		fallthrough
+	case today <= 10:
+		fmt.Println("Buy some wine.")
+	case today > 15:
+		fmt.Println("Visit a doctor.")
+	case today == 25:
+		fmt.Println("Buy some food.")
+	default:
+		fmt.Println("No information available for that day.")
+	}
+}
+
+```
+输出
+```
+Clean your house.
+Buy some wine.
+```
+
 # 2. 第三方包
 
 ## 2.1. Gorm

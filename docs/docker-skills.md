@@ -53,3 +53,9 @@ ENTRYPOINT ["/app/link_service"]
 ```
 
 得到了一个最小、最安全的镜像。
+
+## 1.5. 容器中使用docker
+
+```bash
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker centos:7 /bin/bash
+```
