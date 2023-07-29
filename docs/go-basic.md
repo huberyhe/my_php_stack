@@ -2008,6 +2008,12 @@ CGO_ENABLED=1 CC=aarch64-linux-musl-gcc CXX=aarch64-linux-musl-g++ GOOS=linux GO
 
 > 参考：[CGO 交叉静态编译 · Issue #27 · eyasliu/blog (github.com)](https://github.com/eyasliu/blog/issues/27)
 
+### 1.22.2. 查看初始化过程
+
+```bash
+go build --ldflags=--dumpdep main.go 2>&1 | grep inittask
+```
+
 ## 1.23. init函数
 
 ### 1.23.1. 执行顺序

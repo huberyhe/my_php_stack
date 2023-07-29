@@ -30,6 +30,8 @@ yum versionlock list
 
 ## 1.2. 自解压文件：用于制作单文件升级包
 
+术语：Self-Contained Application Packaging
+
 假设我们要制作一个名字叫`pkg_20210714.csu`的升级包，直接`sh pkg_20210714.csu`可以完成升级。这个文件本身是一个shell脚本，但尾部又包含升级所需的文件
 
 ```bash
@@ -729,3 +731,11 @@ export EDITOR="$VISUAL"
 ```
 
 ctrl+r ctrl+e 查看效果
+
+## 1.16. 环境变量问题
+
+### 1.16.1 sudo环境变量
+
+sudo默认执行命令时不会使用`/etc/profile`里的环境变量，需要加上`-i`参数
+
+> 参考：[bash - /etc/profile not sourced for `sudo su` - Unix & Linux Stack Exchange](https://unix.stackexchange.com/questions/327551/etc-profile-not-sourced-for-sudo-su)
