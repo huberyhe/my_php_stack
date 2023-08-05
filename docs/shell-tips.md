@@ -131,6 +131,8 @@ set -euo pipefail
 - `-u`：使用未初始化的变量时报错，而不是当成NULL。 这个比较有用，有点高级编程的感觉
 - `-o pipefail`：使用Pipe中出错命令的状态码（而不是最后一个）作为整个Pipe的状态码。
 
+> 参考：[The Set Builtin (Bash Reference Manual) (gnu.org)](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
+
 ## 1.7. 获取IP地址
 
 ```bash

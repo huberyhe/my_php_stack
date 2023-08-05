@@ -284,6 +284,17 @@ tar -cf archive.tar --transform 's,^\./,usr/,'
 tar -cf archive.tar --transform 's/$/new/'
 ```
 
+#### 1.3.2.11. 时间戳问题
+
+tar解压文件时默认使文件时间与归档之前保持一致，当当前系统时间早于文件时间时将弹出警告。
+
+```bash
+# 不使用归当前文件时间
+tar xzfm myarchive.tar
+# 关闭警告
+tar xzf myarchive.tar --warning=no-timestamp
+```
+
 
 
 ### 1.3.3. iptables四表五链

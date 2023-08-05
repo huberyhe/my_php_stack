@@ -1,12 +1,230 @@
 [回到首页](../README.md)
 
-# 1. MySQL高级
-
-说明
+# 1. MySQL基础
 
 [TOC]
 
-## 1.1. 分区
+## 1.1. 查看所有表信息
+
+```bash
+##查看所有表信息
+SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'apyun'
+##查看各个表数据量
+SELECT table_name,table_rows FROM information_schema.tables
+WHERE TABLE_SCHEMA = 'apyun' ORDER BY table_rows DESC;
+```
+
+## 1.2. 导入导出数据
+
+```bash
+# 导出表结构
+mysqldump -uroot -p -d dbname > dbname.sql
+# 导出表数据
+mysqldump -uroot -p -t dbname > dbname.sql
+# 导出表结构和表数据
+mysqldump -uroot -p dbname > dbname.sql
+# 导出时指定表
+mysqldump -uroot -p dbname --tables tbname1 tbname2 > dbname.sql
+# 导出时过滤表
+mysqldump -uroot -p dbname --ignore-table=dbname.tbname --ignore-table=dbname.tbname2 > dbname.sql
+```
+
+```sql
+# 导入
+CREATE DATABASE dbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+mysql -uroot -p dbname < /path/dbname.sql
+# 或者
+source dbname.sql
+
+# 导出select后的数据，可用于导出成csv格式
+SELECT * INTO OUTFILE '/home/temp.txt'
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n'
+FROM table_name
+WHERE createtime < 1382716800;
+
+# 导入select后的数据
+LOAD DATA INFILE '/home/temp.txt'
+INTO TABLE table_name
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n'
+(product_id,uuid,mac,monitor,win_version,ip,createtime);
+# 注：从本地导入远程服务器需使用LOAD DATA LOCAL INFILE
+```
+
+`SELECT ... INTO OUTFILE`导出的结果会放到mysql服务器端，所以实际少用。
+
+```sql
+mysql -uroot -p dbname -e 'SELECT * FROM table_name WHERE create_time < 1382716800' -N -s > /home/temp.txt
+```
+
+> 注：
+>
+> - -e：执行sql命令
+> - -N：去掉抬头
+> - -s：去掉标准的分割线
+
+## 1.3. 数据类型
+
+### 1.3.1. 数字型
+
+| **类型**     | **大小**                                 | **范围（有符号）**                                           | **范围（无符号）**                                           | **用途**        |
+| ------------ | ---------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | --------------- |
+| TINYINT      | 1 字节                                   | (-128，127)                                                  | (0，255)                                                     | 小整数值        |
+| SMALLINT     | 2 字节                                   | (-32 768，32 767)                                            | (0，65 535)                                                  | 大整数值        |
+| MEDIUMINT    | 3 字节                                   | (-8 388 608，8 388 607)                                      | (0，16 777 215)                                              | 大整数值        |
+| INT或INTEGER | 4 字节，2^32                             | (-2 147 483 648，2 147 483 647)                              | (0，4 294 967 295)                                           | 大整数值        |
+| BIGINT       | 8 字节                                   | (-9 233 372 036 854 775 808，9 223 372 036 854 775 807)      | (0，18 446 744 073 709 551 615)                              | 极大整数值      |
+| FLOAT        | 4 字节                                   | (-3.402 823 466 E+38，1.175 494 351 E-38)，0，(1.175 494 351 E-38，3.402 823 466 351 E+38) | 0，(1.175 494 351 E-38，3.402 823 466 E+38)                  | 单精度 浮点数值 |
+| DOUBLE       | 8 字节                                   | (1.797 693 134 862 315 7 E+308，2.225 073 858 507 201 4 E-308)，0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308) | 0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308) | 双精度 浮点数值 |
+| DECIMAL      | 对DECIMAL(M,D) ，如果M>D，为M+2否则为D+2 | 依赖于M和D的值                                               | 依赖于M和D的值                                               | 小数值          |
+
+无符号整数用法:
+
+```sql
+CREATE TABLE t7(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    url VARCHAR(40),
+    crcurl INT UNSIGNED NOT NULL DEFAULT 0
+);
+```
+
+### 1.3.2. 字符类型
+
+| CHAR       | 0-255字节             | 定长字符串                      |
+| ---------- | --------------------- | ------------------------------- |
+| VARCHAR    | 0-255字节/0-65535字节 | 变长字符串                      |
+| TINYBLOB   | 0-255字节             | 不超过 255 个字符的二进制字符串 |
+| TINYTEXT   | 0-255字节             | 短文本字符串                    |
+| BLOB       | 0-65 535字节          | 二进制形式的长文本数据          |
+| TEXT       | 0-65 535字节          | 长文本数据                      |
+| MEDIUMBLOB | 0-16 777 215字节      | 二进制形式的中等长度文本数据    |
+| MEDIUMTEXT | 0-16 777 215字节      | 中等长度文本数据                |
+| LOGNGBLOB  | 0-4 294 967 295字节   | 二进制形式的极大文本数据        |
+| LONGTEXT   | 0-4 294 967 295字节   | 极大文本数据                    |
+
+### 1.3.3. 枚举集合
+
+ENUM （最多65535个成员）                    64KB
+SET （最多64个成员）                      64KB
+
+### 1.3.4. 时间类型
+
+一般用datetime和bigint存储时间戳，不受时区影响。
+
+| **类型**  | **大小 (字节)** | **范围**                                | **格式**            | **用途**                 |
+| --------- | --------------- | --------------------------------------- | ------------------- | ------------------------ |
+| DATE      | 3               | 1000-01-01/9999-12-31                   | YYYY-MM-DD          | 日期值                   |
+| TIME      | 3               | '-838:59:59'/'838:59:59'                | HH:MM:SS            | 时间值或持续时间         |
+| YEAR      | 1               | 1901/2155                               | YYYY                | 年份值                   |
+| DATETIME  | 8               | 1000-01-01 00:00:00/9999-12-31 23:59:59 | YYYY-MM-DD HH:MM:SS | 混合日期和时间值         |
+| TIMESTAMP | 4               | 1970-01-01 00:00:00/2037 年某时         | YYYYMMDD HHMMSS     | 混合日期和时间值，时间戳 |
+
+### 1.3.5. 类型实际应用
+
+1、时间戳应该用什么类型存储：TIMESTAMP 或 INT
+
+> 参考：[前端 - MySQL 中存储时间的最佳实践](https://segmentfault.com/a/1190000040270268)
+
+## 1.4. MySQL官方示例数据库
+
+[MySQL :: Other MySQL Documentation](https://dev.mysql.com/doc/index-other.html)
+
+## 1.5. 数据库设计三大范式
+
+1. 第一范式(确保每列保持原子性)
+
+   所有字段值都是不可分解的原子值
+
+2. 第二范式(确保表中的每列都和主键相关)
+
+   第二范式在第一范式的基础之上更进一层。第二范式需要确保数据库表中的每一列都和主键相关，而不能只与主键的某一部分相关（主要针对联合主键而言）。也就是说在一个数据库表中，一个表中只能保存一种数据，不可以把多种数据保存在同一张数据库表中。
+
+3. 第三范式(确保每列都和主键列直接相关,而不是间接相关)
+
+   第三范式需要确保数据表中的每一列数据都和主键直接相关，而不能间接相关。
+
+优点：采用范式可以降低数据的冗余性。
+
+缺点：获取数据时，需要通过Join拼接出最后的数据。
+
+> 参考：
+>
+> 1、[数据库设计三大范式 - Ruthless - 博客园 (cnblogs.com)](https://www.cnblogs.com/linjiqin/archive/2012/04/01/2428695.html)
+>
+> 2、[数据库逻辑设计之三大范式通俗理解，一看就懂，书上说的太晦涩 - SegmentFault 思否](https://segmentfault.com/a/1190000013695030)
+
+## 1.6. 哪些列适合创建索引
+
+1. 在where条件常使用的字段 。
+2. 该字段的内容不是唯一的几个可选值，而是有较丰富的取值选项的字段 。
+3. 该字段内容不是频繁变化的。
+
+## 1.7. 常见配置项
+
+query_cache_type
+
+innodb_buffer_pool_size
+
+insert_pool
+
+## 1.8. 常见的SQL考题
+
+### 1.8.1. 有一个学生选修课程的数据表，查询选修了多门课程的人数
+
+course：stu_id, course_name
+
+```sql
+select count(stu_id)
+from course
+group by stu_id
+having count(course_name) > 1
+```
+
+## 1.9. 日志
+
+错误日志、查询、慢查询日志、redo log、undo log、binlog
+
+## 1.10. DDL与DML
+
+DDL（Data Definition Language）数据定义语言，用于定义和管理数据库的结构和模式，包括表、列、索引、视图等。
+
+DML（Data Manipulation Language）数据操纵语言，用于操作和处理数据库中的数据。
+
+# 2. 数据库事务的概念
+
+## 2.1. 事务的四个隔离级别
+
+- 未提交读
+- 已提交读
+- 可重复读（默认）
+- 串行化
+
+**脏读**：脏读就是指当一个事务正在访问数据，并且对数据进行了修改，而这种修改还没有提交到数据库中，这时，另外一个事务也访问这个数据，然后使用了这个数据。因为这个数据是还没有提交的数据，那么另外一个事务读到的这个数据是脏数据，依据脏数据所做的操作可能是不正确的。
+
+**幻读**：幻读是指当事务不是独立执行时发生的一种现象。事务A读取与搜索条件相匹配的若干行。事务B以插入或删除行等方式来修改事务A的结果集，然后再提交。
+
+简单来说，**幻读是在一个事务中前后两次读的数据不一致**，由于其他事务插入了行。解决方式：innodb加入了间隙锁，在`select ... for update`和`select ... lock in share mode`时阻止行前后插入数据。
+
+MySQL InnoDB 引擎的可重复读隔离级别（默认隔离级），根据不同的查询方式，分别提出了避免幻读的方案：
+
+-   针对**快照读**（普通 select 语句），是通过 MVCC 方式解决了幻读。
+-   针对**当前读**（select ... for update 等语句），是通过 next-key lock（记录锁+间隙锁）方式解决了幻读。
+
+> 参考：
+> 1、[彻底理解事务的4个隔离级别](https://www.cnblogs.com/jycboy/p/transaction.html)
+> 2、[MySQL是如何实现可重复读的?](https://juejin.cn/post/6844904180440629262)
+> 3、[MySQL 可重复读隔离级别，完全解决幻读了吗？](https://xiaolincoding.com/mysql/transaction/phantom.html#%E5%BD%93%E5%89%8D%E8%AF%BB%E6%98%AF%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E5%B9%BB%E8%AF%BB%E7%9A%84)
+
+## 2.2. 事务的四个特性（ACID）
+
+- 原子性（Atomicity）：一个事务（transaction）中的所有操作，或者全部完成，或者全部不完成
+- 一致性（Consistency）：在事务开始之前和事务结束以后，数据库的完整性没有被破坏
+- 隔离性（Isolation）：数据库允许多个并发事务同时对其数据进行读写和修改的能力，隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致
+- 持久性（Durability）：事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失
+
+
+# 3. MySQL高级
+
+## 3.1. 分区
 
 指将同一表中不同行的记录分配到不同的物理文件中，几个分区就有几个.idb文件
 
@@ -48,7 +266,7 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 > 参考：[搞懂MySQL分区](https://www.cnblogs.com/GrimMjx/p/10526821.html)
 
-## 1.2. 分库分表
+## 3.2. 分库分表
 
 **使用场景**：一张表的查询速度慢到影响使用；频繁写入影响查询（并发锁）
 
@@ -60,13 +278,13 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 > 参考：[MySql分库分表与分区的区别和思考](https://www.cnblogs.com/GrimMjx/p/11772033.html)
 
-## 1.3. 读写分离
+## 3.3. 读写分离
 
-## 1.4. 主从复制原理
+## 3.4. 主从复制原理
 
 `binlog` -> 主节点 `log dump thread` 线程-> 从节点I/O线程 -> `relay log` -> 从节点sql进程重放sql
 
-## 1.5. Mycat中间件
+## 3.5. Mycat中间件
 
 官网地址：[Mycat1.6](http://www.mycat.org.cn/)
 
@@ -84,9 +302,9 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 >
 > 4、[mysql读写分离优缺点](https://zhuanlan.zhihu.com/p/358474872)
 
-## 1.6. 常见问题
+## 3.6. 常见问题
 
-### 1.6.1. 什么情况下会生成临时表
+### 3.6.1. 什么情况下会生成临时表
 
 1. UNION查询；
 2. 用到TEMPTABLE算法或者是UNION查询中的视图；
@@ -97,7 +315,7 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 7. FROM中的子查询；
 8. 子查询或者semi-join时创建的表；
 
-### 1.6.2. 什么情况下需要回表查询
+### 3.6.2. 什么情况下需要回表查询
 
 回表查询：先定位主键值，再定位行记录，它的性能较扫一遍索引树更低。
 
@@ -106,20 +324,20 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 >  参考：
 >  [MySQL优化：如何避免回表查询？什么是索引覆盖？ (转) - myseries - 博客园 (cnblogs.com)](https://www.cnblogs.com/myseries/p/11265849.html)
 
-### 1.6.3. 聚簇索引、非聚簇索引和辅助索引
+### 3.6.3. 聚簇索引、非聚簇索引和辅助索引
 
 - 聚簇索引：将数据存储与索引放到了一块，找到索引也就找到了数据。表数据按照索引的顺序来存储的，也就是说索引项的顺序与表中记录的物理顺序一致。
 - 非聚簇索引：将数据存储与索引分开，叶结点包含索引字段值及指向数据页数据行的逻辑指针，其行数量与数据表行数据量一致。
 
 >  参考：[浅谈聚簇索引与非聚簇索引 | Java 技术论坛 (learnku.com)](https://learnku.com/articles/50096)
 
-### 1.6.4. MyISAM与InnoDB引擎适用场景，OLTP与OLAP的概念
+### 3.6.4. MyISAM与InnoDB引擎适用场景，OLTP与OLAP的概念
 
 OLTP（在线事务处理），如Blog、电子商务、网络游戏等；
 
 OLAP（在线分析处理），如数据仓库、数据集市。
 
-### 1.6.5. MyISAM为什么比InnoDB查询更快
+### 3.6.5. MyISAM为什么比InnoDB查询更快
 
 MyISAM在查询主键和非主键时，速度都更快，因为MyISAM要维护的东西更少，比如：
 
@@ -131,7 +349,7 @@ MyISAM在查询主键和非主键时，速度都更快，因为MyISAM要维护�
 
 > 参考：[MySQL中MyISAM为什么比InnoDB查询快](https://www.cnblogs.com/chingho/p/14798021.html)
 
-### 1.6.6. MyISAM与InnoDB中B+树的区别
+### 3.6.6. MyISAM与InnoDB中B+树的区别
 
 MyISAM的主索引和普通索引都是非聚族索引，叶子节点不会存放行数据，而是存放的**磁盘地址**
 
@@ -141,7 +359,7 @@ MyISAM的主索引和普通索引都是非聚族索引，叶子节点不会存�
 >
 > 2、[MyISAM与InnoDB的索引结构](https://www.cnblogs.com/yuyafeng/p/11350873.html)
 
-### 1.6.7. 行锁、表锁的使用
+### 3.6.7. 行锁、表锁的使用
 
 InnoDB的行锁是针对索引加的锁，不是针对记录加的锁。并且该索引不能失效，否则都会从行锁升级为表锁
 
@@ -177,7 +395,7 @@ show status like 'table_locks%';
 > 
 > 2、[INNODB索引实现原理](https://blog.csdn.net/bohu83/article/details/81104432)
 
-### 1.6.8. B+树的结构
+### 3.6.8. B+树的结构
 
 B+树的内部节点包括：Key键值，Index索引值
 B+树的叶子节点包括：Key键值，Index索引值，Data数据
@@ -189,7 +407,7 @@ B+树的内部节点也可称为索引节点，叶子节点也可称为外部节
 > 
 > [InnoDB一棵B+树可以存放多少行数据？](https://www.cnblogs.com/leefreeman/p/8315844.html)
 
-### 1.6.9. Procedure Analyse优化表结构
+### 3.6.9. Procedure Analyse优化表结构
 
 PROCEDURE ANALYSE的语法如下：
 
@@ -206,29 +424,29 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 > 参考：
 > [Procedure Analyse优化表结构 ](https://www.cnblogs.com/duanxz/p/3968639.html)
 
-### 1.6.10. 索引的类型划分
+### 3.6.10. 索引的类型划分
 
-#### 1.6.10.1. 按功能逻辑划分
+#### 3.6.10.1. 按功能逻辑划分
 
 普通索引、主键索引、唯一索引、全文索引
 
-#### 1.6.10.2. 按物理实现划分
+#### 3.6.10.2. 按物理实现划分
 
 聚集索引、非聚集索引
 
-#### 1.6.10.3. 按字段个数划分
+#### 3.6.10.3. 按字段个数划分
 
 单个索引、联合索引
 
-#### 1.6.10.4. 按索引结构划分
+#### 3.6.10.4. 按索引结构划分
 
 常见的有：BTREE、RTREE、HASH、FULLTEXT、SPATIAL
 
 > 参考：[MySQL索引方法 - 成九 - 博客园 (cnblogs.com)](https://www.cnblogs.com/luyucheng/p/6289048.html)
 
-### 1.6.11. 什么场景下应该使用索引
+### 3.6.11. 什么场景下应该使用索引
 
-#### 1.6.11.1. 推荐使用
+#### 3.6.11.1. 推荐使用
 
 - WHERE, GROUP BY, ORDER BY 子句中的字段
 
@@ -240,7 +458,7 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 - 当 SELECT 中有不在索引中的字段时，会先通过索引查询出满足条件的主键值，然后通过主键回表查询出所有的 SELECT 中的字段，影响查询效率。因此如果 SELECT 中的内容很少，为了避免回表，可以把 SELECT 中的字段都加到联合索引中，这也就是宽索引的概念。但是需要注意，如果索引字段过多，存储和维护索引的成本也会增加。
 
-#### 1.6.11.2. 不推荐使用或索引失效情况
+#### 3.6.11.2. 不推荐使用或索引失效情况
 
 - 数据量很小的表
 - 有大量重复数据的字段
@@ -254,11 +472,11 @@ SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 
 - 查询条件与字段类型不匹配，可能（分情况）造成索引失效，所以sql语句一般严格要求类型一致。参考：[WHRER条件里的数据类型必须和字段数据类型一致](http://blog.itpub.net/22418990/viewspace-1302080/)
 
-### 1.6.12. 分布式id生成器
+### 3.6.12. 分布式id生成器
 
 雪花算法：1bit保留+41bit毫秒时间戳+10bit机器ID+12bit序列号=64bit整数
 
-### 1.6.13. uuid主键
+### 3.6.13. uuid主键
 
 优点：
 - 全局唯一+单调递增，适用于分布式
@@ -279,7 +497,7 @@ mysql 8.0使用`uuid_to_bin`转换成二进制保存后，解决了**无序性�
 > 参考：
 > 1、[详解：MySQL自增ID与UUID的优缺点及选择建议，MySQL有序uuid与自定义函数实现_uuid和自增id优缺点](https://blog.csdn.net/qq_62982856/article/details/127963602)
 
-### 1.6.14. innodb中如何定位到数据行
+### 3.6.14. innodb中如何定位到数据行
 
 在InnoDB存储引擎中，可以通过以下步骤定位到数据行：
 
@@ -291,7 +509,7 @@ mysql 8.0使用`uuid_to_bin`转换成二进制保存后，解决了**无序性�
 
 需要注意的是，以上步骤是InnoDB存储引擎内部的实现细节，对于应用程序开发者来说，并不直接操作这些步骤。通常，应用程序开发者可以通过使用SQL语句中的条件来指定目标数据行，然后由数据库管理系统自动完成数据行的定位和检索。
 
-### 1.6.15. 一颗三层高度的b+tree可以存放多少数据
+### 3.6.15. 一颗三层高度的b+tree可以存放多少数据
 
 首先看，一个数据页可以存放多少数据。假如一行数据大小为1k，默认情况下一页为16k，则可以放存放16k/1k=16行数据。
 
@@ -299,9 +517,9 @@ mysql 8.0使用`uuid_to_bin`转换成二进制保存后，解决了**无序性�
 
 于是，2层高度的树可以存放1170x16=18720条数据；3层高度的树可以存放1170x1170*16=21902400，约两千万条数据。
 
-## 1.7. 其他命令
+## 3.7. 其他命令
 
-### 1.7.1. `show index from tb_name`查看表索引详细信息
+### 3.7.1. `show index from tb_name`查看表索引详细信息
 
 其中`Cardinality`字段表示这个列有多少种值，这个数是近似的可以用 `ANALYZE TABLE tb_name` or (for `MyISAM` tables)`myisamchk -a`更新
 
@@ -311,13 +529,13 @@ mysql 8.0使用`uuid_to_bin`转换成二进制保存后，解决了**无序性�
 >
 > MySQL参考手册：[MySQL 5.7 Reference Manual]([MySQL :: MySQL 5.7 Reference Manual](https://dev.mysql.com/doc/refman/5.7/en/))
 
-### 1.7.2. `PROCEDURE ANALYSE`优化表结构
+### 3.7.2. `PROCEDURE ANALYSE`优化表结构
 
 ```sql
 SELECT ... FROM ... WHERE ... PROCEDURE ANALYSE([max_elements,[max_memory]])
 ```
 
-### 1.7.3. explain执行计划
+### 3.7.3. explain执行计划
 
 ```sql
 MariaDB [gf_test]> explain select * from Orders\G
@@ -350,7 +568,7 @@ possible_keys: NULL
 
 > 参考：[MySQL :: MySQL 8.0 Reference Manual :: 8.8.2 EXPLAIN Output Format](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
 
-#### 1.7.3.1. select_type表示查询的类型或操作方式
+#### 3.7.3.1. select_type表示查询的类型或操作方式
 
 1. SIMPLE： 表示简单查询，不包含子查询或连接操作。
 2. PRIMARY： 表示外层查询或主查询。
@@ -364,7 +582,7 @@ possible_keys: NULL
 10. MATERIALIZED： 表示使用了临时表来存储中间结果。
 11. UNCACHEABLE SUBQUERY： 表示无法缓存的子查询。
 
-#### 1.7.3.2. type表示了查询所使用的访问方法（Access Method），即用于获取数据的方式
+#### 3.7.3.2. type表示了查询所使用的访问方法（Access Method），即用于获取数据的方式
 
 1. **const**： 表示使用常量值进行查询，通常用于对主键或唯一索引的等值查询。
 2. eq_ref： 表示等值连接（Equi-Join），即使用索引进行连接操作，索引的每个值只匹配一行。
@@ -377,7 +595,7 @@ possible_keys: NULL
 9. index_merge： 表示使用多个索引进行扫描，然后将结果进行合并。
 10. materialized： 表示使用了临时表来存储中间结果。
 
-#### 1.7.3.3. Extra额外信息
+#### 3.7.3.3. Extra额外信息
 
 1. **Using index**： 表示查询使用了覆盖索引（Covering Index），即查询所需的列都包含在了索引中，无需再访问表的数据页。
 2. Using where： 表示查询使用了 WHERE 子句进行过滤。
@@ -390,7 +608,7 @@ possible_keys: NULL
 9. Impossible WHERE： 表示查询的 WHERE 条件不可能为真，整个查询将返回空结果。
 10. Select tables optimized away： 表示查询可以被优化器简化，不需要访问任何表。
 
-### 1.7.4. 查看mysql和innodb版本
+### 3.7.4. 查看mysql和innodb版本
 
 ```sql
 SELECT VERSION();

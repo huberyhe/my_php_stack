@@ -21,7 +21,7 @@
 ### go
 
 - [基本使用](./docs/go-basic.md)
-- 技巧与性能
+- 技巧与性能优化
 - 框架
 - 常用组件
 
@@ -33,6 +33,8 @@
 ### 反向代理
 
 - [Nginx](./docs/nginx-basic.md)
+- Apache
+- Caddy
 
 ### [负载均衡](./docs/load-balancing.md)
 
@@ -64,20 +66,16 @@
 
 - 关系型
 
-	- MySQL
-
-		- [基础](./docs/mysql-basic.md)
-		- [事务](./docs/mysql-transaction.md)
-		- [高级](./docs/mysql-advanced.md)
-
+	- [MySQL](./docs/mysql.md)
 	- [PostgreSQL](./docs/postgresql-basic.md)
 	- [sqlite](./docs/sqlite-basic.md)
 
 - 非关系型
 
-	- MongoDB
-	- Elasticsearch
-	- [Dgraph](./docs/dgraph-basic.md)
+	- [MongoDB](./docs/mongodb.md)
+	- [Elasticsearch](./docs/elasticsearch.md)
+	- [Dgraph](./docs/dgraph.md)
+	- [Redis](./docs/redis.md)
 
 ### 缓存
 
@@ -85,10 +83,17 @@
 - Memcached
 - Google Guava
 
-### 消息队列
+### [消息队列](./docs/mq.md)
 
 - RabbitMQ
 - Kafka
+
+### 服务发现与注册
+
+- etcd
+- ZooKeeper
+- nacos
+- k8s
 
 ## 工程构建
 
@@ -103,15 +108,11 @@
 - [技巧](./docs/shell-tips.md)
 - [三剑客](./docs/shell-advanced-command.md)
 
-### Makefile
+### [Makefile](./docs/makefile.md)
 
 ### 打包
 
-- docker
-
-	- [基础](./docs/docker-basic.md)
-	- [技巧](./docs/docker-skills.md)
-
+- [docker](./docs/docker.md)
 - [rpm和deb包](./docs/linux-package.md)
 - ssu包
 

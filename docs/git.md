@@ -103,6 +103,7 @@ git commit -a -m "revert to ..."
 
 ```bash
 git --git-dir=the/local/repo/.git --work-tree=the/local/repo status
+git -C the/local/repo status
 ```
 
 ### 1.3.2. 判断当前目录是否为git仓库
@@ -142,6 +143,30 @@ git config --global core.safecrlf true
 `git log --name-only` 显示每次提交修改的文件名
 `git log --name-status`显示每次提交修改的文件名和状态
 `git log --stat`显示每次提交修改的文件名和修改统计
+
+### 1.3.7. 归档
+
+```bash
+# 将仓库当前分支的最后一次提交，归档到/var/tmp/junk目录，不包含.git目录
+git archive --format=tar --prefix=junk/ HEAD | (cd /var/tmp/ && tar xf -)
+# 或使用tar
+tar --exclude-vcs -zcf foo.tar.gz ./FOLDER_NAME
+```
+
+### 1.3.8. 全局gitignore
+
+家目录下创建.gitignore文件，然后配置`core.excludesFile`
+
+```
+# linux
+git config --global core.excludesFile '~/.gitignore'
+# cmd
+git config --global core.excludesFile "%USERPROFILE%\.gitignore"
+# powershell
+git config --global core.excludesFile "$Env:USERPROFILE\.gitignore"
+```
+
+
 
 
 ## 1.4. git客户端
