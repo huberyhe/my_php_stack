@@ -69,3 +69,18 @@ GET index_name/_search
 
 > 参考：
 > [分页 | Elasticsearch: 权威指南 | Elastic](https://www.elastic.co/guide/cn/elasticsearch/guide/current/pagination.html)
+
+查看索引模板
+```bash
+curl -X GET "132.131.0.21:9200/_template/dlp-clipboard?pretty" -H ''
+```
+
+查看映射
+```bash
+curl -X GET "132.131.0.21:9200/dlp-clipboard-2023.08.10/_mapping/udp?pretty" -H ''
+```
+
+查看集群信息
+```bash
+curl -X GET "132.131.0.21:9200?pretty" -H ''
+```

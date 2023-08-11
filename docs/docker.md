@@ -186,6 +186,25 @@ RUN ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezon
 
 1.12.4. macvlan网络。直接接入虚拟网卡，可划分vlan
 
+## 1.13. CMD和ENTRYPOINT的区别
+
+docker run时可带或不带命令参数，ENTRYPOINT都会执行，CMD只有不带参数才会执行。
+
+```
+# Dockerfile
+ENTRYPINT ["ping"]
+CMD ["www.google.com"]
+
+# 不带参数，实际执行ping www.google.com
+docker run -d xxx 
+
+# 带参数，实际执行ping www.youtube.com
+docker run -d xxx www.youtube.com
+
+```
+
+
+> 参考：[How are CMD and ENTRYPOINT different in a Dockerfile? (educative.io)](https://www.educative.io/answers/how-are-cmd-and-entrypoint-different-in-a-dockerfile)
 
 # 2. Docker技巧
 
@@ -245,4 +264,10 @@ ENTRYPOINT ["/app/link_service"]
 
 ```bash
 docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker centos:7 /bin/bash
+```
+
+## 2.6. 查看进程所属的容器
+
+```
+docker ps -q | xargs docker inspect --format '{{.State.Pid}}, {{.Name}}' | grep "PID"
 ```

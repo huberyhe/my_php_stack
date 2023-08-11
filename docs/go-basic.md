@@ -153,7 +153,7 @@ string := strconv.FormatInt(int64, 10)
 s := string(97) // s == "a"
 ```
 
-## 1.6. 常用常量
+## 1.6. 常量
 
 ### 1.6.1. 整型最值
 
@@ -162,7 +162,32 @@ math.MaxInt32
 math.MinInt32
 ```
 
+### 1.6.2. 模拟枚举
 
+go没有提供枚举类型，但使用使用const枚举
+
+```go
+type EnumPolicyType int // 枚举类型
+
+const (
+    PolicyTypeAgent EnumPolicyType = iota // 0
+    _
+    PolicyTypeGroup // 2
+)
+
+func typeToName(_type EnumPolicyType) string {
+	switch _type {
+	case PolicyTypeAgent:
+		return "终端策略"
+	case PolicyTypeGroup:
+		return "部门策略"
+	default:
+		return "未知策略"
+	}
+}
+```
+
+> 参考：[iota: Golang 中优雅的常量](https://segmentfault.com/a/1190000000656284)
 
 ## 1.7. 正则
 
