@@ -272,9 +272,9 @@ docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/
 docker ps -q | xargs docker inspect --format '{{.State.Pid}}, {{.Name}}' | grep "PID"
 ```
 
-## Docker Compose
+# 3. Docker Compose
 
-### 3.1. 忽略某个服务（不启动）
+## 3.1. 忽略某个服务（不启动）
 
 donotstart行
 
@@ -307,7 +307,7 @@ networks:
         gateway: 132.131.0.1
 ```
 
-### 3.2. 包含另外一个yaml
+## 3.2. 包含另外一个yaml
 
 ```yaml
 version: "2.0"
