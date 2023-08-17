@@ -84,3 +84,9 @@ curl -X GET "132.131.0.21:9200/dlp-clipboard-2023.08.10/_mapping/udp?pretty" -H 
 ```bash
 curl -X GET "132.131.0.21:9200?pretty" -H ''
 ```
+
+查询时排除某个索引
+
+```
+curl -X GET 'localhost:9200/*,-dlp-*/_search?pretty'
+```

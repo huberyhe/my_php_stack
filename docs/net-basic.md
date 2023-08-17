@@ -134,5 +134,19 @@ TCP 是全双工的，在断开连接时两端都需要发送 FIN 和 ACK。
 
 ## 1.10. 大端小端问题
 
+## 1.11. mqtt消息可靠性
+
+三种QoS质量等级：
+QoS 1: 最多交付一次
+QoS 2: 至少交付一次
+QoS 3: 只交付一次
+
+至少交付一次时，接收方在收到PUBLISH消息后发送PUBACK确认消息给发送方，发送方在接收PUBACK超时时会重传消息，这就可能导致接收方收到两次消息。
+
+只交付一次时，时序图如下。
 
 
+![[../imgs/Pasted image 20230817163255.png]]
+如何避免多次交付消息：发送方在收到PUBREC消息前可以重传，接收方在收到PUBREL消息前接受重传，发送方在收到PUBCOMP消息后可重新使用Packet ID发送新消息。
+
+> 参考：[MQTT QoS 0, 1, 2 介绍 | EMQ (emqx.com)](https://www.emqx.com/zh/blog/introduction-to-mqtt-qos)

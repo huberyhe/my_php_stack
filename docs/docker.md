@@ -271,3 +271,57 @@ docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/
 ```
 docker ps -q | xargs docker inspect --format '{{.State.Pid}}, {{.Name}}' | grep "PID"
 ```
+
+## Docker Compose
+
+### 3.1. 忽略某个服务（不启动）
+
+donotstart行
+
+```yaml
+version: "2.0"
+services:
+  paddle-ocr:
+    image: docker-hub.cloud.top/srp-tools/paddle-ocr:latest
+    container_name: topdlp_paddle-ocr
+    restart: always
+    privileged: True
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    volumes:
+      - /config-map/paddle/paddle-ocr.conf:/var/paddle-ocr.conf
+    profiles:
+      - donotstart
+    networks:
+      extnetwork:
+        ipv4_address: 132.131.0.25
+    hostname: your-name
+
+networks:
+  extnetwork:
+    ipam:
+      config:
+      - subnet:  132.131.0.1/16
+        gateway: 132.131.0.1
+```
+
+### 3.2. 包含另外一个yaml
+
+```yaml
+version: "2.0"
+services:
+  paddle-ocr:
+    extends:
+      file: /config-map/paddle/docker-compose.yaml
+      service: paddle-ocr
+
+networks:
+  extnetwork:
+    ipam:
+      config:
+      - subnet:  132.131.0.1/16
+        gateway: 132.131.0.1
+
+```

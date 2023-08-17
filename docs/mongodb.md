@@ -79,3 +79,29 @@ db.movies.deleteOne( { cast: "Brad Pitt" } )
 db.movies.deleteMany( { title: "Titanic" } )
 db.movies.deleteMany({})
 ```
+
+### 1.2.4. 关于id
+
+go中使用`bson.NewObjectId()`得到的id是数据库唯一的
+
+> 参考：[mongodb - Possibility of duplicate Mongo ObjectId's being generated in two different collections? - Stack Overflow](https://stackoverflow.com/questions/4677237/possibility-of-duplicate-mongo-objectids-being-generated-in-two-different-colle)
+
+### 1.2.5. 索引
+
+```
+# 查看索引
+db.clientinfo.getIndexes()
+
+# 创建索引
+db.collection.createIndex(
+   { orderDate: 1, category: 1 },
+   { name: "date_category_fr", collation: { locale: "fr", strength: 2 } }
+)
+
+# 查询分析
+db.clientinfo.find({_id:'59C70824-120F-50AF-BE19-27F5EB359EED'}).explain()
+
+
+# 查看索引大小，indexSizes键
+db.clientinfo.stats()
+```

@@ -2746,6 +2746,20 @@ Clean your house.
 Buy some wine.
 ```
 
+## 1.41. embed文件嵌入
+
+1.16版本引入
+
+```go
+package main
+
+import (
+    _ "embed"
+)
+
+//go:embed preset_regex.json
+var presetRegex []byte
+```
 # 2. 第三方包
 
 ## 2.1. Gorm
@@ -2928,7 +2942,13 @@ github.com/prometheus/procfs
 
 ### 2.8.3. seelog
 
+## 2.9. 基础助手
 
+### 2.9.1. go实现集合
+
+集合的特点是元素不重复
+
+[sets package - k8s.io/apimachinery/pkg/util/sets - Go Packages](https://pkg.go.dev/k8s.io/apimachinery/pkg/util/sets)
 # 3. 开发环境
 
 ## 3.1. vscode
