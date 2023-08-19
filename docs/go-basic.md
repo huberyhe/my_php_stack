@@ -1757,10 +1757,20 @@ func main() {
 
 > 参考：[go - Can I concurrently write different slice elements - Stack Overflow](https://stackoverflow.com/questions/49879322/can-i-concurrently-write-different-slice-elements)
 
-#### 1.19.2.1. sync/atomic
+#### 1.19.2.1. 并发安全的数据类型
+
+- 原子操作
+- 通道Channel
+- WaitGroup
+- 互斥锁Mutex
+- 读写锁RWMutet
+
+基础数据类型整型、字符串、数组、切片、map等都**不是**线程安全的
+
+#### 1.19.2.2. sync/atomic
 
 
-#### 1.19.2.2. sync.Map，支持线程安全的map
+#### 1.19.2.3. sync.Map，支持线程安全的map
 
 ```go
 package main

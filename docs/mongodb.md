@@ -105,3 +105,36 @@ db.clientinfo.find({_id:'59C70824-120F-50AF-BE19-27F5EB359EED'}).explain()
 # 查看索引大小，indexSizes键
 db.clientinfo.stats()
 ```
+
+### 1.2.6. 聚合
+
+```
+db.user.aggregate([
+  {
+    $match: {
+      username: "heyc"
+    }
+  },
+  {
+    $lookup: {
+      from: "role",
+      localField: "role_name",
+      foreignField: "role_name",
+      as: "role_info"
+    }
+  },
+  {
+    $unwind: "$role_info"
+  },
+  {
+    $addFields: {
+      "role_id": "$role_info._id"
+    }
+  },
+  {
+    $project: {
+      "role_info": 0
+    }
+  }
+])
+```
