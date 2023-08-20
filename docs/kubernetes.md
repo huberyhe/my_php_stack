@@ -45,6 +45,10 @@ kubectl exec my-nginx-646554d7fd-5d7bk -- printenv
 
 # 查看容器日志
 kubectl logs my-nginx-646554d7fd-5d7bk
+
+# 查看 ReplicaSet 对象
+kubectl get replicasets
+kubectl describe replicasets
 ```
 
 ### 1.1.2. 创建服务
@@ -119,5 +123,78 @@ kubectl exec -it redis -- redis-cli
 
 
 
-## 1.2. 标题2
+## 1.2. 无状态应用
 
+无状态应用不需要持久化数据，方便水平扩展和故障恢复。
+
+
+
+php+redis的留言板应用示例
+
+```bash
+# 创建redis部署
+kubectl apply -f https://k8s.io/examples/application/guestbook/redis-leader-deployment.yaml
+# 创建redis领导者服务
+kubectl apply -f https://k8s.io/examples/application/guestbook/redis-leader-service.yaml
+
+# 创建redis部署
+kubectl apply -f https://k8s.io/examples/application/guestbook/redis-follower-deployment.yaml
+# 创建redis追随者服务
+kubectl apply -f https://k8s.io/examples/application/guestbook/redis-follower-service.yaml
+
+# 创建 Guestbook 前端 Deployment
+kubectl apply -f https://k8s.io/examples/application/guestbook/frontend-deployment.yaml
+# 创建前端服务
+kubectl apply -f https://k8s.io/examples/application/guestbook/frontend-service.yaml
+
+# 转发开放端口，访问 http://localhost:8080
+kubectl port-forward svc/frontend 8080:80
+```
+
+
+
+> 参考：[示例：使用 Redis 部署 PHP 留言板应用程序 | Kubernetes](https://kubernetes.io/zh-cn/docs/tutorials/stateless-application/guestbook/)
+
+## 1.3. 有状态应用
+
+有状态应用依赖持久化的状态，这些状态需要在应用迁移、扩展和故障恢复时得到保留。
+
+
+
+wordpress+mysql的博客应用示例
+
+
+
+```bash
+# 创建 PersistentVolumeClaims 和 PersistentVolumes
+
+# 创建 Secret 生成器
+cat <<EOF >./kustomization.yaml
+secretGenerator:
+- name: mysql-pass
+  literals:
+  - password=YOUR_PASSWORD
+EOF
+
+# 补充 MySQL 和 WordPress 的资源配置
+curl -LO https://k8s.io/examples/application/wordpress/mysql-deployment.yaml
+curl -LO https://k8s.io/examples/application/wordpress/wordpress-deployment.yaml
+cat <<EOF >>./kustomization.yaml
+resources:
+  - mysql-deployment.yaml
+  - wordpress-deployment.yaml
+EOF
+
+# 应用和验证
+kubectl apply -k ./
+kubectl get secrets
+kubectl get pvc
+kubectl get pods
+kubectl get services wordpress
+minikube service wordpress --url
+# 访问上一步的地址
+```
+
+
+
+> 参考：[示例：使用持久卷部署 WordPress 和 MySQL | Kubernetes](https://kubernetes.io/zh-cn/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/)

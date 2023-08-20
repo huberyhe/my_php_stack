@@ -82,37 +82,67 @@ git commit -a -m "revert to ..."
 
 ## 1.3. 代码合并的几种方法
 
-### 1.3.1 git merge
+### 1.3.1. 1.3.1 git merge
 
-### 1.3.2 git cherry-pick
+### 1.3.2. 1.3.2 git cherry-pick
 
 `git cherry-pick`命令的作用，就是将指定的提交（commit）应用于其他分支
 
 > 参考：[git cherry-pick 教程](https://www.ruanyifeng.com/blog/2020/04/git-cherry-pick.html)
 
-### 1.3.3 git merge --squash
+### 1.3.3. 1.3.3 git merge --squash
 
 > 参考：
 > 
 > 1. [Git合并那些事——认识几种Merge方法](https://morningspace.github.io/tech/git-merge-stories-1/)
 > 2. [github - What does it mean to squash commits in git?](https://stackoverflow.com/questions/35703556/what-does-it-mean-to-squash-commits-in-git)
 
-## 1.3. 其他命令
+## 1.4. 设置代理
 
-### 1.3.1. 查看任意目录的状态
+命令行设置
+
+```bash
+# 设置全局代理
+git config --global http.proxy socks5://127.0.0.1:1080
+git config --global https.proxy socks5://127.0.0.1:1080
+
+# 取消代理
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+# 针对github设置代理和取消代理
+git config --global http.https://github.com.proxy socks5://127.0.0.1:1080
+git config --global --unset http.https://github.com.proxy)
+```
+
+配置文件，修改`~/.ssh/config`
+
+```
+# linux
+ProxyCommand nc -X 5 -x 127.0.0.1:1080 %h %p
+
+# windows
+ProxyCommand connect -S 127.0.0.1:1080 %h %p
+```
+
+
+
+## 1.5. 其他命令
+
+### 1.5.1. 查看任意目录的状态
 
 ```bash
 git --git-dir=the/local/repo/.git --work-tree=the/local/repo status
 git -C the/local/repo status
 ```
 
-### 1.3.2. 判断当前目录是否为git仓库
+### 1.5.2. 判断当前目录是否为git仓库
 
 ```bash
 [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == "true" ]
 ```
 
-### 1.3.4. 文件可执行权限
+### 1.5.3. 文件可执行权限
 
 ```bash
 # 查看权限
@@ -121,7 +151,7 @@ git ls-files --stage test.sh
 git update-index --chmod=+x *.sh
 ```
 
-### 1.3.5. 换行符问题
+### 1.5.4. 换行符问题
 
 core.autocrlf
 - true：提交时转换为LF，检出时转换为CRLF
@@ -138,13 +168,13 @@ git config --global core.autocrlf input
 git config --global core.safecrlf true
 ```
 
-### 1.3.6. git log
+### 1.5.5. git log
 
 `git log --name-only` 显示每次提交修改的文件名
 `git log --name-status`显示每次提交修改的文件名和状态
 `git log --stat`显示每次提交修改的文件名和修改统计
 
-### 1.3.7. 归档
+### 1.5.6. 归档
 
 ```bash
 # 将仓库当前分支的最后一次提交，归档到/var/tmp/junk目录，不包含.git目录
@@ -153,7 +183,7 @@ git archive --format=tar --prefix=junk/ HEAD | (cd /var/tmp/ && tar xf -)
 tar --exclude-vcs -zcf foo.tar.gz ./FOLDER_NAME
 ```
 
-### 1.3.8. 全局gitignore
+### 1.5.7. 全局gitignore
 
 家目录下创建.gitignore文件，然后配置`core.excludesFile`
 
@@ -169,13 +199,13 @@ git config --global core.excludesFile "$Env:USERPROFILE\.gitignore"
 
 
 
-## 1.4. git客户端
+## 1.6. git客户端
 
-### 1.4.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
+### 1.6.1. [GitHub CLI](https://github.com/cli/cli#github-cli)，GitHub官方命令行工具
 
 ![screenshot of gh pr status](../imgs/84171218-327e7a80-aa40-11ea-8cd1-5177fc2d0e72.png)
 
-### 1.4.2. [Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
+### 1.6.2. [Fork](https://git-fork.com/)，Window和mac os下的桌面客户端
 
 ![image 1](../imgs/image1Win.jpg)
 
