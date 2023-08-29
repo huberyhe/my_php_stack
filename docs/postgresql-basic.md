@@ -54,6 +54,9 @@ mydb=#
 
 ```
 
+2.3、查看表定义使用`\d table_name`命令
+
+2.4、查看函数定义使用`\sf func_name`命令
 ## 1.4. 检查表、表字段是否存在
 
 表字段可以通过检查`INFORMATION_SCHEMA.COLUMNS`表，表可以通过`INFORMATION_SCHEMA.TABLES`表或`to_regclass('${tb_name}')`命令
@@ -272,3 +275,22 @@ pq: current transaction is aborted, commands ignored until end of transaction bl
 
 > 其他好文章：
 > 1、[PostgreSQL的并行查询](https://www.cnblogs.com/abclife/p/13952833.html)
+
+## 1.12. 加快总数统计的方法
+
+通过查询分析评估总数
+
+```
+CREATE OR REPLACE FUNCTION count_estimate(
+    query text
+) RETURNS integer LANGUAGE plpgsql AS $$
+DECLARE
+    plan jsonb;
+BEGIN
+    EXECUTE 'EXPLAIN (FORMAT JSON)' || query INTO plan;
+    RETURN plan->0->'Plan'->'Plan Rows';
+END;
+$$;
+```
+
+> 参考：[Count estimate - PostgreSQL wiki](https://wiki.postgresql.org/wiki/Count_estimate)

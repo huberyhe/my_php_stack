@@ -8,6 +8,10 @@
 
 ## 1.1. 基本概念
 
+基本元素：点node，边edge，点属性，边属性facets
+
+schema定义：点属性和边需要先定义类型和索引方式
+
 ## 1.2. 使用场景
 
 ### 1.2.1. 图数据库相对于关系数据库的优势
@@ -72,8 +76,6 @@ curl "localhost:8080/query" --silent --request POST \
 }
 ' | python -m json.tool | less
 ```
-
-
 
 修改和新增数据：
 
@@ -182,6 +184,100 @@ me：当前查询的名称
 
 定义：`q(func: ...) @groupby(predicate) { min(...) }`
 
+#### 7. 边属性facets
+
+定义：
+```
+<td.relation.policygroup_agent>: uid @reverse .
+```
+
+新增边：0x2715是策略uid，0x2711是终端uid
+```
+{
+  set {
+    <0x2715> <td.relation.policygroup_agent> <0x2711> .
+    <0x2715> <td.relation.policygroup_agent> <0x2711> (enable=1).
+  }
+}
+```
+
+表示策略拥有（下发给了）终端，状态为启用
+
+查看边和边属性：pg1获取所有边属性，pg2获取指定边属性，pg3获取边属性的别名，pg4过滤边属性。agent_policy获取终端上已绑定策略的策略信息，包含策略启用状态（即边属性）
+
+```
+{
+    var(func: uid(0x2711)) {
+        ~td.relation.policygroup_agent @facets(agent_bind as enable)
+    }
+    q(func: uid(0x2711)) {
+        pg1: ~td.relation.policygroup_agent @facets {
+          uid
+        }
+        pg2: ~td.relation.policygroup_agent @facets(enable) {
+          uid
+        }
+        pg3: ~td.relation.policygroup_agent @facets(bind_enable:enable) {
+          uid
+        }
+        pg4: ~td.relation.policygroup_agent @facets(eq(enable, 0)) {
+          uid
+        }
+    }
+    agent_policy(func: uid(agent_bind)) {
+        uid
+        td.attribute.name
+        td.attribute.type
+        td.attribute.description
+        bind_enable: val(agent_bind)
+    }
+}
+```
+
+得到：
+```json
+{
+    "q": [
+        {
+            "pg1": [
+                {
+                    "uid": "0x2715",
+                    "pg1|enable": 0
+                }
+            ],
+            "pg2": [
+                {
+                    "uid": "0x2715",
+                    "pg2|enable": 0
+                }
+            ],
+            "pg3": [
+                {
+                    "uid": "0x2715",
+                    "bind_enable": 0
+                }
+            ],
+            "pg4": [
+                {
+                    "uid": "0x2715"
+                }
+            ]
+        }
+    ],
+    "agent_policy": [
+        {
+            "uid": "0x2715",
+            "td.attribute.name": "215",
+            "td.attribute.type": "policygroup",
+            "td.attribute.description": "",
+            "bind_enable": 0
+        }
+    ]
+}
+```
+
+
+> 参考：[Facets and Edge attributes - Query language (dgraph.io)](https://dgraph.io/docs/query-language/facets/)
 ### 1.4.2. 新增
 
 ```dql
@@ -271,6 +367,19 @@ curl localhost:8080/health
 - zw：zero存储WAL文件的目录
 - p：alpha存储`posting lists`的目录
 - w：alpha存储`raft write-ahead logs`的目录
+
+## 1.10. schema
+
+定义字段类型为string，使用索引且索引类型为hash和fulltext。不同的索引类型支持的过滤方式不同，参考[过滤方法](https://dgraph.io/docs/query-language/functions/)
+
+```
+curl 'http://192.168.56.103:19191/alter' \
+  --data-raw '<td.attribute.accountlocked>: string @index(hash, fulltext) .' \
+  --compressed \
+  --insecure
+```
+
+
 
 > 参考：
 >
