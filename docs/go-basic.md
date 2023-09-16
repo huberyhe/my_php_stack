@@ -102,6 +102,7 @@ func Round(val float64, precision int) float64 {
 }
 ```
 
+注意：`fmt.Sprintf("%.1f", 0.25) == "0.2"`
 ## 1.4. 类型判断
 
 ### 1.4.1. switch
