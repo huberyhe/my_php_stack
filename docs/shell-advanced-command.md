@@ -686,6 +686,10 @@ find /wns/ -path /wns/docker_root -prune -o -type f -regextype posix-extended -r
 netstat -lpn | awk '{print $7}' | awk -F'/' '{print $1}' | xargs -I PID ps -q PID -o pid=,cmd= | sort -n | uniq
 ```
 
+## 1.8. 获取脚本调用者
 
+```bash
+PARENT_COMMAND=$(ps -o comm= $PPID)
+```
 
 [xargs 命令教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2019/08/xargs-tutorial.html)

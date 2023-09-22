@@ -2080,6 +2080,37 @@ CGO_ENABLED=1 CC=aarch64-linux-musl-gcc CXX=aarch64-linux-musl-g++ GOOS=linux GO
 go build --ldflags=--dumpdep main.go 2>&1 | grep inittask
 ```
 
+### 1.22.3. 编译时为变量赋值
+
+用于编译时为程序注入git等信息，类似dgraph
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+)
+var (
+    gitHash   string
+    buildTime string
+    goVersion string
+)
+func main() {
+    args := os.Args
+    if len(args) == 2 && (args[1] == "--version" || args[1] == "-v") {
+        fmt.Printf("Git Commit Hash: %s \n", gitHash)
+        fmt.Printf("Build TimeStamp: %s \n", buildTime)
+        fmt.Printf("GoLang Version: %s \n", goVersion)
+        return
+    }
+}
+```
+
+```bash
+go build -ldflags "-X 'main.goVersion=$(go version)' -X 'main.gitHash=$(git show -s --format=%H)' -X 'main.buildTime=$(git show -s --format=%cd)'" -o main.exe version.go
+```
+
 ## 1.23. init函数
 
 ### 1.23.1. 执行顺序
@@ -2231,7 +2262,7 @@ golang中分为值类型和引用类型
 
 引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
 
-值类型在函数传递后不会修改原数据，而值类型会同时修改
+值类型在函数传递后不会修改原数据，而引用类型会同时修改
 
 ```go
 package main

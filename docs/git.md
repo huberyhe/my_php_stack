@@ -133,6 +133,7 @@ ProxyCommand connect -S 127.0.0.1:1080 %h %p
 
 ```bash
 git --git-dir=the/local/repo/.git --work-tree=the/local/repo status
+
 git -C the/local/repo status
 ```
 
@@ -196,6 +197,12 @@ git config --global core.excludesFile "%USERPROFILE%\.gitignore"
 git config --global core.excludesFile "$Env:USERPROFILE\.gitignore"
 ```
 
+### 1.5.8. 获取当前hash id
+
+```bash
+git rev-parse --short HEAD
+git --no-pager show -s --format=%H
+```
 
 
 
