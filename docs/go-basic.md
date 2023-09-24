@@ -2832,6 +2832,57 @@ import (
 //go:embed preset_regex.json
 var presetRegex []byte
 ```
+## 1.42. 程序平滑退出
+
+linux下可以使用`man 7 signal`查看POSIX系统信号，常用的2是`ctrl+c`，15是`kill`，9是`kill -9`,9是无条件结束程序，不能被捕获。
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"os/signal"
+	"time"
+)
+
+func main() {
+	// 创建一个信号通道，用于接收操作系统的信号
+	sigChan := make(chan os.Signal, 1)
+
+	// 告诉 signal 包监听 SIGINT 和 SIGTERM 信号
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// 启动程序的主逻辑
+	go mainLogic()
+
+	// 等待信号
+	s := <-sigChan
+	fmt.Println("收到信号", s)
+
+	// 接收到信号后执行清理工作
+	cleanup()
+
+	// 退出程序
+	os.Exit(0)
+}
+
+func mainLogic() {
+	for {
+		// 执行程序的主要逻辑
+		fmt.Println("Working...")
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func cleanup() {
+	// 执行清理工作，例如关闭文件、数据库连接等
+	fmt.Println("Cleaning up...")
+}
+```
+
+
+
 # 2. 第三方包
 
 ## 2.1. Gorm
