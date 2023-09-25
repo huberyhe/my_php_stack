@@ -44,6 +44,8 @@ var val int
 val := 100
 ```
 
+根据经验，如果需要声明初始值为零值的变量，应该使用var关键字声明变量；如果提供确切的非零值初始化变量或者使用函数返回值创建变量，应该使用简化变量声明运算符。
+
 大部分类型在声明时会被系统初始化为零值，整型零值是0，字符串零值是空字符串，布尔零值是false
 
 指针类型不会被自动初始化，不能直接使用，比如：
@@ -103,9 +105,38 @@ func Round(val float64, precision int) float64 {
 ```
 
 注意：`fmt.Sprintf("%.1f", 0.25) == "0.2"`
-## 1.4. 类型判断
 
-### 1.4.1. switch
+## 1.4. 数组
+
+在函数间传递大数组时，应该使用指针
+
+## 1.5. 切片
+
+### 1.5.1. nil切片与空切片
+
+在需要描述一个不存在的切片时，nil切片会很好用。想表示空集合时空切片很好用。
+
+### 1.5.2. append时切片容量增长机制
+
+在切片的容量小于1000个元素时，总是会成倍地增加容量。一旦元素个数超过1000，容量的增长因子会设为1.25，也就是会每次增加25%的容量。
+
+### 1.5.3. 安全复制切片
+
+如果在创建切片时设置切片的容量和长度一样，就可以强制让新切片的第一个append操作创建一个新的底层数组，与原有的底层数组分离。分离后，可以安全地进行后续修改。
+
+```go
+source := []string{"Apple", "Orange", "Plum", "Banana", "Grape"}
+slice := source[2:3:3]
+slice = appen(slice, "Kiwi")
+```
+
+## 1.6. 映射
+
+映射是无序的集合，无序的原因是映射的实现使用了散列表。
+
+## 1.7. 类型判断
+
+### 1.7.1. switch
 
 ```go
 for k, v := range user5 {
@@ -128,11 +159,11 @@ for k, v := range user5 {
 ```
 
 
-### 1.4.2. reflect反射
+### 1.7.2. reflect反射
 
-## 1.5. 类型转换
+## 1.8. 类型转换
 
-### 1.5.1. 整型与字符串互转
+### 1.8.1. 整型与字符串互转
 
 ```go
 // string转成int
@@ -154,16 +185,70 @@ string := strconv.FormatInt(int64, 10)
 s := string(97) // s == "a"
 ```
 
-## 1.6. 常量
+## 1.9. 值类型、引用类型
 
-### 1.6.1. 整型最值
+golang中分为值类型和引用类型
+
+值类型分别有：int系列、float系列、bool、string、数组和结构体
+
+引用类型有：指针、slice切片、管道channel、接口interface、map、函数等
+
+值类型的特点是：变量直接存储值，内存通常在栈中分配
+
+引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
+
+值类型在函数传递后不会修改原数据，而引用类型会同时修改
+
+```go
+package main
+
+import "fmt"
+
+type ts struct {
+    A int
+}
+
+func t(st ts, s []int, m map[string]int) {
+    st.A = 11
+    s[0] = 11
+    m["a"] = 11
+
+    return
+}
+
+func main() {
+    st := ts{
+        A: 1,
+    }
+    s := []int{1,2,3}
+    m := map[string]int{
+        "a": 1,
+        "b": 2,
+        "c": 3,
+    }
+    t(st, s, m)
+    fmt.Println(st, s, m) // {1} [11 2 3] map[a:11 b:2 c:3]
+}
+```
+
+## 1.10. go中函数传参都是值传递
+
+在Go语言中，所有变量都以值的方式床底。因为指针变量的值是所指向的内存地址，在函数之间传递指针变量，是在传递这个地址值，所以依旧被看作以值的方式在传递。
+
+> 参考：
+> 
+> [Go语言参数传递是传值还是传引用](https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value)
+
+## 1.11. 常量
+
+### 1.11.1. 整型最值
 
 ```go
 math.MaxInt32
 math.MinInt32
 ```
 
-### 1.6.2. 模拟枚举
+### 1.11.2. 模拟枚举
 
 go没有提供枚举类型，但使用使用const枚举
 
@@ -190,9 +275,88 @@ func typeToName(_type EnumPolicyType) string {
 
 > 参考：[iota: Golang 中优雅的常量](https://segmentfault.com/a/1190000000656284)
 
-## 1.7. 正则
+## 1.12. 匿名函数与闭包
 
-### 1.7.1. 正则匹配
+匿名函数中使用外部变量，注意直接使用和通过参数使用的区别
+
+```go
+var wg sync.WaitGroup
+for _, c := range []string{"a", "b", "c"} {
+    go func() {
+        time.Sleep(1 * time.Second)
+        fmt.Println("func 1: ", c) // 运行时的值
+        wg.Done()
+    }()
+    wg.Add(1)
+
+    go func(c string) {
+        time.Sleep(2 * time.Second)
+        fmt.Println("func 2: ", c) // 调用时的值
+        wg.Done()
+    }(c)
+    wg.Add(1)
+
+    func(c string) {
+        go func() {
+            time.Sleep(3 * time.Second)
+            fmt.Println("func 3: ", c)
+            wg.Done()
+        }()
+    }(c)
+    wg.Add(1)
+
+}
+wg.Wait()
+```
+
+以上代码输出：
+
+```bash
+func 1:  c
+func 1:  c
+func 1:  c
+func 2:  a
+func 2:  c
+func 2:  b
+func 3:  c
+func 3:  b
+func 3:  a
+```
+
+闭包有局部变量，并返回一个函数变量，特点是这个函数可以多次使用局部变量，变量的值在闭包生命周期内可以保持。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	a := Fun()
+	b := a("hello ")
+	c := a("hello ")
+	fmt.Println(b) //worldhello
+	fmt.Println(c) //worldhello hello
+
+	a = Fun()
+	b = a("hi ")
+	c = a("hi")
+	fmt.Println(b) //worldhi 
+	fmt.Println(c) //worldhello hello
+
+}
+
+func Fun() func(string) string {
+	a := "world"
+	return func(args string) string {
+		a += args
+		return a
+	}
+}
+```
+
+## 1.13. 正则
+
+### 1.13.1. 正则匹配
 
 ```go
 name := regexp.MustCompile("[\u4e00-\u9fa5~!@#$%^&*(){}|<>\\\\/+\\-【】:\"?'：；‘’“”，。、《》\\]\\[`]")
@@ -201,7 +365,7 @@ if name.MatchString(param["username"]) {
 }
 ```
 
-### 1.7.2. 正则查找子串
+### 1.13.2. 正则查找子串
 
 ```go
 re := regexp.MustCompile(`<!--{{TPL_LIST_ITEM_START}}-->([\s\S]*?)<!--{{TPL_LIST_ITEM_END}}-->`)
@@ -215,7 +379,7 @@ if len(matches) > 1 {
 }
 ```
 
-### 1.7.3. 替换
+### 1.13.3. 替换
 
 ```go
 re, _ := regexp.Compile("a");
@@ -225,26 +389,26 @@ fmt.Println(rep) // Abcd
 
 
 
-## 1.8. 时间
+## 1.14. 时间
 
-### 1.8.1. `time.Now()`返回的是什么？
+### 1.14.1. `time.Now()`返回的是什么？
 
 返回的是当前时间的`time.Time`对象。
 
-### 1.8.2. 获取当前时间的时间戳
+### 1.14.2. 获取当前时间的时间戳
 
 ```go
 time.Now().Unix() // 1653194203
 ```
 
-### 1.8.3. 时间格式化
+### 1.14.3. 时间格式化
 
 ```go
 const TimeFormat = "2006-01-02 15:04:05"
 time.Now().Format(TimeFormat)
 ```
 
-### 1.8.4. 时间字符串生成时间对象，时间戳生成时间对象
+### 1.14.4. 时间字符串生成时间对象，时间戳生成时间对象
 
 ```go
 const TimeFormat = "2006-01-02 15:04:05"
@@ -285,22 +449,22 @@ fmt.Println(time.Now().In(cstSh))
 2022-12-23 17:09:29.9312074 +0800 CST
 ```
 
-### 1.8.5. 判断是否时零值
+### 1.14.5. 判断是否时零值
 
 ```go
 tn := time.Now()
 tn.IsZero()
 ```
 
-## 1.9. 文件
+## 1.15. 文件
 
-### 1.9.1. touch文件
+### 1.15.1. touch文件
 
 ```go
 os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
 ```
 
-### 1.9.2. 读写文件
+### 1.15.2. 读写文件
 
 ```go
 
@@ -345,9 +509,9 @@ func readByLine(fn string) (bs []string, err error)  {
 func ioutil.ReadFile(filename string) ([]byte, error)
 ```
 
-### 1.9.3. 实例：
+### 1.15.3. 实例：
 
-#### 1.9.3.1. 列出目录文件
+#### 1.15.3.1. 列出目录文件
 
 ```go
 func main() {
@@ -379,7 +543,7 @@ func listAll(path string, curHier int){
 }
 ```
 
-#### 1.9.3.2. 拷贝文件和文件夹
+#### 1.15.3.2. 拷贝文件和文件夹
 
 ```go
 func CopyDir(src, dst string) error {
@@ -425,7 +589,7 @@ func CopyFile(src, dst string) (err error) {
 }
 ```
 
-### 1.9.4. 移动与复制文件
+### 1.15.4. 移动与复制文件
 
 ```go
 // 移动文件
@@ -434,7 +598,7 @@ os.Rename("./aa/bb/c1/file.go", "./aa/bb/c2/file.go")
 // 复制文件。没有直接方法，就是读和写文件
 ```
 
-### 1.9.5. 文件名与后缀
+### 1.15.5. 文件名与后缀
 
 ```go
 fullFilename := "D:/software/Typora/bin/typora.exe"
@@ -451,14 +615,14 @@ filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
 fmt.Println("filenameOnly =", filenameOnly) // typora
 ```
 
-### 1.9.6. 删除文件和文件夹
+### 1.15.6. 删除文件和文件夹
 
 ```go
 err := os.Remove(file) // 文件夹必须为空
 err := os.RemoveAll(path) // 可以删除不为空的文件夹
 ```
 
-### 1.9.7. 路径存在判断
+### 1.15.7. 路径存在判断
 
 ```go
 func IsExists(path string) bool {
@@ -474,14 +638,14 @@ func IsExists(path string) bool {
 }
 ```
 
-### 1.9.8. 创建目录
+### 1.15.8. 创建目录
 
 ```go
 os.Mkdir("abc", os.ModePerm) //创建目录  
 os.MkdirAll("dir1/dir2/dir3", os.ModePerm) //创建多级目录
 ```
 
-### 1.9.9. 临时目录和文件
+### 1.15.9. 临时目录和文件
 
 1.16版本新增
 
@@ -490,7 +654,7 @@ os.MkdirTemp("", "sampledir")
 os.CreateTemp("", "sample")
 ```
 
-### 1.9.10. 文件md5
+### 1.15.10. 文件md5
 
 ```go
 func GetFileMD5(filePath string) (string, error) {
@@ -504,7 +668,7 @@ func GetFileMD5(filePath string) (string, error) {
 }
 ```
 
-### 1.9.11. zip文件解压
+### 1.15.11. zip文件解压
 
 ```go
 package fileHelper
@@ -612,9 +776,9 @@ func (uz *Unzip) Unzip(dest string) error {
 }
 ```
 
-## 1.10. 并发，协程与管道
+## 1.16. 并发，协程与管道
 
-### 1.10.1. 管道
+### 1.16.1. 管道
 
 只有可写的管道才能close，close应该在发送方执行
 
@@ -637,9 +801,9 @@ b := <- a
 - 读关闭的管道：返回未读完的数据或（0值，ok=false）
 
 
-### 1.10.2. 协程
+### 1.16.2. 协程
 
-#### 1.10.2.1. 协程池示例，用于计算数字各位的和
+#### 1.16.2.1. 协程池示例，用于计算数字各位的和
 
 输入12345，输出15(=1+2+3+4+5)
 
@@ -735,7 +899,7 @@ func main() {
 }
 ```
 
-#### 1.10.2.2. 控制协程数量
+#### 1.16.2.2. 控制协程数量
 
 ```go
 package main
@@ -813,7 +977,7 @@ func main() {
 
 
 
-#### 1.10.2.3. 面试题：交替输出
+#### 1.16.2.3. 面试题：交替输出
 
 ```go
 package main
@@ -848,22 +1012,22 @@ func main() {
 
 
 
-## 1.11. dlv调试
+## 1.17. dlv调试
 
-### 1.11.1. 调试时带上命令行参数，`--`后带上参数
+### 1.17.1. 调试时带上命令行参数，`--`后带上参数
 
 ```bash
 dlv debug main.go --output ./bin/license -- -c ./etc/license.json
 dlv exec ./bin/license -- -c ./etc/license.json
 ```
 
-### 1.11.2. 设置字符串可显示长度
+### 1.17.2. 设置字符串可显示长度
 
 ```
 config max-string-len 99999
 ```
 
-### 1.11.3. 常用命令
+### 1.17.3. 常用命令
 
 ```
 // 打断点
@@ -909,7 +1073,7 @@ trace
 > 参考：[delve/README.md at master · go-delve/delve · GitHub](https://github.com/go-delve/delve/blob/master/Documentation/cli/README.md)
 
 
-## 1.12. 数据库事务处理
+## 1.18. 数据库事务处理
 
 ```go
 db, err := postgreHelper.Open()
@@ -934,101 +1098,20 @@ defer func() {
 
 > 参考：[Golang transaction 事务使用的正确姿势](http://www.mspring.org/2019/03/18/Golang-transaction-事务使用的正确姿势/)
 
-## 1.13. 匿名函数与闭包
 
-匿名函数中使用外部变量，注意直接使用和通过参数使用的区别
+## 1.19. 锁
 
-```go
-var wg sync.WaitGroup
-for _, c := range []string{"a", "b", "c"} {
-    go func() {
-        time.Sleep(1 * time.Second)
-        fmt.Println("func 1: ", c) // 运行时的值
-        wg.Done()
-    }()
-    wg.Add(1)
-
-    go func(c string) {
-        time.Sleep(2 * time.Second)
-        fmt.Println("func 2: ", c) // 调用时的值
-        wg.Done()
-    }(c)
-    wg.Add(1)
-
-    func(c string) {
-        go func() {
-            time.Sleep(3 * time.Second)
-            fmt.Println("func 3: ", c)
-            wg.Done()
-        }()
-    }(c)
-    wg.Add(1)
-
-}
-wg.Wait()
-```
-
-以上代码输出：
-
-```bash
-func 1:  c
-func 1:  c
-func 1:  c
-func 2:  a
-func 2:  c
-func 2:  b
-func 3:  c
-func 3:  b
-func 3:  a
-```
-
-闭包有局部变量，并返回一个函数变量，特点是这个函数可以多次使用局部变量，变量的值在闭包生命周期内可以保持。
-
-```go
-package main
-
-import "fmt"
-
-func main() {
-	a := Fun()
-	b := a("hello ")
-	c := a("hello ")
-	fmt.Println(b) //worldhello
-	fmt.Println(c) //worldhello hello
-
-	a = Fun()
-	b = a("hi ")
-	c = a("hi")
-	fmt.Println(b) //worldhi 
-	fmt.Println(c) //worldhello hello
-
-}
-
-func Fun() func(string) string {
-	a := "world"
-	return func(args string) string {
-		a += args
-		return a
-	}
-}
-
-```
-
-
-
-## 1.14. 锁
-
-### 1.14.1. 并发锁 sync.Mutex与sync.RWMutex
+### 1.19.1. 并发锁 sync.Mutex与sync.RWMutex
 
 Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
 
 RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写
 
-### 1.14.2. 锁的实现原理
+### 1.19.2. 锁的实现原理
 
 原子的比较交换操作：`atomic.CompareAndSwapInt32`
 
-### 1.14.3. channel实现互斥锁
+### 1.19.3. channel实现互斥锁
 
 使用缓冲长度为1的channel，加锁为读，解锁为写。
 
@@ -1105,7 +1188,7 @@ func main() {
 }
 ```
 
-### 1.14.4. 文件锁
+### 1.19.4. 文件锁
 
 ```go
 func main() {
@@ -1135,9 +1218,9 @@ func main() {
 
 
 
-## 1.15. 使用避坑
+## 1.20. 使用避坑
 
-### 1.15.1. 修改全局变量的问题
+### 1.20.1. 修改全局变量的问题
 
 ```go
 package main
@@ -1213,7 +1296,7 @@ d value: 4, point: 0x5131d8
 b value: 6, point: 0xc00009c020
 ```
 
-## 1.16. map并发问题
+## 1.21. map并发问题
 
 并发写一个map会出现问题，运行时报错：`fatal error: concurrent map read and map write`
 
@@ -1279,7 +1362,7 @@ scene.Range(func(k, v interface{}) bool {
 })
 ```
 
-## 1.17. logrus使用
+## 1.22. logrus使用
 
 logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: Structured, pluggable logging for Go](https://github.com/sirupsen/logrus)。其他常用日志库还有[Zerolog](https://github.com/rs/zerolog)、 [Zap](https://github.com/uber-go/zap)和[Apex](https://github.com/apex/log).
 
@@ -1287,7 +1370,7 @@ logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: St
 
 ![image-20220526100147494](../imgs/image-20220526100147494.png)
 
-### 1.17.1. 配置formater，指定日志输入格式
+### 1.22.1. 配置formater，指定日志输入格式
 
 ```go
 type TopLog struct {
@@ -1382,7 +1465,7 @@ func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 ```
 
-### 1.17.2. 配置gorm使用logrus
+### 1.22.2. 配置gorm使用logrus
 
 ```go
 type Database struct {
@@ -1476,11 +1559,11 @@ func (*GormLogger) Print(v ...interface{}) {
 }
 ```
 
-## 1.18. 性能问题分析与相关工具
+## 1.23. 性能问题分析与相关工具
 
-### 1.18.1. pprof
+### 1.23.1. pprof
 
-#### 1. 修改代码启用pprof
+#### 1.23.1.1. 修改代码启用pprof
 
 ```go
 package data
@@ -1519,17 +1602,17 @@ func main() {
 }
 ```
 
-#### 2. 页面查看pprof
+#### 1.23.1.2. 页面查看pprof
 
 [192.168.56.103:6060/debug/pprof/heap?debug=1](http://192.168.56.103:6060/debug/pprof/heap?debug=1)
 
-#### 4. go tool pprof 命令行查看
+#### 1.23.1.3. go tool pprof 命令行查看
 
 ```bash
 go tool pprof -inuse_space  http://127.0.0.1:6060/debug/pprof/heap
 ```
 
-#### 5. go tool pprof 图形化查看
+#### 1.23.1.4. go tool pprof 图形化查看
 
 ```bash
 go tool pprof -http=0.0.0.0:8081  http://127.0.0.1:6060/debug/pprof/heap
@@ -1545,7 +1628,7 @@ go tool pprof -http=0.0.0.0:8081  http://127.0.0.1:6060/debug/pprof/heap
 > 参考：[golang 内存分析/动态追踪](https://lrita.github.io/2017/05/26/golang-memory-pprof/#go-tool)
 
 
-### 1.18.2. gops进程诊断工具
+### 1.23.2. gops进程诊断工具
 
 在go 1.17以上版本下安装
 
@@ -1612,7 +1695,7 @@ Use "gops [command] --help" for more information about a command.
 > 参考：[Go 进程诊断工具 gops](https://golang2.eddycjy.com/posts/ch6/06-gops/)
 
 
-### 1.18.3. 开启gc状态打印
+### 1.23.3. 开启gc状态打印
 
 ```bash
 GODEBUG=gctrace=1 /opt/topsec/topihs/TopIHS/debug/patch-srv
@@ -1659,7 +1742,7 @@ VmSwap:	       0 kB
 主动触发gc：`runtime.GC`
 触发将内存归还给操作系统的行为：`debug.FreeOSMemory`
 
-### 1.18.4. 打印内存状态
+### 1.23.4. 打印内存状态
 
 ```go
 func print_heap_info() {
@@ -1670,7 +1753,7 @@ func print_heap_info() {
 }
 ```
 
-### 1.18.5. 竞态检测，提前发现内存并发问题
+### 1.23.5. 竞态检测，提前发现内存并发问题
 
 ```bash
 go run -race mysrc.go
@@ -1678,7 +1761,7 @@ go run -race mysrc.go
 
 > 参考：[Go 译文之竞态检测器 race](https://juejin.cn/post/6844903918233714695)
 
-### 1.18.6. 内存逃逸分析
+### 1.23.6. 内存逃逸分析
 
 1. 内存分配到堆上的影响
 
@@ -1705,9 +1788,9 @@ go tool compile -S main.go
 
 > 参考：[1.9 我要在栈上。不，你应该在堆上](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)
 
-## 1.19. 高并发与性能优化
+## 1.24. 高并发与性能优化
 
-### 1.19.1. sync.Pool
+### 1.24.1. sync.Pool
 
 ```go
 package main
@@ -1750,7 +1833,7 @@ func main() {
 
 > 参考：[深度解密 Go 语言之 sync.Pool](https://www.cnblogs.com/qcrao-2018/p/12736031.html)
 
-### 1.19.2. 变量的线程安全问题
+### 1.24.2. 变量的线程安全问题
 
 对于变量的并发访问往往会产生竞态问题，不同类型由于实现方式不同产生竞态问题的条件也不同，具体可在运行或编译时加`--race`参数检测
 
@@ -1758,7 +1841,7 @@ func main() {
 
 > 参考：[go - Can I concurrently write different slice elements - Stack Overflow](https://stackoverflow.com/questions/49879322/can-i-concurrently-write-different-slice-elements)
 
-#### 1.19.2.1. 并发安全的数据类型
+#### 1.24.2.1. 并发安全的数据类型
 
 - 原子操作
 - 通道Channel
@@ -1768,10 +1851,10 @@ func main() {
 
 基础数据类型整型、字符串、数组、切片、map等都**不是**线程安全的
 
-#### 1.19.2.2. sync/atomic
+#### 1.24.2.2. sync/atomic
 
 
-#### 1.19.2.3. sync.Map，支持线程安全的map
+#### 1.24.2.3. sync.Map，支持线程安全的map
 
 ```go
 package main
@@ -1815,7 +1898,7 @@ func main()  {
 > 参考：[深度解密 Go 语言之 sync.map](https://www.cnblogs.com/qcrao-2018/p/12833787.html)
 
 
-### 1.19.3. bytes.Buffer
+### 1.24.3. bytes.Buffer
 
 ```
 # 丢弃一个io.Reader
@@ -1823,7 +1906,7 @@ io.Copy(ioutil.Discard, dataIn)
 ```
 
 
-### 实例：读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
+### 1.24.4. 实例：读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
 
 优化前，直接把上传的文件读到内存并解析
 
@@ -1874,7 +1957,7 @@ _ = decoder.Decode(&head)
 > 
 > 2、[内存泄漏的在线排查](https://panzhongxian.cn/cn/2020/12/memory-leak-problem-1/)
 
-## 1.20. 多协程并发的优秀实现
+## 1.25. 多协程并发的优秀实现
 
 几个原则：
 
@@ -1934,9 +2017,9 @@ func main() {
 
 该实现中，任何一个服务遇到错误时另外一个服务都能干净地退出，由系统的进程管理器来重启
 
-## 1.21. 错误处理
+## 1.26. 错误处理
 
-### 1.21.1. 错误处理注意三点：
+### 1.26.1. 错误处理注意三点：
 
 - 错误只处理一次，避免出现重复的日志
 - 错误应该包含相关信息，从错误文字上就能大概判断错误位置
@@ -1993,7 +2076,7 @@ runtime.goexit
 exit status 1
 ```
 
-### 1.21.2. 自定义错误
+### 1.26.2. 自定义错误
 
 根据error接口定义，自定义错误只要实现了Error方法即可
 ```go
@@ -2042,7 +2125,7 @@ func main() {
 }
 ```
 
-## 1.22. go build参数
+## 1.27. go build参数
 
 ```
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l" -mod=vendor -o runtime/bin/license-srv cmd/main.go
@@ -2062,7 +2145,7 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 -s 禁用符号表
 
-### 1.22.1. cgo交叉编译
+### 1.27.1. cgo交叉编译
 
 在[Index of /x86_64-linux-musl/](https://more.musl.cc/x86_64-linux-musl/)下载对应平台的`*-linux-musl-cross.tgz / `，解压后添加到PATH。
 
@@ -2074,13 +2157,13 @@ CGO_ENABLED=1 CC=aarch64-linux-musl-gcc CXX=aarch64-linux-musl-g++ GOOS=linux GO
 
 > 参考：[CGO 交叉静态编译 · Issue #27 · eyasliu/blog (github.com)](https://github.com/eyasliu/blog/issues/27)
 
-### 1.22.2. 查看初始化过程
+### 1.27.2. 查看初始化过程
 
 ```bash
 go build --ldflags=--dumpdep main.go 2>&1 | grep inittask
 ```
 
-### 1.22.3. 编译时为变量赋值
+### 1.27.3. 编译时为变量赋值
 
 用于编译时为程序注入git等信息，类似dgraph
 
@@ -2111,9 +2194,25 @@ func main() {
 go build -ldflags "-X 'main.goVersion=$(go version)' -X 'main.gitHash=$(git show -s --format=%H)' -X 'main.buildTime=$(git show -s --format=%cd)'" -o main.exe version.go
 ```
 
-## 1.23. init函数
+### 1.27.4. 指定包时使用通配符
 
-### 1.23.1. 执行顺序
+3个点表示匹配所有的字符串。下面命令会编译chapter3目录下的所有包：
+
+```go
+go build github.com/goinaction/code/chapter3/...
+```
+
+
+
+
+## 1.28. go build缓存目录
+
+缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
+
+
+## 1.29. init函数
+
+### 1.29.1. 执行顺序
 
 `import --> const --> var --> init()`
 
@@ -2124,7 +2223,7 @@ go build -ldflags "-X 'main.goVersion=$(go version)' -X 'main.gitHash=$(git show
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
 
-### 1.23.2. 使用原则
+### 1.29.2. 使用原则
 
 init 函数通常用于：
 
@@ -2142,11 +2241,11 @@ init 函数通常用于：
 
 > 参考：[答应我，别在go项目中用init()了](https://studygolang.com/articles/34488)
 
-## 1.24. context的使用
+## 1.30. context的使用
 
 context 用来解决 goroutine 之间*退出通知*、*元数据传递*的功能。
 
-### 1.24.1. 停止协程
+### 1.30.1. 停止协程
 
 ```go
 package main
@@ -2200,7 +2299,7 @@ func main() {
 
 > 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
 
-### 1.24.2. 协程超时
+### 1.30.2. 协程超时
 
 `context.WithTimeout`返回上下文和一个取消方法。`ctx.Done`会在超时时间到达，或执行取消方法时收到消息。
 
@@ -2222,7 +2321,7 @@ time.Sleep(5*time.Second)
 cancel()
 ```
 
-### 1.24.3. 元数据传递
+### 1.30.3. 元数据传递
 
 ```go
 package main
@@ -2250,74 +2349,19 @@ func process(ctx context.Context) {
 }
 ```
 
-## 1.25. 值类型、引用类型
+## 1.31. 编码规范
 
-golang中分为值类型和引用类型
-
-值类型分别有：int系列、float系列、bool、string、数组和结构体
-
-引用类型有：指针、slice切片、管道channel、接口interface、map、函数等
-
-值类型的特点是：变量直接存储值，内存通常在栈中分配
-
-引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
-
-值类型在函数传递后不会修改原数据，而引用类型会同时修改
-
-```go
-package main
-
-import "fmt"
-
-type ts struct {
-    A int
-}
-
-func t(st ts, s []int, m map[string]int) {
-    st.A = 11
-    s[0] = 11
-    m["a"] = 11
-
-    return
-}
-
-func main() {
-    st := ts{
-        A: 1,
-    }
-    s := []int{1,2,3}
-    m := map[string]int{
-        "a": 1,
-        "b": 2,
-        "c": 3,
-    }
-    t(st, s, m)
-    fmt.Println(st, s, m) // {1} [11 2 3] map[a:11 b:2 c:3]
-}
-```
-
-## 1.26. go中函数传参都是值传递
-
-> 参考：
-> 
-> [Go语言参数传递是传值还是传引用](https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value)
-
-## 1.27. go build缓存目录
-
-缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
-
-## 1.28. 编码规范
-
-### 1.28.1. 命名规范
+### 1.31.1. 命名规范
 
 - 文件名全部小写，除单元测试外避免使用下划线
 - 变量名、常量、函数名使用驼峰式命名，不建议使用下划线和数字
+- 命名接口。如果接口类型只包含一个方法，那么这个类型的名字以er结尾。如果接口类型内部声明了多个方法，其名字需要与其行为关联。
 
 > 参考：[命名规范 | go-zero](https://go-zero.dev/cn/docs/develop/naming-spec/)
 
-## 1.29. 错误处理，error与panic
+## 1.32. 错误处理，error与panic
 
-### 1.29.1. 自定义error
+### 1.32.1. 自定义error
 
 error接口定义：
 ```go
@@ -2375,7 +2419,7 @@ switch err.(type)
 }
 ```
 
-### 1.29.2. panic恢复
+### 1.32.2. panic恢复
 
 1. 程序中非致命的问题应避免使用panic，除非目的就是要中断程序（当前协程）
 2. 守护型协程应该使用recover捕获panic并恢复，避免协程由于异常退出
@@ -2429,7 +2473,7 @@ func main() {
 }
 
 ```
-## 1.30. 内置排序方法
+## 1.33. 内置排序方法
 
 使用内置排序需要实现`sort.Interface`接口
 ```go
@@ -2494,15 +2538,15 @@ func main() {
 }
 ```
 
-## 1.31. GMP模型与调度流程
+## 1.34. GMP模型与调度流程
 
-### 1.31.1. GMP模型
+### 1.34.1. GMP模型
 
 - G（Goroutine）：协程
 - M（Machine）：对内核级线程的封装
 - P（Processor）：即为G和M的调度对象，用来调度G和M之间的关联关系，其数量可通过GoMAXPROCS()来设置，默认为核心数
 
-### 1.31.2. 调度流程
+### 1.34.2. 调度流程
 
 1. 存在一个全局G队列
 2. 每个P有一个局部G队列，
@@ -2512,11 +2556,11 @@ func main() {
 
 > 参考：[用 GODEBUG 看调度跟踪](https://golang2.eddycjy.com/posts/ch6/04-godebug-sched/)
 
-## 1.32. GC垃圾回收
+## 1.35. GC垃圾回收
 
-### 1.32.1. 三色标记法
+### 1.35.1. 三色标记法
 
-### 1.32.2. GC触发时机
+### 1.35.2. GC触发时机
 
 自动GC
 
@@ -2524,14 +2568,14 @@ func main() {
 
 手动GC：`runtime.GC`
 
-### 1.32.3. GC流程
+### 1.35.3. GC流程
 
 
 > 参考：[用 GODEBUG 看 GC](https://golang2.eddycjy.com/posts/ch6/05-godebug-gc/)
 
-## 1.33. 变量分配在堆上还是栈上，内存逃逸分析
+## 1.36. 变量分配在堆上还是栈上，内存逃逸分析
 
-### 1.33.1. 哪些情况会分配到堆上
+### 1.36.1. 哪些情况会分配到堆上
 
 1. Go 中声明一个函数内局部变量时，当编译器发现变量的作用域没有逃出函数范围时，就会在栈上分配内存，反之则分配在堆上，逃逸分析由编译器完成，作用于编译阶段
 2. 指针类型的变量
@@ -2539,7 +2583,7 @@ func main() {
 4. 动态类型：返回返回一个interface{}类型
 5. 闭包引用对象
 
-### 1.33.2. 检查该变量是在栈上分配还是堆上分配
+### 1.36.2. 检查该变量是在栈上分配还是堆上分配
 
 有两种方式可以确定变量是在堆还是在栈上分配内存:
 -   通过编译后生成的汇编函数来确认，在堆上分配内存的变量都会调用 runtime 包的 `newobject` 函数；
@@ -2557,7 +2601,7 @@ go build -gcflags "-m -l" main.go
 > 1. [Frequently Asked Questions (FAQ) - The Go Programming Language](https://go.dev/doc/faq#stack_or_heap)
 > 2. [golang 中函数使用值返回与指针返回的区别，底层原理分析](https://cloud.tencent.com/developer/article/1890639)
 
-## 1.34. 内部包internal
+## 1.37. 内部包internal
 
 内部包的规范约定：导出路径包含`internal`关键字的包，只允许`internal`的父级目录及父级目录的子包导入，其它包无法导入。
 
@@ -2582,7 +2626,7 @@ go build -gcflags "-m -l" main.go
 
 如上包结构的程序，`resources/internal/cpu`和`resources/internal/mem`只能被`resources`包及其子包`resources/input`中的代码导入，不能被`prototype`包里的代码导入。
 
-## 1.35. json struct tag
+## 1.38. json struct tag
 
 1）不指定tag
 
@@ -2646,7 +2690,7 @@ Int64String int64 json:",string" // “Int64String”:“0”
 
 “string” opt的使用可以在Marshal/Unmarshal时自动进行数据类型的转换，减少了手动数据转换的麻烦，但是一定要注意使用的范围，对不满足的类型使用，是会报错的。
 
-## 1.36. 反射reflect的使用
+## 1.39. 反射reflect的使用
 
 一个ORM的例子，传入对象，生成一个插入sql：
 
@@ -2709,7 +2753,7 @@ func TestMakeCreateSql(t *testing.T) {
 	}
 }
 ```
-## 1.37. unsafe的使用
+## 1.40. unsafe的使用
 
 `unsafe.Pointer`表示任意类型且可寻址的指针值，可以在不同的指针类型之间进行转换（类似 C 语言的 void * 的用途）。其包含四种核心操作：
 
@@ -2738,17 +2782,17 @@ func main(){
 }
 ```
 
-## 1.38. runtime包的使用
+## 1.41. runtime包的使用
 
-### 1.38.1. 打印堆栈
+### 1.41.1. 打印堆栈
 
 ```go
 debug.PrintStack()
 ```
 
-## 1.39. http包的使用
+## 1.42. http包的使用
 
-### 1.39.1. 转发请求
+### 1.42.1. 转发请求
 
 ```go
 func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
@@ -2779,7 +2823,7 @@ func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
 }
 ```
 
-## 1.40. switch
+## 1.43. switch的使用
 
 1、switch后可不跟变量
 2、case隐式break，只要匹配上就break不再匹配。如果需要匹配多个case，可使用fallthrough
@@ -2818,7 +2862,7 @@ Clean your house.
 Buy some wine.
 ```
 
-## 1.41. embed文件嵌入
+## 1.44. embed文件嵌入
 
 1.16版本引入
 
@@ -2832,7 +2876,7 @@ import (
 //go:embed preset_regex.json
 var presetRegex []byte
 ```
-## 1.42. 程序平滑退出
+## 1.45. 程序平滑退出
 
 linux下可以使用`man 7 signal`查看POSIX系统信号，常用的2是`ctrl+c`，15是`kill`，9是`kill -9`,9是无条件结束程序，不能被捕获。
 
