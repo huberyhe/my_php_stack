@@ -294,3 +294,13 @@ $$;
 ```
 
 > 参考：[Count estimate - PostgreSQL wiki](https://wiki.postgresql.org/wiki/Count_estimate)
+
+## 1.13. 服务平滑退出
+
+```bash
+kill -INT $main_pid
+```
+
+> 参考：
+> [What is the graceful way to stop (kill) postmaster? (narkive.com)](https://pgsql-general.postgresql.narkive.com/HbcAI6zm/what-is-the-graceful-way-to-stop-kill-postmaster)
+> [PostgreSQL: Documentation: 16: 19.3. Starting the Database Server](https://www.postgresql.org/docs/current/server-start.html)

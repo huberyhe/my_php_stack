@@ -675,9 +675,7 @@ grep -P
 
 ## 1.5. getopts获取命令行参数
 
-## 1.6. trap信号处理
-
-## 1.7. xargs
+## 1.6. xargs
 
 ```bash
 # 哪些目录包含图片文件
@@ -685,11 +683,3 @@ find /wns/ -path /wns/docker_root -prune -o -type f -name *.jpg -print0 | xargs 
 find /wns/ -path /wns/docker_root -prune -o -type f -regextype posix-extended -regex ".*\.(jpg|png|gif)" -print0 | xargs -0 dirname | uniq
 netstat -lpn | awk '{print $7}' | awk -F'/' '{print $1}' | xargs -I PID ps -q PID -o pid=,cmd= | sort -n | uniq
 ```
-
-## 1.8. 获取脚本调用者
-
-```bash
-PARENT_COMMAND=$(ps -o comm= $PPID)
-```
-
-[xargs 命令教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2019/08/xargs-tutorial.html)

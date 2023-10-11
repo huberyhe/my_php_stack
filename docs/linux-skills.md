@@ -397,6 +397,31 @@ WantedBy=app.service
 >
 > 7 、[Controlling a Multi-Service Application with systemd](https://alesnosek.com/blog/2016/12/04/controlling-a-multi-service-application-with-systemd/)
 
+### 1.3.7. 由主进程管理子进程
+
+systemd在停止服务时默认会kill掉所有子进程，导致子进程可能没有被正常关闭。在需要子进程被主进程管理，而不是被systemd管理时，可以设置`KillMode=process`
+
+```
+[Unit]
+Description=Server commander
+After=network.target
+
+[Service]
+User=serveruser
+Type=forking
+PIDFile=/var/Server/Server.pid
+
+ExecStart=/var/Server/Server.py
+ExecStop=/bin/kill -s TERM $MAINPID
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> 参考：
+> [Systemd and process spawning: child processes are killed when main process exits - Unix & Linux Stack Exchange](https://unix.stackexchange.com/questions/204922/systemd-and-process-spawning-child-processes-are-killed-when-main-process-exits)
+> [systemd.kill (www.freedesktop.org)](https://www.freedesktop.org/software/systemd/man/systemd.kill.html#KillMode=)
 ## 1.4. 进程管理supervisord
 
 ## 1.5. 日志文件管理logrotate

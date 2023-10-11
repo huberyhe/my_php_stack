@@ -348,3 +348,56 @@ adddate() {
 ./theotherscript.sh | adddate >>/var/log/logfile
 ```
 
+## 1.17. trap信号处理
+
+可以使用trap捕获`Ctrl+C`和`kill`信号。`trap -l`列出了系统支持的信号，常见的如`SIGTERM`和`SIGINT`。
+
+```bash
+trap command signal
+```
+
+例如：
+
+```bash
+trap 'goto_exit;exit' SIGTERM SIGINT
+
+function goto_exit() {
+    echo "receive stop signal, daemon now exiting ..."
+    exit
+}
+```
+
+忽略信号：
+```bash
+trap "" 2 # 使用Ctrl+c快捷键将无任何操作
+```
+
+恢复信号：
+```bash
+trap ':' 1 2 3 20 15 # 该命令即可恢复指定信号
+```
+
+重置 SIGINT，即使用系统默认的信号处理函数：
+```
+trap - SIGINT
+```
+
+> 参考：[Linux信号和trap命令的使用](https://www.cnblogs.com/liuhedong/p/10663842.html)
+## 1.18. 获取脚本调用者
+
+```bash
+PARENT_COMMAND=$(ps -o comm= $PPID)
+```
+
+[xargs 命令教程 - 阮一峰的网络日志 (ruanyifeng.com)](https://www.ruanyifeng.com/blog/2019/08/xargs-tutorial.html)
+
+## 1.19. 等待进程退出
+
+```bash
+while kill -0 $PID; do 
+    sleep 1
+done
+
+# 或者，对于当前shell的子进程
+wait $PID
+```
