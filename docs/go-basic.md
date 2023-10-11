@@ -1848,7 +1848,7 @@ func main() {
 - 通道Channel
 - WaitGroup
 - 互斥锁Mutex
-- 读写锁RWMutet
+- 读写锁RWMutex
 
 基础数据类型整型、字符串、数组、切片、map等都**不是**线程安全的
 
@@ -2928,7 +2928,44 @@ func cleanup() {
 
 ## 1.46. 定时器
 
-sleep after tick 的区别
+定时器方法：
+
+- `time.Sleep`：阻塞一段时间
+- `time.NewTimer`：定时器，一段时间后发送消息到通道，重置后可重复使用。需要Stop释放
+- `time.After`：一段时间后发送消息到通道
+- `time.AfterFunc`：一段时间后执行一个回调函数
+- `time.NewTicker`：重复定时器。从new开始，每隔一段时间往通道里发送一个消息。如果通道里已经有消息，则丢弃。需要Stop释放
+- `time.Tick`：NewTicker的简化版本，无法Stop，所有有泄露风险
+
+
+
+例如：
+
+```go
+func testTicker() {
+	tn := time.Now()
+	tm := time.NewTicker(10 * time.Second) // 从new开始，每10s往通道里发送一个消息。如果通道里已经有消息，则丢弃。
+	defer tm.Stop()
+
+	<-tm.C
+	fmt.Println(time.Since(tn).Seconds(), "tick n1")
+
+	time.Sleep(11 * time.Second)
+	<-tm.C
+	fmt.Println(time.Since(tn).Seconds(), "tick n2")
+
+	<-tm.C
+	fmt.Println(time.Since(tn).Seconds(), "tick n3")
+}
+```
+
+打印如下，n2在sleep后立即打印，n3在第30s打印
+
+```bash
+10.0146309 tick n1
+21.0167355 tick n2
+30.0111594 tick n3
+```
 
 # 2. 第三方包
 
