@@ -56,7 +56,7 @@ e7356180b1d1 vh_push
 f03974f382e9 vh_wxwifi
 ```
 
-> 支持的占位符：[docker ps | Docker Documentation](https://docs.docker.com/engine/reference/commandline/ps/#formatting)
+> 支持的占位符：[docker ps | Docker Docs](https://docs.docker.com/engine/reference/commandline/ps/#format)
 
 ## 1.6. 列出容器IP
 
