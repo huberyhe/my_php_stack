@@ -255,7 +255,7 @@ keys可以模糊匹配，但是会一次返回所有符合条件的key，scan的
 
 ## 1.5. 集群
 
-### 1.5.1. 同步模式
+### 1.5.1. 复制模式
 
 主从同步、从从同步：集群中为减轻主节点的压力，可以使用*从从同步*和*无盘复制*
 
@@ -264,6 +264,20 @@ keys可以模糊匹配，但是会一次返回所有符合条件的key，scan的
 CAP原理：当网络分区发生时，一致性和可用性两难全。两节点无法通信时，一个节点数据的修改无法同步到另外一个节点，所以数据的一致性无法满足，除非牺牲可用性，停止提供修改数据的功能。
 
 redis数据是异步同步的，不满足一致性要求，只保证最终一致性。使用`wait`指令可确数据修改后的强一致性。
+
+配置主节点：
+
+```bash
+# 命令或配置
+slaveof ip port
+slave-read-only yes
+# 命令，取消复制
+slaveof no one
+# 命令，查看复制状态
+info replication
+```
+
+
 
 ### 1.5.2. 哨兵模式 Sentinel
 
@@ -293,6 +307,61 @@ min-slaves-max-lag 10
 2、同时实现高可用和分片
 
 3、需要客户端支持。
+
+
+
+哈希分片
+
+1、节点取余：`hash(key)%nodes_cnt`
+
+扩容问题：翻倍扩容，避免相互大量迁移和流量不均匀
+
+2、一致性哈希：哈希+顺时针（优化取余）
+
+节点伸缩时只影响临近的节点，建议采用翻倍扩容保证最小迁移数据和负载均衡
+
+3、虚拟槽分区：服务端管理节点、槽和数据的关系，redis cluster
+
+
+
+搭建步骤：
+
+1、准备节点
+
+2、节点握手meet
+
+3、分配槽
+
+4、分配主从
+
+```bash
+# 集群信息
+> cluster info
+# 集群节点
+> cluster nodes
+# 配置主从
+> cluster replicate <node_id>
+# 分配槽
+> cluster addslots 0
+# 查看槽的分配关系
+> cluster slots
+
+# 集群下数据操作
+redis-cli -c -p 7000 set hello world
+```
+
+以上搭建集群的操作可以用官方工具`redis-trib.rb`
+
+```bash
+# 完成握手、分配槽、分配主从
+redis-trib.rb create --replicas 1 127.0.0.1:8001 127.0.0.1:8002 127.0.0.1:8003 127.0.0.1:8004 127.0.0.1:8005 127.0.0.1:8006
+# 新节点加入集群
+redis-trib.rb add-node 127.0.0.1:8007 127.0.0.1:8008
+# 迁移槽和数据
+
+```
+
+
 
 ## 1.6. 消息队列
 
@@ -408,7 +477,17 @@ mem_allocator:libc
 
 ### 2. 生成快照 SAVE/BGSAVE
 
+### 3. AOF重写 BGREWRITEAOF
+
 ### 3. 查看配置 config 
+
+查看所有配置
+
+```bash
+config get *
+```
+
+
 
 查看安装目录
 
@@ -433,3 +512,166 @@ mem_allocator:libc
 1) "save"
 2) "900 1 300 10 60 10000"
 ```
+
+查看aof重写配置
+
+```bash
+127.0.0.1:6379> config get auto-aof-*
+1) "auto-aof-rewrite-percentage"
+2) "100"
+3) "auto-aof-rewrite-min-size"
+4) "67108864"
+127.0.0.1:6379> config get *append*
+ 1) "appendfsync"
+ 2) "everysec"
+ 3) "no-appendfsync-on-rewrite"
+ 4) "no"
+ 5) "appendfilename"
+ 6) "appendonly.aof"
+ 7) "appenddirname"
+ 8) "appendonlydir"
+ 9) "appendonly"
+10) "no"
+```
+
+
+
+## 1.10. 慢查询
+
+### 1. 查看慢日志配置
+
+默认慢日志条数100，慢查询阈值10000微秒
+
+```
+127.0.0.1:6379> config get slowlog-max-len
+1) "slowlog-max-len"
+2) "128"
+127.0.0.1:6379> config get slowlog-log-slower-than
+1) "slowlog-log-slower-than"
+2) "10000"
+127.0.0.1:6379>
+```
+
+### 2. 查看慢日志
+
+redis的慢日志存放在内存中
+
+```bash
+# 获取1条慢查询日志
+slowlog get 1
+
+# 获取慢查询日志队列长度
+slowlog len
+
+# 清空慢查询
+slowlog reset
+
+```
+
+## 2. 运维和优化
+
+### 2.1. fork操作
+
+fork是同步操作，`info latest_fork_usec`可以看到上次fork耗时
+
+1、合适的器硬件
+
+2、控制redis实例的最大可用内存：maxmemory
+
+3、合理配置linux内存分配策略：vm.overcommit_memory=1
+
+4、降低fork频率：例如放宽aof重写自动触发时机，不必要的全量复制
+
+
+
+### 2.2. 子进程开销和优化
+
+1、rdb和aof文件生成属于cpu密集型操作。部署redis时，不和cpu绑定，不和cpu密集型应用一起部署
+
+2、fork的内存开销，copy-on-write。关闭linux大页，`echo never > /sys/kernel/mm/transparent_hugepage/enabled`
+
+3、监控硬盘开销。不和存储服务、消息队列等硬盘io密集型应用一起部署；配置`no-appendfsync-on-rewrite=yes`
+
+
+
+### 2.3. aof阻塞定位
+
+如果配置每秒刷盘的aof策略，则在同步线程写入硬盘的同时，主线程会对比上次fsync的时间，如果大于2s则会阻塞直到同步完成。
+
+查看阻塞：
+
+1、redis日志
+
+2、命令：`info persistence`里aof_delayed_fsync字段记录阻塞的次数
+
+3、top里的io wait
+
+
+
+## 3. 缓存
+
+### 3.1. 缓存更新策略
+
+1、lru/lfu/fifio算法剔除：maxmemory-policy
+
+2、超时剔除：expire
+
+3、主动更新：开发控制生命周期
+
+### 3.2. 缓存穿透：大量缓存没命中
+
+原因：
+
+发现：
+
+1、响应时间
+
+2、业务本身的问题：设计上，存在空
+
+3、相关指标：总调用数、缓存层命中数、存储层命中数
+
+解决版本：
+
+1、缓存空对象。但需要更多的键；短期不一致
+
+2、布隆过滤器拦截，预热。不适用于频繁更新的数据
+
+### 3.3. 缓存雪崩：缓存层异常，流量大量走到后端组件
+
+优化方案：
+
+1、保证缓存层的高可用
+
+2、依赖隔离组件为后端限流，如hystrix
+
+3、提前演练：例如压力测试
+
+### 3.4. 无底洞问题：加机器没有提升性能
+
+原因：批量操作涉及到n个节点，时间复杂度O(n)
+
+优化方法：
+
+1、命令本身优化：慢查询如keys，hgetall
+
+2、减少网络通信次数
+
+3、降低接入成本：客户端长连接、连接池、nio等
+
+### 3.5. 热点key重建问题
+
+较长的重建时间；对后端存储层产生较大压力
+
+目标：
+
+1、减少重建次数
+
+2、数据尽可能一致
+
+3、减少潜在危险：死锁
+
+解决方法：
+
+1、互斥锁；缺点是阻塞请求
+
+2、永不过期：不设置expire，但有逻辑过期时间，异步构建缓存。缺点是不保证一致性，逻辑过期时间增加维护成本和内存成本。
