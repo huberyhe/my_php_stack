@@ -198,3 +198,15 @@ minikube service wordpress --url
 
 
 > 参考：[示例：使用持久卷部署 WordPress 和 MySQL | Kubernetes](https://kubernetes.io/zh-cn/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/)
+
+# Istio
+
+## 2.1. 功能
+
+- 改进了调试：提供了类似链路跟踪的功能
+- 监控和观测能力：观测流量，比如等待时间、服务时间、错误占比等
+- 策略：限制服务间的相互协作
+- 路由和负载均衡：可以实现蓝绿部署
+- 回路中断：
+
+> 参考：[什么是 Istio？ | IBM](https://www.ibm.com/cn-zh/topics/istio)

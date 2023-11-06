@@ -448,7 +448,7 @@ port2 8080;
 
 #### 1.3.3.8. 去掉前后空白
 ```bash
-echo "   PHP and MySQL   " | sed -e 's/^[[:space:]]*//'
+echo "   PHP and MySQL   " | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 ```
 
 #### 1.3.3.9. 包含换行、空格和引号时的处理

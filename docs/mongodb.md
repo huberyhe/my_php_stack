@@ -81,8 +81,11 @@ db.movies.deleteMany({})
 ```
 
 查询：[db.collection.find(query, projection, options).pretty()]([db.collection.find() — MongoDB Manual](https://www.mongodb.com/docs/manual/reference/method/db.collection.find/#db.collection.find))
+
 排序：[cursor.sort(sort)]([cursor.sort() — MongoDB Manual](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/#cursor.sort))
+
 分页：[cursor.skip().limit()]([cursor.limit() — MongoDB Manual](https://www.mongodb.com/docs/upcoming/reference/method/cursor.limit/#cursor.limit))
+
 计数：[cursor.count()]([cursor.count() — MongoDB Manual](https://www.mongodb.com/docs/upcoming/reference/method/cursor.count/#cursor.count))
 
 插入：

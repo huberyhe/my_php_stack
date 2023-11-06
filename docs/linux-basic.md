@@ -398,6 +398,14 @@ reboot -nf
 
 > 参考：[强制重启Linux系统的几种方法%%%%](https://zohead.com/archives/linux-force-reboot/)
 
+### 1.3.9. 软链接
+
+目录软链接，`-f`在软链接存在时强制生成，`-n`避免软链接到了目标的目录下
+
+```bash
+ln -sfn /opt/edr_deploy/2.2.15.5-ZY /opt/edr_deploy/version_latest
+```
+
 ## 1.4. 日志截断
 
 ```bash
