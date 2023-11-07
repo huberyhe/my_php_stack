@@ -122,12 +122,40 @@ func Round(val float64, precision int) float64 {
 
 ### 1.5.3. 安全复制切片
 
+一般情况下，切片的切片会引用原切片的底层数组。
+
+```go
+a := []int{1, 2, 3, 4, 5}
+b := a[1:3]
+b = append(b, 6)
+fmt.Println(a) // 1,2,3,6,5
+fmt.Println(b) // 2,3,6
+```
+
 如果在创建切片时设置切片的容量和长度一样，就可以强制让新切片的第一个append操作创建一个新的底层数组，与原有的底层数组分离。分离后，可以安全地进行后续修改。
 
 ```go
-source := []string{"Apple", "Orange", "Plum", "Banana", "Grape"}
-slice := source[2:3:3]
-slice = appen(slice, "Kiwi")
+a := []int{1, 2, 3, 4, 5}
+
+// 部分复制
+b := a[1:3:3]
+b = append(b, 6)
+fmt.Println(a) // 1,2,3,4,5
+fmt.Println(b) // 2,3,6
+
+// 整个复制
+c := a[:]
+c = append(c, 6)
+fmt.Println(a) // 1,2,3,4,5
+fmt.Println(c) // 1,2,3,4,5,6
+```
+
+也可以使用copy来创建一个独立副本
+
+```go
+originalSlice := []int{1, 2, 3, 4, 5}
+copiedSlice := make([]int, len(originalSlice))
+copy(copiedSlice, originalSlice)
 ```
 
 ## 1.6. 映射
@@ -233,7 +261,7 @@ func main() {
 
 ## 1.10. go中函数传参都是值传递
 
-在Go语言中，所有变量都以值的方式床底。因为指针变量的值是所指向的内存地址，在函数之间传递指针变量，是在传递这个地址值，所以依旧被看作以值的方式在传递。
+在Go语言中，所有变量都以值的方式传递。因为指针变量的值是所指向的内存地址，在函数之间传递指针变量，是在传递这个地址值，所以依旧被看作以值的方式在传递。
 
 > 参考：
 > 
@@ -324,7 +352,7 @@ func 3:  b
 func 3:  a
 ```
 
-闭包有局部变量，并返回一个函数变量，特点是这个函数可以多次使用局部变量，变量的值在闭包生命周期内可以保持。
+闭包一般有局部变量（也可以是函数参数和全局 变量），并返回一个函数值，特点是这个函数可以多次使用局部变量，变量的值在闭包生命周期内可以保持。
 
 ```go
 package main
@@ -1228,17 +1256,17 @@ package main
 
 import "fmt"
 
-var AppPath = "/opt/topsec/topihs"
 func init() {
-    AppPath, err := GetAppPath()
+var AppPath = "/opt/topsec/topihs"
+  AppPath, err := GetAppPath()
 	if err != nil {
 		panic(err)
 	}
-    fmt.Println("AppPath1", AppPath)
+  fmt.Println("AppPath1", AppPath)
 }
 
 func GetAppPath() (string, error) {
-	return ""/opt/topsec"", nil
+	return "/opt/topsec", nil
 }
 
 func main() {
@@ -1362,6 +1390,10 @@ scene.Range(func(k, v interface{}) bool {
     return true
 })
 ```
+
+缺点：
+
+1、不适用于大量写的场景，容易导致读操作频繁无法命中，而进一步加锁读取
 
 ## 1.22. logrus使用
 
@@ -1763,6 +1795,8 @@ go run -race mysrc.go
 > 参考：[Go 译文之竞态检测器 race](https://juejin.cn/post/6844903918233714695)
 
 ### 1.23.6. 内存逃逸分析
+
+指的是一个变量或对象在其作用域之外仍然被引用或访问的情况
 
 1. 内存分配到堆上的影响
 
