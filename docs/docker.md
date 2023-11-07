@@ -178,11 +178,11 @@ RUN ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezon
 
 ## 1.12. 网络驱动
 
-1.12.1. bridge桥接网络。使用NAT转发端口流量
+1.12.1. bridge单机桥接网络，windows下有NAT
 
-1.12.2. overlay多机覆盖网络
+1.12.2. overlay多机覆盖网络，用于跨多个Docker主机的容器通信，如swarm
 
-1.12.3. host主机共享网络
+1.12.3. host主机共享网络，容器与主机共享网络命名空间
 
 1.12.4. macvlan网络。直接接入虚拟网卡，可划分vlan
 
