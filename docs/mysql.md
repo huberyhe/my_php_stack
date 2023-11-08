@@ -210,8 +210,11 @@ MySQL InnoDB 引擎的可重复读隔离级别（默认隔离级），根据不�
 -   针对**当前读**（select ... for update 等语句），是通过 next-key lock（记录锁+间隙锁）方式解决了幻读。
 
 > 参考：
+> 
 > 1、[彻底理解事务的4个隔离级别](https://www.cnblogs.com/jycboy/p/transaction.html)
+> 
 > 2、[MySQL是如何实现可重复读的?](https://juejin.cn/post/6844904180440629262)
+> 
 > 3、[MySQL 可重复读隔离级别，完全解决幻读了吗？](https://xiaolincoding.com/mysql/transaction/phantom.html#%E5%BD%93%E5%89%8D%E8%AF%BB%E6%98%AF%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E5%B9%BB%E8%AF%BB%E7%9A%84)
 
 ## 2.2. 事务的四个特性（ACID）
@@ -282,7 +285,7 @@ KEY分区和HASH分区相似，不同之处在于HASH分区使用用户定义的
 
 ## 3.4. 主从复制原理
 
-`binlog` -> 主节点 `log dump thread` 线程-> 从节点I/O线程 -> `relay log` -> 从节点sql进程重放sql
+`binlog` -> 主节点 `log dump thread` 线程-> 从节点I/O线程 -> `relay log` -> 从节点sql线程重放sql
 
 ## 3.5. Mycat中间件
 
@@ -379,7 +382,7 @@ show status like 'innodb_row_lock%';
 - 表锁：
 
 ```sql
-lock table myisam_lock read;// 显式加表锁
+lock table myisam_lock read;// 显式加表锁，如果有意向锁则阻塞（行锁会产生意向锁）
 ...
 unlock tables;
 
@@ -394,6 +397,8 @@ show status like 'table_locks%';
 > 1、[MySQL 行锁 表锁机制](https://www.cnblogs.com/itdragon/p/8194622.html)
 > 
 > 2、[INNODB索引实现原理](https://blog.csdn.net/bohu83/article/details/81104432)
+> 
+> 3、[意向锁（Intention Locks）](https://www.cnblogs.com/nevererror/p/16251861.html)
 
 ### 3.6.8. B+树的结构
 
