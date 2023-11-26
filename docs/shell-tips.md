@@ -196,6 +196,12 @@ function askYN ()
 	return $ret
 }
 
+read -n 1 -s -r -p "按任意键继续"
+echo
+
+read -p "按回车键继续"
+echo
+
 iptablesFile='/etc/iptables.rule'
 if [[ -f $iptablesFile ]] && askYN "Already configured, restore(Y) or continue(N)?" ; then
 	echo "Already configured, restore."

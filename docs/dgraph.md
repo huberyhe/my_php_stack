@@ -352,6 +352,7 @@ Dgraph Alpha hosts predicates and indexes. Predicates are either the properties 
 Ratel serves the UI to run queries, mutations & altering schema.
 
 zero: grpc占用5080端口，http占用6080端口
+
 alpha: http占用8080端口，grpc占用9080端口，worker grpc占用内部7080端口
 
 > 参考：[https://dgraph.io/docs/deploy/ports-usage/](https://dgraph.io/docs/deploy/ports-usage/)
