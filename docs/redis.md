@@ -446,8 +446,16 @@ EVAL script numkeys key [key ...] arg [arg ...]
 eval "if redis.call('exists', KEYS[1]) == 1 then redis.call('hset', KEYS[1], ARGV[1], 1) end" 1 59205FE8-3ADB-9A25-2755-72A8F6EC2CBE Reload
 ```
 
+也可以直接执行一个lua脚本：
+
+```bash
+redis-cli EVAL script.lua 1 mysortedset mymember 10
+```
+
 > 参考：
+> 
 > 1、[Scripting with Lua | Redis](https://redis.io/docs/manual/programmability/eval-intro/)
+> 
 > 2、[EVAL – Redis (cndoc.github.io)](https://cndoc.github.io/redis-doc-cn/cn/commands/eval.html)
 
 ## 1.9. 系统命令
