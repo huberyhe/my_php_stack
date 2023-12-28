@@ -676,6 +676,13 @@ os.MkdirAll("dir1/dir2/dir3", os.ModePerm) //创建多级目录
 
 ### 1.15.9. 临时目录和文件
 
+1.14版本新增
+
+```go
+ioutil.TempDir("", "example")
+ioutil.TempFile(tempDir, "example")
+```
+
 1.16版本新增
 
 ```go
