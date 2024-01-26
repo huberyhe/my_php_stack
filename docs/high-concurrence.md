@@ -103,3 +103,9 @@ kafka confluent的一个插件，实现从MySQL binlog获取数据事件并发�
 > 参考：
 > 1. [数据同步工具之FlinkCDC/Canal/Debezium对比](https://www.cnblogs.com/importbigdata/articles/15658757.html)
 > 2. [MySql实时数据变更事件捕获kafka confluent之debezium](https://juejin.cn/post/6844903662880309255)
+
+## 1.5. 指标
+
+服务级指标（SLI）或关键性能指标（KPI）
+
+平均无故障时间（MTBF）和平均恢复时间（MTTR）

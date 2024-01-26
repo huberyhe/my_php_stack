@@ -825,9 +825,9 @@ func (uz *Unzip) Unzip(dest string) error {
 
 ## 1.17. 并发，协程与管道
 
-### 1.17.1. 管道
+### 1.17.1. 通道
 
-只有可写的管道才能close，close应该在发送方执行
+1、 只有可写的通道才能close，close应该在发送方执行
 
 ```go
 // 初始化
@@ -840,12 +840,18 @@ a <- 1
 b := <- a
 ```
 
-管道未初始化或已关闭时的读写情况
+2、 通道未初始化或已关闭时的读写情况
 
-- 写未初始化管道：阻塞
-- 读未初始化管道：阻塞
-- 写关闭的管道：panic
-- 读关闭的管道：返回未读完的数据或（0值，ok=false）
+- 写未初始化通道：阻塞
+- 读未初始化通道：阻塞
+- 写关闭的通道：panic
+- 读关闭的通道：返回未读完的数据或（0值，ok=false）
+
+3、 基于上述特性，可以通过判断通道是否关闭来决定（多个）协程退出
+
+4、 无缓冲通道与长度为1的有缓冲通道的区别
+
+无缓冲通道必须有接收方准备好接收数据时数据才能发送进去，可以保证同步；有缓冲通道只要缓冲区没慢就可以发送消息
 
 
 ### 1.17.2. 协程
@@ -2937,9 +2943,12 @@ linux下可以使用`man 7 signal`查看POSIX系统信号，常用的2是`ctrl+c
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
+	"syscall"
 	"time"
 )
 
@@ -2950,32 +2959,57 @@ func main() {
 	// 告诉 signal 包监听 SIGINT 和 SIGTERM 信号
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
+	wg := sync.WaitGroup{}
+	ctx, cancel := context.WithCancel(context.Background())
 	// 启动程序的主逻辑
-	go mainLogic()
+	wg.Add(1)
+	go func() {
+		mainLogic(ctx)
+		close(sigChan)
+		fmt.Println("主逻辑退出")
+		wg.Done()
+	}()
 
 	// 等待信号
-	s := <-sigChan
-	fmt.Println("收到信号", s)
+	s, ok := <-sigChan
+	if ok {
+		fmt.Println("收到信号", s)
+	} else {
+		fmt.Println("程序正常退出")
+	}
 
-	// 接收到信号后执行清理工作
-	cleanup()
+	// 接收到信号后通知主逻辑退出，并执行清理工作
+	cleanup(cancel)
+	wg.Wait()
 
 	// 退出程序
 	os.Exit(0)
 }
 
-func mainLogic() {
-	for {
+func mainLogic(ctx context.Context) {
+	var done bool
+	var counter int
+	for !done {
 		// 执行程序的主要逻辑
-		fmt.Println("Working...")
-		time.Sleep(1 * time.Second)
+		select {
+		case <-ctx.Done():
+			done = true
+		case <-time.After(5 * time.Second):
+			fmt.Println("Working...")
+			counter++
+			if counter >= 3 {
+				done = true // 模拟程序正常退出
+			}
+		}
 	}
 }
 
-func cleanup() {
+func cleanup(cancel context.CancelFunc) {
 	// 执行清理工作，例如关闭文件、数据库连接等
 	fmt.Println("Cleaning up...")
+	cancel()
 }
+
 ```
 
 ## 1.47. 定时器
@@ -3017,6 +3051,64 @@ func testTicker() {
 10.0146309 tick n1
 21.0167355 tick n2
 30.0111594 tick n3
+```
+
+## 1.48. cgo
+
+```go
+package main
+
+/*
+#include <stdio.h>
+#include <stdlib.h>
+
+void printMessage(char* msg) {
+   printf("%s\n", msg);
+}
+*/
+import "C"
+import "unsafe"
+
+func main() {
+	message := C.CString("Hello, World!")
+	defer C.free(unsafe.Pointer(message))
+	C.printMessage(message)
+}
+```
+
+## 1.49. 项目目录结构
+```
+/myproject
+ /api
+    /handlers
+    /middleware
+ /cmd
+    /mycommand
+      main.go
+ /pkg
+    /mylibrary
+ /web
+    /static
+    /templates
+ Dockerfile
+ Makefile
+ .gitignore
+ README.md
+ go.mod
+ go.sum
+```
+
+- /api: 此目录通常包含API的所有处理器和中间件。
+- /cmd: 此目录包含应用程序的所有命令。每个命令都有自己的目录，该目录下包含一个main.go文件，该文件是命令的入口点。
+- /pkg: 此目录包含库代码，这些代码可以被其他应用程序使用。
+- /web: 此目录包含Web服务器的代码。
+
+## 1.50. 编译时注入编译信息
+
+类似dgraph做的，编译时写入版本、编译日期等信息到进程
+
+```bash
+go build -ldflags "-s -w -X 'pkg/gconfig.gitHash=5bfd92b6b23beee0c94969926cdac8ce71aff23a" -o ./bin/test ./cmd/main.go
 ```
 
 # 2. 第三方包

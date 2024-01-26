@@ -125,6 +125,7 @@ script_dir=$(dirname $(readlink -f $0))
 
 ```bash
 set -euo pipefail
+trap 'echo "Error at line $0:$LINENO" >&2' ERR
 ```
 
 - `-e`：当程序返回非0状态码时报错退出
