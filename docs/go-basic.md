@@ -114,6 +114,12 @@ func Round(val float64, precision int) float64 {
 
 ### 1.5.1. nil切片与空切片
 
+```go
+# 空切片不是nil
+emptySlice := []int{}
+emptySlice != nil
+```
+
 在需要描述一个不存在的切片时，nil切片会很好用。想表示空集合时空切片很好用。
 
 ### 1.5.2. append时切片容量增长机制
@@ -128,7 +134,7 @@ func Round(val float64, precision int) float64 {
 a := []int{1, 2, 3, 4, 5}
 b := a[1:3]
 b = append(b, 6)
-fmt.Println(a) // 1,2,3,6,5
+fmt.Println(a) // 1,2,3,6,5。改变了原切片的值
 fmt.Println(b) // 2,3,6
 ```
 
@@ -165,7 +171,7 @@ copy(copiedSlice, originalSlice)
 - 指针方法可以通过指针调用
 - 值方法可以通过值调用
 - 接收者是值的方法可以通过指针调用，因为指针会首先被解引用
-- 接收者是指针的方法不可以通过值调用，因为存储在接口中的值没有地址
+- **接收者是指针的方法不可以通过值调用**，因为存储在接口中的值没有地址
 
 > 参考：https://learnku.com/docs/the-way-to-go/116-usage-set-and-interface/3652
 
@@ -173,124 +179,20 @@ copy(copiedSlice, originalSlice)
 
 映射是无序的集合，无序的原因是映射的实现使用了散列表。
 
-## 1.8. 类型判断
 
-### 1.8.1. switch
-
-```go
-for k, v := range user5 {
-    switch v2 := v.(type) {
-        case string:
-        fmt.Println(k, "is string", v2)
-        case int:
-        fmt.Println(k, "is int", v2)
-        case bool:
-        fmt.Println(k, "is bool", v2)
-        case []interface{}:
-        fmt.Println(k, "is an array:")
-        for i, iv := range v2 {
-            fmt.Println(i, iv)
-        }
-        default:
-        fmt.Println(k, "类型未知")
-    }
-}
-```
-
-
-### 1.8.2. reflect反射
-
-## 1.9. 类型转换
-
-### 1.9.1. 整型与字符串互转
-
-```go
-// string转成int
-int, err := strconv.Atoi(string)
-
-// string转成int64
-int64, err := strconv.ParseInt(string, 10, 64)
-
-// int转成string
-string := strconv.Itoa(int)
-
-// int64转成string
-string := strconv.FormatInt(int64, 10)
-```
-
-注意，go不支持强制转换，使用string()会得到意想不到的结果
-
-```go
-s := string(97) // s == "a"
-```
-
-## 1.10. 值类型、引用类型
-
-golang中分为值类型和引用类型
-
-值类型分别有：int系列、float系列、bool、string、数组和结构体
-
-引用类型有：指针、slice切片、管道channel、接口interface、map、函数等
-
-值类型的特点是：变量直接存储值，内存通常在栈中分配
-
-引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
-
-值类型在函数传递后不会修改原数据，而引用类型会同时修改
-
-```go
-package main
-
-import "fmt"
-
-type ts struct {
-    A int
-}
-
-func t(st ts, s []int, m map[string]int) {
-    st.A = 11
-    s[0] = 11
-    m["a"] = 11
-
-    return
-}
-
-func main() {
-    st := ts{
-        A: 1,
-    }
-    s := []int{1,2,3}
-    m := map[string]int{
-        "a": 1,
-        "b": 2,
-        "c": 3,
-    }
-    t(st, s, m)
-    fmt.Println(st, s, m) // {1} [11 2 3] map[a:11 b:2 c:3]
-}
-```
-
-## 1.11. go中函数传参都是值传递
-
-在Go语言中，所有变量都以值的方式传递。因为指针变量的值是所指向的内存地址，在函数之间传递指针变量，是在传递这个地址值，所以依旧被看作以值的方式在传递。
-
-> 参考：
-> 
-> [Go语言参数传递是传值还是传引用](https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value)
-
-## 1.12. 常量
+## 1.8. 常量
 
 常量中的数据类型只可以是布尔型、数字型（整数型、浮点型和复数）和字符串型
-### 1.12.1. 整型最值
+### 1.8.1. 整型最值
 
 ```go
 math.MaxInt32
 math.MinInt32
 ```
 
-### 1.12.2. 模拟枚举
+### 1.8.2. 模拟枚举
 
-go没有提供枚举类型，但使用使用const枚举
+go没有提供枚举类型，但可以使用常量模拟
 
 ```go
 type EnumPolicyType int // 枚举类型
@@ -315,7 +217,7 @@ func typeToName(_type EnumPolicyType) string {
 
 > 参考：[iota: Golang 中优雅的常量](https://segmentfault.com/a/1190000000656284)
 
-## 1.13. 匿名函数与闭包
+## 1.9. 匿名函数与闭包
 
 匿名函数中使用外部变量，注意直接使用和通过参数使用的区别
 
@@ -394,9 +296,445 @@ func Fun() func(string) string {
 }
 ```
 
-## 1.14. 正则
+## 1.10. switch的使用
 
-### 1.14.1. 正则匹配
+1、switch后可不跟变量
+2、case隐式break，只要匹配上就break不再匹配。如果需要匹配多个case，可使用fallthrough
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	today := 6
+
+	switch {
+	case today < 5:
+		fmt.Println("Clean your house.")
+	case today < 8:
+		fmt.Println("Clean your house.")
+		fallthrough
+	case today <= 10:
+		fmt.Println("Buy some wine.")
+	case today > 15:
+		fmt.Println("Visit a doctor.")
+	case today == 25:
+		fmt.Println("Buy some food.")
+	default:
+		fmt.Println("No information available for that day.")
+	}
+}
+
+```
+输出
+```
+Clean your house.
+Buy some wine.
+```
+
+## 1.11. 并发，协程与管道
+
+### 1.11.1. 通道
+
+1、 只有可写的通道才能close，close应该在发送方执行
+
+```go
+// 初始化
+var a chan int
+a = make(chan int, 2)
+
+// 写数据
+a <- 1
+// 读数据
+b := <- a
+```
+
+2、 通道未初始化或已关闭时的读写情况
+
+- 写未初始化通道：阻塞
+- 读未初始化通道：阻塞
+- 写关闭的通道：panic
+- 读关闭的通道：返回未读完的数据（ok=true）或（零值，ok=false）
+
+3、 基于上述特性，可以通过判断通道是否关闭来决定（多个）协程退出
+
+4、 无缓冲通道与长度为1的有缓冲通道的区别
+
+无缓冲通道必须有接收方准备好接收数据时数据才能发送进去，可以保证同步；有缓冲通道只要缓冲区没慢就可以发送消息
+
+
+### 1.11.2. 协程
+
+#### 1.11.2.1. 协程池示例，用于计算数字各位的和
+
+输入12345，输出15(=1+2+3+4+5)
+
+```go
+package main
+
+import (  
+    "fmt"
+    "math/rand"
+    "sync"
+    "time"
+)
+
+type Job struct {  
+    id       int
+    randomno int
+}
+type Result struct {  
+    job         Job
+    sumofdigits int
+}
+
+var jobs = make(chan Job, 10)  
+var results = make(chan Result, 10)
+
+// 实际计算方法
+func digits(number int) int {  
+    sum := 0
+    no := number
+    for no != 0 {
+        digit := no % 10
+        sum += digit
+        no /= 10
+    }
+    time.Sleep(2 * time.Second)
+    return sum
+}
+
+// 一个worker
+func worker(wg *sync.WaitGroup) {  
+    for job := range jobs {
+        output := Result{job, digits(job.randomno)}
+        results <- output
+    }
+    wg.Done()
+}
+
+// 创建worker池
+func createWorkerPool(noOfWorkers int) {  
+    var wg sync.WaitGroup
+    for i := 0; i < noOfWorkers; i++ {
+        wg.Add(1)
+        go worker(&wg)
+    }
+    wg.Wait()
+    close(results)
+}
+
+// 分配任务
+func allocate(noOfJobs int) {  
+    for i := 0; i < noOfJobs; i++ {
+        randomno := rand.Intn(999)
+        job := Job{i, randomno}
+        jobs <- job
+    }
+    close(jobs)
+}
+
+// 获取结果
+func result(done chan bool) {  
+    for result := range results {
+        fmt.Printf("Job id %d, input random no %d , sum of digits %d\n", result.job.id, result.job.randomno, result.sumofdigits)
+    }
+    done <- true
+}
+
+func main() {  
+    startTime := time.Now()
+    
+    noOfJobs := 100
+    go allocate(noOfJobs)
+    
+    done := make(chan bool)
+    go result(done)
+    
+    noOfWorkers := 10
+    createWorkerPool(noOfWorkers)
+    
+    <-done
+    endTime := time.Now()
+    diff := endTime.Sub(startTime)
+    fmt.Println("total time taken ", diff.Seconds(), "seconds")
+}
+```
+
+#### 1.11.2.2. 控制协程数量
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+var wg = sync.WaitGroup{}
+
+func main() {
+    userCount := 10
+    ch := make(chan bool, 2) // 10个协程，并发为2
+    for i := 0; i < userCount; i++ {
+        wg.Add(1)
+        go Read(ch, i)
+    }
+
+    wg.Wait()
+}
+
+func Read(ch chan bool, i int) {
+    defer wg.Done()
+
+    ch <- true
+    fmt.Printf("go func: %d, time: %d\n", i, time.Now().Unix())
+    time.Sleep(time.Second)
+    <-ch
+}
+```
+
+进化，控制协程数量、并发数量、执行次数
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+var wg sync.WaitGroup
+
+func worker(id, d int) {
+	fmt.Printf("go id: %d, func: %d, time: %d\n", id, d, time.Now().Unix())
+	time.Sleep(time.Second * time.Duration(d))
+}
+
+func main() {
+	userCount := 10         // 协程总数量
+	ch := make(chan int, 5) // 并发协程数量
+	for i := 0; i < userCount; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			for d := range ch {
+				worker(id, d)
+			}
+		}(i)
+	}
+
+	for i := 0; i < 10; i++ { // 协程执行次数，总10*2=20次
+		ch <- 1
+		ch <- 2
+		//time.Sleep(time.Second)
+	}
+
+	close(ch)
+	wg.Wait()
+}
+
+```
+
+
+
+#### 1.11.2.3. 面试题：交替输出
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+var wg = sync.WaitGroup{}
+var ch = make(chan bool)
+
+func echo(ch chan bool, s string) {
+	for {
+		<-ch
+		fmt.Println(s)
+		ch <- true
+	}
+	wg.Done()
+}
+
+func main() {
+	go echo(ch, "11111")
+	wg.Add(1)
+	go echo(ch, "22222")
+	wg.Add(1)
+
+	ch <- true
+	wg.Wait()
+}
+```
+
+# 2. 高级
+
+## 2.1. 类型判断
+
+### 2.1.1. switch
+
+```go
+for k, v := range user5 {
+    switch v2 := v.(type) {
+        case string:
+        fmt.Println(k, "is string", v2)
+        case int:
+        fmt.Println(k, "is int", v2)
+        case bool:
+        fmt.Println(k, "is bool", v2)
+        case []interface{}:
+        fmt.Println(k, "is an array:")
+        for i, iv := range v2 {
+            fmt.Println(i, iv)
+        }
+        default:
+        fmt.Println(k, "类型未知")
+    }
+}
+```
+
+
+### 2.1.2. reflect反射
+
+## 2.2. 类型转换
+
+### 2.2.1. 整型与字符串互转
+
+```go
+// string转成int
+int, err := strconv.Atoi(string)
+
+// string转成int64
+int64, err := strconv.ParseInt(string, 10, 64)
+
+// int转成string
+string := strconv.Itoa(int)
+
+// int64转成string
+string := strconv.FormatInt(int64, 10)
+```
+
+注意，go不支持强制转换，使用string()会得到意想不到的结果
+
+```go
+s := string(97) // s == "a"
+```
+
+### 2.2.2. byte转字符串
+
+```go
+string('a') // "a"
+int('a') // 97
+```
+
+
+
+## 2.3. 错误与异常
+
+一般来说，一旦Go程序部署后，在任何情况下发生的异常都不应该导致程序异常退出。
+
+错误转换成异常：
+
+```go
+func funcOne() (err error) {
+    defer func() {
+        if p := recover(); p != nil {
+            fmt.Println("异常恢复！p", p)
+            if str, ok := p.(string); ok {
+                err = errors.New(str)
+            } else {
+                err = errors.New("success")
+            }
+            debug.PrintStack()
+        }
+    }
+    
+    return funcTwo()
+}
+
+func funcTwo() error {
+    panic("模拟异常")
+    return errors.New("success")
+}
+
+func main() {
+    err := funcOne()
+    if err != nil {
+        fmt.Printf("error is nil\n")
+    } else {
+        fmt.Printf("error is %v\n", err)
+    }
+}
+```
+
+
+
+## 2.4. 值类型、引用类型
+
+golang中分为值类型和引用类型
+
+值类型分别有：int系列、float系列、bool、string、数组和结构体
+
+引用类型有：指针、slice切片、管道channel、接口interface、map、函数等
+
+值类型的特点是：变量直接存储值，内存通常在栈中分配
+
+引用类型的特点是：变量存储的是一个地址，这个地址对应的空间里才是真正存储的值，内存通常在堆中分配
+
+值类型在函数传递后不会修改原数据，而引用类型会同时修改
+
+```go
+package main
+
+import "fmt"
+
+type ts struct {
+    A int
+}
+
+func t(st ts, s []int, m map[string]int) {
+    st.A = 11
+    s[0] = 11
+    m["a"] = 11
+
+    return
+}
+
+func main() {
+    st := ts{
+        A: 1,
+    }
+    s := []int{1,2,3}
+    m := map[string]int{
+        "a": 1,
+        "b": 2,
+        "c": 3,
+    }
+    t(st, s, m)
+    fmt.Println(st, s, m) // {1} [11 2 3] map[a:11 b:2 c:3]
+}
+```
+
+## 2.5. go中函数传参都是值传递
+
+在Go语言中，所有变量都以值的方式传递。因为指针变量的值是所指向的内存地址，在函数之间传递指针变量，是在传递这个地址值，所以依旧被看作以值的方式在传递。
+
+> 参考：
+> 
+> [Go语言参数传递是传值还是传引用](https://www.flysnow.org/2018/02/24/golang-function-parameters-passed-by-value)
+
+
+## 2.6. 正则
+
+### 2.6.1. 正则匹配
 
 ```go
 name := regexp.MustCompile("[\u4e00-\u9fa5~!@#$%^&*(){}|<>\\\\/+\\-【】:\"?'：；‘’“”，。、《》\\]\\[`]")
@@ -405,7 +743,7 @@ if name.MatchString(param["username"]) {
 }
 ```
 
-### 1.14.2. 正则查找子串
+### 2.6.2. 正则查找子串
 
 ```go
 re := regexp.MustCompile(`<!--{{TPL_LIST_ITEM_START}}-->([\s\S]*?)<!--{{TPL_LIST_ITEM_END}}-->`)
@@ -419,7 +757,7 @@ if len(matches) > 1 {
 }
 ```
 
-### 1.14.3. 替换
+### 2.6.3. 替换
 
 ```go
 re, _ := regexp.Compile("a");
@@ -429,26 +767,26 @@ fmt.Println(rep) // Abcd
 
 
 
-## 1.15. 时间
+## 2.7. 时间
 
-### 1.15.1. `time.Now()`返回的是什么？
+### 2.7.1. `time.Now()`返回的是什么？
 
 返回的是当前时间的`time.Time`对象。
 
-### 1.15.2. 获取当前时间的时间戳
+### 2.7.2. 获取当前时间的时间戳
 
 ```go
 time.Now().Unix() // 1653194203
 ```
 
-### 1.15.3. 时间格式化
+### 2.7.3. 时间格式化
 
 ```go
 const TimeFormat = "2006-01-02 15:04:05"
 time.Now().Format(TimeFormat)
 ```
 
-### 1.15.4. 时间字符串生成时间对象，时间戳生成时间对象
+### 2.7.4. 时间字符串生成时间对象，时间戳生成时间对象
 
 ```go
 const TimeFormat = "2006-01-02 15:04:05"
@@ -489,22 +827,22 @@ fmt.Println(time.Now().In(cstSh))
 2022-12-23 17:09:29.9312074 +0800 CST
 ```
 
-### 1.15.5. 判断是否时零值
+### 2.7.5. 判断是否时零值
 
 ```go
 tn := time.Now()
 tn.IsZero()
 ```
 
-## 1.16. 文件
+## 2.8. 文件
 
-### 1.16.1. touch文件
+### 2.8.1. touch文件
 
 ```go
 os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
 ```
 
-### 1.16.2. 读写文件
+### 2.8.2. 读写文件
 
 ```go
 
@@ -549,9 +887,9 @@ func readByLine(fn string) (bs []string, err error)  {
 func ioutil.ReadFile(filename string) ([]byte, error)
 ```
 
-### 1.16.3. 实例：
+### 2.8.3. 实例：
 
-#### 1.16.3.1. 列出目录文件
+#### 2.8.3.1. 列出目录文件
 
 ```go
 func main() {
@@ -583,7 +921,7 @@ func listAll(path string, curHier int){
 }
 ```
 
-#### 1.16.3.2. 拷贝文件和文件夹
+#### 2.8.3.2. 拷贝文件和文件夹
 
 ```go
 func CopyDir(src, dst string) error {
@@ -629,7 +967,7 @@ func CopyFile(src, dst string) (err error) {
 }
 ```
 
-### 1.16.4. 移动与复制文件
+### 2.8.4. 移动与复制文件
 
 ```go
 // 移动文件
@@ -638,7 +976,7 @@ os.Rename("./aa/bb/c1/file.go", "./aa/bb/c2/file.go")
 // 复制文件。没有直接方法，就是读和写文件
 ```
 
-### 1.16.5. 文件名与后缀
+### 2.8.5. 文件名与后缀
 
 ```go
 fullFilename := "D:/software/Typora/bin/typora.exe"
@@ -655,14 +993,14 @@ filenameOnly := strings.TrimSuffix(filenameWithSuffix, fileSuffix)
 fmt.Println("filenameOnly =", filenameOnly) // typora
 ```
 
-### 1.16.6. 删除文件和文件夹
+### 2.8.6. 删除文件和文件夹
 
 ```go
 err := os.Remove(file) // 文件夹必须为空
 err := os.RemoveAll(path) // 可以删除不为空的文件夹
 ```
 
-### 1.16.7. 路径存在判断
+### 2.8.7. 路径存在判断
 
 ```go
 func IsExists(path string) bool {
@@ -678,14 +1016,14 @@ func IsExists(path string) bool {
 }
 ```
 
-### 1.16.8. 创建目录
+### 2.8.8. 创建目录
 
 ```go
 os.Mkdir("abc", os.ModePerm) //创建目录  
 os.MkdirAll("dir1/dir2/dir3", os.ModePerm) //创建多级目录
 ```
 
-### 1.16.9. 临时目录和文件
+### 2.8.9. 临时目录和文件
 
 1.14版本新增
 
@@ -701,7 +1039,7 @@ os.MkdirTemp("", "sampledir")
 os.CreateTemp("", "sample")
 ```
 
-### 1.16.10. 文件md5
+### 2.8.10. 文件md5
 
 ```go
 func GetFileMD5(filePath string) (string, error) {
@@ -715,7 +1053,7 @@ func GetFileMD5(filePath string) (string, error) {
 }
 ```
 
-### 1.16.11. zip文件解压
+### 2.8.11. zip文件解压
 
 ```go
 package fileHelper
@@ -823,264 +1161,23 @@ func (uz *Unzip) Unzip(dest string) error {
 }
 ```
 
-## 1.17. 并发，协程与管道
 
-### 1.17.1. 通道
+## 2.9. dlv调试
 
-1、 只有可写的通道才能close，close应该在发送方执行
-
-```go
-// 初始化
-var a chan int
-a = make(chan int, 2)
-
-// 写数据
-a <- 1
-// 读数据
-b := <- a
-```
-
-2、 通道未初始化或已关闭时的读写情况
-
-- 写未初始化通道：阻塞
-- 读未初始化通道：阻塞
-- 写关闭的通道：panic
-- 读关闭的通道：返回未读完的数据或（0值，ok=false）
-
-3、 基于上述特性，可以通过判断通道是否关闭来决定（多个）协程退出
-
-4、 无缓冲通道与长度为1的有缓冲通道的区别
-
-无缓冲通道必须有接收方准备好接收数据时数据才能发送进去，可以保证同步；有缓冲通道只要缓冲区没慢就可以发送消息
-
-
-### 1.17.2. 协程
-
-#### 1.17.2.1. 协程池示例，用于计算数字各位的和
-
-输入12345，输出15(=1+2+3+4+5)
-
-```go
-package main
-
-import (  
-    "fmt"
-    "math/rand"
-    "sync"
-    "time"
-)
-
-type Job struct {  
-    id       int
-    randomno int
-}
-type Result struct {  
-    job         Job
-    sumofdigits int
-}
-
-var jobs = make(chan Job, 10)  
-var results = make(chan Result, 10)
-
-// 实际计算方法
-func digits(number int) int {  
-    sum := 0
-    no := number
-    for no != 0 {
-        digit := no % 10
-        sum += digit
-        no /= 10
-    }
-    time.Sleep(2 * time.Second)
-    return sum
-}
-
-// 一个worker
-func worker(wg *sync.WaitGroup) {  
-    for job := range jobs {
-        output := Result{job, digits(job.randomno)}
-        results <- output
-    }
-    wg.Done()
-}
-
-// 创建worker池
-func createWorkerPool(noOfWorkers int) {  
-    var wg sync.WaitGroup
-    for i := 0; i < noOfWorkers; i++ {
-        wg.Add(1)
-        go worker(&wg)
-    }
-    wg.Wait()
-    close(results)
-}
-
-// 分配任务
-func allocate(noOfJobs int) {  
-    for i := 0; i < noOfJobs; i++ {
-        randomno := rand.Intn(999)
-        job := Job{i, randomno}
-        jobs <- job
-    }
-    close(jobs)
-}
-
-// 获取结果
-func result(done chan bool) {  
-    for result := range results {
-        fmt.Printf("Job id %d, input random no %d , sum of digits %d\n", result.job.id, result.job.randomno, result.sumofdigits)
-    }
-    done <- true
-}
-
-func main() {  
-    startTime := time.Now()
-    
-    noOfJobs := 100
-    go allocate(noOfJobs)
-    
-    done := make(chan bool)
-    go result(done)
-    
-    noOfWorkers := 10
-    createWorkerPool(noOfWorkers)
-    
-    <-done
-    endTime := time.Now()
-    diff := endTime.Sub(startTime)
-    fmt.Println("total time taken ", diff.Seconds(), "seconds")
-}
-```
-
-#### 1.17.2.2. 控制协程数量
-
-```go
-package main
-
-import (
-	"fmt"
-	"sync"
-)
-
-var wg = sync.WaitGroup{}
-
-func main() {
-    userCount := 10
-    ch := make(chan bool, 2) // 10个协程，并发为2
-    for i := 0; i < userCount; i++ {
-        wg.Add(1)
-        go Read(ch, i)
-    }
-
-    wg.Wait()
-}
-
-func Read(ch chan bool, i int) {
-    defer wg.Done()
-
-    ch <- true
-    fmt.Printf("go func: %d, time: %d\n", i, time.Now().Unix())
-    time.Sleep(time.Second)
-    <-ch
-}
-```
-
-进化，控制协程数量、并发数量、执行次数
-
-```go
-package main
-
-import (
-	"fmt"
-	"sync"
-	"time"
-)
-
-var wg sync.WaitGroup
-
-func worker(id, d int) {
-	fmt.Printf("go id: %d, func: %d, time: %d\n", id, d, time.Now().Unix())
-	time.Sleep(time.Second * time.Duration(d))
-}
-
-func main() {
-	userCount := 10         // 协程总数量
-	ch := make(chan int, 5) // 并发协程数量
-	for i := 0; i < userCount; i++ {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			for d := range ch {
-				worker(id, d)
-			}
-		}(i)
-	}
-
-	for i := 0; i < 10; i++ { // 协程执行次数，总10*2=20次
-		ch <- 1
-		ch <- 2
-		//time.Sleep(time.Second)
-	}
-
-	close(ch)
-	wg.Wait()
-}
-
-```
-
-
-
-#### 1.17.2.3. 面试题：交替输出
-
-```go
-package main
-
-import (
-	"fmt"
-	"sync"
-)
-
-var wg = sync.WaitGroup{}
-var ch = make(chan bool)
-
-func echo(ch chan bool, s string) {
-	for {
-		<-ch
-		fmt.Println(s)
-		ch <- true
-	}
-	wg.Done()
-}
-
-func main() {
-	go echo(ch, "11111")
-	wg.Add(1)
-	go echo(ch, "22222")
-	wg.Add(1)
-
-	ch <- true
-	wg.Wait()
-}
-```
-
-
-
-## 1.18. dlv调试
-
-### 1.18.1. 调试时带上命令行参数，`--`后带上参数
+### 2.9.1. 调试时带上命令行参数，`--`后带上参数
 
 ```bash
 dlv debug main.go --output ./bin/license -- -c ./etc/license.json
 dlv exec ./bin/license -- -c ./etc/license.json
 ```
 
-### 1.18.2. 设置字符串可显示长度
+### 2.9.2. 设置字符串可显示长度
 
 ```
 config max-string-len 99999
 ```
 
-### 1.18.3. 常用命令
+### 2.9.3. 常用命令
 
 ```
 // 打断点
@@ -1126,7 +1223,7 @@ trace
 > 参考：[delve/README.md at master · go-delve/delve · GitHub](https://github.com/go-delve/delve/blob/master/Documentation/cli/README.md)
 
 
-## 1.19. 数据库事务处理
+## 2.10. 数据库事务处理
 
 ```go
 db, err := postgreHelper.Open()
@@ -1152,19 +1249,19 @@ defer func() {
 > 参考：[Golang transaction 事务使用的正确姿势](http://www.mspring.org/2019/03/18/Golang-transaction-事务使用的正确姿势/)
 
 
-## 1.20. 锁
+## 2.11. 锁
 
-### 1.20.1. 并发锁 sync.Mutex与sync.RWMutex
+### 2.11.1. 并发锁 sync.Mutex与sync.RWMutex
 
-Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
+Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写。适用于读写不确定的场景，即读写次数没有明显的区别，并且只允许右一个读或者写的场景
 
-RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写
+RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写。经常用于读次数远远多于写次数的场景
 
-### 1.20.2. 锁的实现原理
+### 2.11.2. 锁的实现原理
 
 原子的比较交换操作：`atomic.CompareAndSwapInt32`
 
-### 1.20.3. channel实现互斥锁
+### 2.11.3. channel实现互斥锁
 
 使用缓冲长度为1的channel，加锁为读，解锁为写。
 
@@ -1241,7 +1338,7 @@ func main() {
 }
 ```
 
-### 1.20.4. 文件锁
+### 2.11.4. 文件锁
 
 ```go
 func main() {
@@ -1271,9 +1368,9 @@ func main() {
 
 
 
-## 1.21. 使用避坑
+## 2.12. 使用避坑
 
-### 1.21.1. 修改全局变量的问题
+### 2.12.1. 修改全局变量的问题
 
 ```go
 package main
@@ -1349,7 +1446,7 @@ d value: 4, point: 0x5131d8
 b value: 6, point: 0xc00009c020
 ```
 
-## 1.22. map并发问题
+## 2.13. map并发问题
 
 并发写一个map会出现问题，运行时报错：`fatal error: concurrent map read and map write`
 
@@ -1419,7 +1516,7 @@ scene.Range(func(k, v interface{}) bool {
 
 1、不适用于大量写的场景，容易导致读操作频繁无法命中，而进一步加锁读取
 
-## 1.23. logrus使用
+## 2.14. logrus使用
 
 logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: Structured, pluggable logging for Go](https://github.com/sirupsen/logrus)。其他常用日志库还有[Zerolog](https://github.com/rs/zerolog)、 [Zap](https://github.com/uber-go/zap)和[Apex](https://github.com/apex/log).
 
@@ -1427,7 +1524,7 @@ logrus是十分常用的第三方日志库，项目地址：[sirupsen/logrus: St
 
 ![image-20220526100147494](../imgs/image-20220526100147494.png)
 
-### 1.23.1. 配置formater，指定日志输入格式
+### 2.14.1. 配置formater，指定日志输入格式
 
 ```go
 type TopLog struct {
@@ -1522,7 +1619,7 @@ func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 ```
 
-### 1.23.2. 配置gorm使用logrus
+### 2.14.2. 配置gorm使用logrus
 
 ```go
 type Database struct {
@@ -1616,11 +1713,11 @@ func (*GormLogger) Print(v ...interface{}) {
 }
 ```
 
-## 1.24. 性能问题分析与相关工具
+## 2.15. 性能问题分析与相关工具
 
-### 1.24.1. pprof
+### 2.15.1. pprof
 
-#### 1.24.1.1. 修改代码启用pprof
+#### 2.15.1.1. 修改代码启用pprof
 
 ```go
 package data
@@ -1659,17 +1756,17 @@ func main() {
 }
 ```
 
-#### 1.24.1.2. 页面查看pprof
+#### 2.15.1.2. 页面查看pprof
 
 [192.168.56.103:6060/debug/pprof/heap?debug=1](http://192.168.56.103:6060/debug/pprof/heap?debug=1)
 
-#### 1.24.1.3. go tool pprof 命令行查看
+#### 2.15.1.3. go tool pprof 命令行查看
 
 ```bash
 go tool pprof -inuse_space  http://127.0.0.1:6060/debug/pprof/heap
 ```
 
-#### 1.24.1.4. go tool pprof 图形化查看
+#### 2.15.1.4. go tool pprof 图形化查看
 
 ```bash
 go tool pprof -http=0.0.0.0:8081  http://127.0.0.1:6060/debug/pprof/heap
@@ -1685,7 +1782,7 @@ go tool pprof -http=0.0.0.0:8081  http://127.0.0.1:6060/debug/pprof/heap
 > 参考：[golang 内存分析/动态追踪](https://lrita.github.io/2017/05/26/golang-memory-pprof/#go-tool)
 
 
-### 1.24.2. gops进程诊断工具
+### 2.15.2. gops进程诊断工具
 
 在go 1.17以上版本下安装
 
@@ -1752,7 +1849,7 @@ Use "gops [command] --help" for more information about a command.
 > 参考：[Go 进程诊断工具 gops](https://golang2.eddycjy.com/posts/ch6/06-gops/)
 
 
-### 1.24.3. 开启gc状态打印
+### 2.15.3. 开启gc状态打印
 
 ```bash
 GODEBUG=gctrace=1 /opt/topsec/topihs/TopIHS/debug/patch-srv
@@ -1799,7 +1896,7 @@ VmSwap:	       0 kB
 主动触发gc：`runtime.GC`
 触发将内存归还给操作系统的行为：`debug.FreeOSMemory`
 
-### 1.24.4. 打印内存状态
+### 2.15.4. 打印内存状态
 
 ```go
 func print_heap_info() {
@@ -1810,7 +1907,7 @@ func print_heap_info() {
 }
 ```
 
-### 1.24.5. 竞态检测，提前发现内存并发问题
+### 2.15.5. 竞态检测，提前发现内存并发问题
 
 ```bash
 go run -race mysrc.go
@@ -1818,7 +1915,7 @@ go run -race mysrc.go
 
 > 参考：[Go 译文之竞态检测器 race](https://juejin.cn/post/6844903918233714695)
 
-### 1.24.6. 内存逃逸分析
+### 2.15.6. 内存逃逸分析
 
 指的是一个变量或对象在其作用域之外仍然被引用或访问的情况
 
@@ -1847,9 +1944,9 @@ go tool compile -S main.go
 
 > 参考：[1.9 我要在栈上。不，你应该在堆上](https://eddycjy.gitbook.io/golang/di-1-ke-za-tan/stack-heap)
 
-## 1.25. 高并发与性能优化
+## 2.16. 高并发与性能优化
 
-### 1.25.1. sync.Pool
+### 2.16.1. sync.Pool
 
 ```go
 package main
@@ -1892,7 +1989,7 @@ func main() {
 
 > 参考：[深度解密 Go 语言之 sync.Pool](https://www.cnblogs.com/qcrao-2018/p/12736031.html)
 
-### 1.25.2. 变量的线程安全问题
+### 2.16.2. 变量的线程安全问题
 
 对于变量的并发访问往往会产生竞态问题，不同类型由于实现方式不同产生竞态问题的条件也不同，具体可在运行或编译时加`--race`参数检测
 
@@ -1900,7 +1997,7 @@ func main() {
 
 > 参考：[go - Can I concurrently write different slice elements - Stack Overflow](https://stackoverflow.com/questions/49879322/can-i-concurrently-write-different-slice-elements)
 
-#### 1.25.2.1. 并发安全的数据类型
+#### 2.16.2.1. 并发安全的数据类型
 
 - 原子操作
 - 通道Channel
@@ -1910,10 +2007,10 @@ func main() {
 
 基础数据类型整型、字符串、数组、切片、map等都**不是**线程安全的
 
-#### 1.25.2.2. sync/atomic
+#### 2.16.2.2. sync/atomic
 
 
-#### 1.25.2.3. sync.Map，支持线程安全的map
+#### 2.16.2.3. sync.Map，支持线程安全的map
 
 ```go
 package main
@@ -1957,7 +2054,7 @@ func main()  {
 > 参考：[深度解密 Go 语言之 sync.map](https://www.cnblogs.com/qcrao-2018/p/12833787.html)
 
 
-### 1.25.3. bytes.Buffer
+### 2.16.3. bytes.Buffer
 
 ```
 # 丢弃一个io.Reader
@@ -1965,7 +2062,7 @@ io.Copy(ioutil.Discard, dataIn)
 ```
 
 
-### 1.25.4. 实例：读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
+### 2.16.4. 实例：读取上传的xml文件并解析时，造成大量内存占用且长时间不能释放
 
 优化前，直接把上传的文件读到内存并解析
 
@@ -2016,7 +2113,31 @@ _ = decoder.Decode(&head)
 > 
 > 2、[内存泄漏的在线排查](https://panzhongxian.cn/cn/2020/12/memory-leak-problem-1/)
 
-## 1.26. 多协程并发的优秀实现
+## 2.17. 并发设计模式
+
+### 2.17.1. 屏障模式
+
+就是一种屏障，用来阻塞goroutine直到聚合所有goroutine返回结果，可以使用通道来实现
+
+### 2.17.2. 未来模式
+
+也称为承诺模式，主进程不等子进程执行完就直接返回，然后等到未来执行完的时候再去取结果。
+
+### 2.17.3. 管道模式
+
+也称为流水线模式。每一道工序的输出，就是下一道工序的输入，在工序之间传递的东西就是数据，而传递的数据称为数据流
+
+### 2.17.4. 扇出扇入模式
+
+扇出是指多个函数可以从同一通道读取数据，直到该通道关闭。
+
+扇入是指一个函数可以从多个输入中读取数据并继续执行，直到所有输入都关闭。
+
+### 2.17.5. 协程池模式
+
+### 2.17.6. 发布-订阅模式
+
+## 2.18. 多协程并发的优秀实现
 
 几个原则：
 
@@ -2076,9 +2197,105 @@ func main() {
 
 该实现中，任何一个服务遇到错误时另外一个服务都能干净地退出，由系统的进程管理器来重启
 
-## 1.27. 错误处理
+## 2.19. 并发控制的方法
 
-### 1.27.1. 错误处理注意三点：
+### 2.19.1. 消息队列+worker
+
+### 2.19.2. 利用带缓冲的通道
+
+### 2.19.3. Semaphore（信号量）
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"golang.org/x/sync/semaphore"
+	"sync"
+	"time"
+)
+
+func main() {
+	ctx := context.TODO()
+
+	// 创建一个信号量，最多允许两个并发
+	sem := semaphore.NewWeighted(2)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			// 获取信号量
+			if err := sem.Acquire(ctx, 1); err != nil {
+				fmt.Printf("goroutine %d: %v\n", id, err)
+				return
+			}
+			defer sem.Release(1)
+
+			// 模拟一些工作
+			fmt.Printf("goroutine %d: Working\n", id)
+			time.Sleep(time.Second)
+
+		}(i)
+	}
+
+	wg.Wait()
+}
+```
+
+### 2.19.4. Singleflight
+
+`golang.org/x/sync/singleflight` 包提供了一个确保只有一个请求执行某个函数的机制，即使这个函数同时被多个 goroutine 请求。
+
+```go
+package main
+
+import (
+	"fmt"
+	"golang.org/x/sync/singleflight"
+	"sync"
+	"time"
+)
+
+func main() {
+	var g singleflight.Group
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+
+			// 使用 singleflight.Do 保证只有一个 goroutine 执行某个函数
+			val, err, _ := g.Do("key", func() (interface{}, error) {
+				fmt.Printf("goroutine %d: Executing\n", id)
+				time.Sleep(time.Second)
+				return "result", nil
+			})
+
+			if err != nil {
+				fmt.Printf("goroutine %d: %v\n", id, err)
+				return
+			}
+
+			// 所有 goroutine 都会打印相同的结果，而只有一个执行了真正的函数
+			fmt.Printf("goroutine %d: Result: %v\n", id, val)
+		}(i)
+	}
+
+	wg.Wait()
+}
+```
+
+
+
+## 2.20. 错误处理
+
+### 2.20.1. 错误处理注意三点：
 
 - 错误只处理一次，避免出现重复的日志
 - 错误应该包含相关信息，从错误文字上就能大概判断错误位置
@@ -2135,7 +2352,7 @@ runtime.goexit
 exit status 1
 ```
 
-### 1.27.2. 自定义错误
+### 2.20.2. 自定义错误
 
 根据error接口定义，自定义错误只要实现了Error方法即可
 ```go
@@ -2184,7 +2401,7 @@ func main() {
 }
 ```
 
-## 1.28. go build参数
+## 2.21. go build参数
 
 ```
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l" -mod=vendor -o runtime/bin/license-srv cmd/main.go
@@ -2192,19 +2409,21 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 
 1、gcflags编译参数：`go tool compile --help`查看可用参数
 
--N 禁用优化
+- `-N`：禁用优化。使用 `-N` 标志可以禁用大部分编译器的优化，适用于调试代码时。
 
--l 禁用内联
+- `-l`：禁用内联。使用 `-l` 标志可以禁用编译器的函数内联优化。
 
--m 打印出逃逸分析的优化策略
+- `-m`：打印内存分配统计信息。使用 `-m` 标志可以让编译器输出关于内存分配的统计信息，用于分析程序的内存使用情况，可看到逃逸分析。
+- `-m=1`：打印内存分配详细信息。使用 `-m=1` 标志可以让编译器输出更详细的内存分配信息，包括每个函数的内存分配情况。
+- `-m=2`：打印内存分配和回收详细信息。使用 `-m=2` 标志可以让编译器输出更详细的内存分配和回收信息，包括每次内存分配和回收的位置和大小。
+- `-S`： 输出汇编代码。使用 `-S` 标志可以让编译器输出编译后的汇编代码，用于分析程序的性能和效率。
 
 2、ldflags链接参数：`go tool link –help`查看可用参数
 
--w 禁用DWARF
+- `-s`： 禁止符号表。使用 `-s` 标志可以在生成的可执行文件中移除符号表和调试信息，减小可执行文件的大小。
+- `-w`： 禁止调试信息。使用 `-w` 标志可以在生成的可执行文件中移除调试信息，减小可执行文件的大小。
 
--s 禁用符号表
-
-### 1.28.1. cgo交叉编译
+### 2.21.1. cgo交叉编译
 
 在[Index of /x86_64-linux-musl/](https://more.musl.cc/x86_64-linux-musl/)下载对应平台的`*-linux-musl-cross.tgz / `，解压后添加到PATH。
 
@@ -2216,13 +2435,13 @@ CGO_ENABLED=1 CC=aarch64-linux-musl-gcc CXX=aarch64-linux-musl-g++ GOOS=linux GO
 
 > 参考：[CGO 交叉静态编译 · Issue #27 · eyasliu/blog (github.com)](https://github.com/eyasliu/blog/issues/27)
 
-### 1.28.2. 查看初始化过程
+### 2.21.2. 查看初始化过程
 
 ```bash
 go build --ldflags=--dumpdep main.go 2>&1 | grep inittask
 ```
 
-### 1.28.3. 编译时为变量赋值
+### 2.21.3. 编译时为变量赋值
 
 用于编译时为程序注入git等信息，类似dgraph
 
@@ -2253,7 +2472,7 @@ func main() {
 go build -ldflags "-X 'main.goVersion=$(go version)' -X 'main.gitHash=$(git show -s --format=%H)' -X 'main.buildTime=$(git show -s --format=%cd)'" -o main.exe version.go
 ```
 
-### 1.28.4. 指定包时使用通配符
+### 2.21.4. 指定包时使用通配符
 
 3个点表示匹配所有的字符串。下面命令会编译chapter3目录下的所有包：
 
@@ -2264,14 +2483,14 @@ go build github.com/goinaction/code/chapter3/...
 
 
 
-## 1.29. go build缓存目录
+## 2.22. go build缓存目录
 
 缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
 
 
-## 1.30. init函数
+## 2.23. init函数
 
-### 1.30.1. 执行顺序
+### 2.23.1. 执行顺序
 
 `import --> const --> var --> init()`
 
@@ -2282,7 +2501,7 @@ go build github.com/goinaction/code/chapter3/...
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
 
-### 1.30.2. 使用原则
+### 2.23.2. 使用原则
 
 init 函数通常用于：
 
@@ -2300,11 +2519,11 @@ init 函数通常用于：
 
 > 参考：[答应我，别在go项目中用init()了](https://studygolang.com/articles/34488)
 
-## 1.31. context的使用
+## 2.24. context的使用
 
 context 用来解决 goroutine 之间*退出通知*、*元数据传递*的功能。
 
-### 1.31.1. 停止协程
+### 2.24.1. 停止协程
 
 ```go
 package main
@@ -2358,7 +2577,7 @@ func main() {
 
 > 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
 
-### 1.31.2. 协程超时
+### 2.24.2. 协程超时
 
 `context.WithTimeout`返回上下文和一个取消方法。`ctx.Done`会在超时时间到达，或执行取消方法时收到消息。
 
@@ -2380,7 +2599,7 @@ time.Sleep(5*time.Second)
 cancel()
 ```
 
-### 1.31.3. 元数据传递
+### 2.24.3. 元数据传递
 
 ```go
 package main
@@ -2408,9 +2627,9 @@ func process(ctx context.Context) {
 }
 ```
 
-## 1.32. 编码规范
+## 2.25. 编码规范
 
-### 1.32.1. 命名规范
+### 2.25.1. 命名规范
 
 - 文件名全部小写，除单元测试外避免使用下划线
 - 变量名、常量、函数名使用驼峰式命名，不建议使用下划线和数字
@@ -2418,9 +2637,9 @@ func process(ctx context.Context) {
 
 > 参考：[命名规范 | go-zero](https://go-zero.dev/cn/docs/develop/naming-spec/)
 
-## 1.33. 错误处理，error与panic
+## 2.26. 错误处理，error与panic
 
-### 1.33.1. 自定义error
+### 2.26.1. 自定义error
 
 error接口定义：
 ```go
@@ -2478,7 +2697,7 @@ switch err.(type)
 }
 ```
 
-### 1.33.2. panic恢复
+### 2.26.2. panic恢复
 
 1. 程序中非致命的问题应避免使用panic，除非目的就是要中断程序（当前协程）
 2. 守护型协程应该使用recover捕获panic并恢复，避免协程由于异常退出
@@ -2532,7 +2751,7 @@ func main() {
 }
 
 ```
-## 1.34. 内置排序方法
+## 2.27. 内置排序方法
 
 使用内置排序需要实现`sort.Interface`接口
 ```go
@@ -2597,15 +2816,15 @@ func main() {
 }
 ```
 
-## 1.35. GMP模型与调度流程
+## 2.28. GMP模型与调度流程
 
-### 1.35.1. GMP模型
+### 2.28.1. GMP模型
 
 - G（Goroutine）：协程
 - M（Machine）：对内核级线程的封装
 - P（Processor）：即为G和M的调度对象，用来调度G和M之间的关联关系，其数量可通过GoMAXPROCS()来设置，默认为核心数
 
-### 1.35.2. 调度流程
+### 2.28.2. 调度流程
 
 1. 存在一个全局G队列
 2. 每个P有一个局部G队列，
@@ -2615,11 +2834,11 @@ func main() {
 
 > 参考：[用 GODEBUG 看调度跟踪](https://golang2.eddycjy.com/posts/ch6/04-godebug-sched/)
 
-## 1.36. GC垃圾回收
+## 2.29. GC垃圾回收
 
-### 1.36.1. 三色标记法
+### 2.29.1. 三色标记法
 
-### 1.36.2. GC触发时机
+### 2.29.2. GC触发时机
 
 自动GC
 
@@ -2627,14 +2846,14 @@ func main() {
 
 手动GC：`runtime.GC`
 
-### 1.36.3. GC流程
+### 2.29.3. GC流程
 
 
 > 参考：[用 GODEBUG 看 GC](https://golang2.eddycjy.com/posts/ch6/05-godebug-gc/)
 
-## 1.37. 变量分配在堆上还是栈上，内存逃逸分析
+## 2.30. 变量分配在堆上还是栈上，内存逃逸分析
 
-### 1.37.1. 哪些情况会分配到堆上
+### 2.30.1. 哪些情况会分配到堆上
 
 1. Go 中声明一个函数内局部变量时，当编译器发现变量的作用域没有逃出函数范围时，就会在栈上分配内存，反之则分配在堆上，逃逸分析由编译器完成，作用于编译阶段
 2. 指针类型的变量
@@ -2642,7 +2861,7 @@ func main() {
 4. 动态类型：返回返回一个interface{}类型
 5. 闭包引用对象
 
-### 1.37.2. 检查该变量是在栈上分配还是堆上分配
+### 2.30.2. 检查该变量是在栈上分配还是堆上分配
 
 有两种方式可以确定变量是在堆还是在栈上分配内存:
 -   通过编译后生成的汇编函数来确认，在堆上分配内存的变量都会调用 runtime 包的 `newobject` 函数；
@@ -2660,7 +2879,7 @@ go build -gcflags "-m -l" main.go
 > 1. [Frequently Asked Questions (FAQ) - The Go Programming Language](https://go.dev/doc/faq#stack_or_heap)
 > 2. [golang 中函数使用值返回与指针返回的区别，底层原理分析](https://cloud.tencent.com/developer/article/1890639)
 
-## 1.38. 内部包internal
+## 2.31. 内部包internal
 
 内部包的规范约定：导出路径包含`internal`关键字的包，只允许`internal`的父级目录及父级目录的子包导入，其它包无法导入。
 
@@ -2685,7 +2904,7 @@ go build -gcflags "-m -l" main.go
 
 如上包结构的程序，`resources/internal/cpu`和`resources/internal/mem`只能被`resources`包及其子包`resources/input`中的代码导入，不能被`prototype`包里的代码导入。
 
-## 1.39. json struct tag
+## 2.32. json struct tag
 
 1）不指定tag
 
@@ -2749,7 +2968,7 @@ Int64String int64 json:",string" // “Int64String”:“0”
 
 “string” opt的使用可以在Marshal/Unmarshal时自动进行数据类型的转换，减少了手动数据转换的麻烦，但是一定要注意使用的范围，对不满足的类型使用，是会报错的。
 
-## 1.40. 反射reflect的使用
+## 2.33. 反射reflect的使用
 
 一个ORM的例子，传入对象，生成一个插入sql：
 
@@ -2812,7 +3031,7 @@ func TestMakeCreateSql(t *testing.T) {
 	}
 }
 ```
-## 1.41. unsafe的使用
+## 2.34. unsafe的使用
 
 `unsafe.Pointer`表示任意类型且可寻址的指针值，可以在不同的指针类型之间进行转换（类似 C 语言的 void * 的用途）。其包含四种核心操作：
 
@@ -2841,17 +3060,17 @@ func main(){
 }
 ```
 
-## 1.42. runtime包的使用
+## 2.35. runtime包的使用
 
-### 1.42.1. 打印堆栈
+### 2.35.1. 打印堆栈
 
 ```go
 debug.PrintStack()
 ```
 
-## 1.43. http包的使用
+## 2.36. http包的使用
 
-### 1.43.1. 转发请求
+### 2.36.1. 转发请求
 
 ```go
 func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
@@ -2882,46 +3101,7 @@ func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
 }
 ```
 
-## 1.44. switch的使用
-
-1、switch后可不跟变量
-2、case隐式break，只要匹配上就break不再匹配。如果需要匹配多个case，可使用fallthrough
-
-```go
-package main
-
-import (
-	"fmt"
-)
-
-func main() {
-	today := 6
-
-	switch {
-	case today < 5:
-		fmt.Println("Clean your house.")
-	case today < 8:
-		fmt.Println("Clean your house.")
-		fallthrough
-	case today <= 10:
-		fmt.Println("Buy some wine.")
-	case today > 15:
-		fmt.Println("Visit a doctor.")
-	case today == 25:
-		fmt.Println("Buy some food.")
-	default:
-		fmt.Println("No information available for that day.")
-	}
-}
-
-```
-输出
-```
-Clean your house.
-Buy some wine.
-```
-
-## 1.45. embed文件嵌入
+## 2.37. embed文件嵌入
 
 1.16版本引入
 
@@ -2935,7 +3115,7 @@ import (
 //go:embed preset_regex.json
 var presetRegex []byte
 ```
-## 1.46. 程序平滑退出
+## 2.38. 程序平滑退出
 
 linux下可以使用`man 7 signal`查看POSIX系统信号，常用的2是`ctrl+c`，15是`kill`，9是`kill -9`,9是无条件结束程序，不能被捕获。
 
@@ -3012,7 +3192,7 @@ func cleanup(cancel context.CancelFunc) {
 
 ```
 
-## 1.47. 定时器
+## 2.39. 定时器
 
 定时器方法：
 
@@ -3021,7 +3201,7 @@ func cleanup(cancel context.CancelFunc) {
 - `time.After`：一段时间后发送消息到通道
 - `time.AfterFunc`：一段时间后执行一个回调函数
 - `time.NewTicker`：重复定时器。从new开始，每隔一段时间往通道里发送一个消息。如果通道里已经有消息，则丢弃。需要Stop释放
-- `time.Tick`：NewTicker的简化版本，无法Stop，所有有泄露风险
+- `time.Tick`：NewTicker的简化版本，无法Stop，所以有泄露风险，适用于整个应用程序生命周期
 
 
 
@@ -3053,7 +3233,7 @@ func testTicker() {
 30.0111594 tick n3
 ```
 
-## 1.48. cgo
+## 2.40. cgo
 
 ```go
 package main
@@ -3076,7 +3256,7 @@ func main() {
 }
 ```
 
-## 1.49. 项目目录结构
+## 2.41. 项目目录结构
 ```
 /myproject
  /api
@@ -3103,7 +3283,7 @@ func main() {
 - /pkg: 此目录包含库代码，这些代码可以被其他应用程序使用。
 - /web: 此目录包含Web服务器的代码。
 
-## 1.50. 编译时注入编译信息
+## 2.42. 编译时注入编译信息
 
 类似dgraph做的，编译时写入版本、编译日期等信息到进程
 
@@ -3111,17 +3291,19 @@ func main() {
 go build -ldflags "-s -w -X 'pkg/gconfig.gitHash=5bfd92b6b23beee0c94969926cdac8ce71aff23a" -o ./bin/test ./cmd/main.go
 ```
 
-# 2. 第三方包
+# 3. 内部包
 
-## 2.1. Gorm
+# 4. 第三方包
 
-### 2.1.1. 相对更新：
+## 4.1. Gorm
+
+### 4.1.1. 相对更新：
 
 ```go
 Db.Model(xy).Where("id = ? ", id).Update("sign_up_num", gorm.Expr("sign_up_num+ ?", 1))
 ```
 
-### 2.1.2. 查询，不存在则创建
+### 4.1.2. 查询，不存在则创建
 
 ```go
 var licTmp model.CascadeLic
@@ -3129,7 +3311,7 @@ var licTmp model.CascadeLic
 txn.Where(model.CascadeLic{Type: "lower", LowerTAG: lic.LowerTAG, UUID: lic.UUID}).Attrs(lic).FirstOrCreate(&licTmp)
 ```
 
-### 2.1.3. 复用通用的逻辑
+### 4.1.3. 复用通用的逻辑
 
 ```go
 whereScopeFuncs := make([]func(db *gorm.DB) *gorm.DB, 0)
@@ -3150,18 +3332,18 @@ if len(whereScopeFuncs) > 0 {
 }
 ```
 
-### 2.1.4. 查询后判断错误为未找到
+### 4.1.4. 查询后判断错误为未找到
 
 ```go
 errors.Is(err, gorm.ErrRecordNotFound)
 ```
 
-### 2.1.5. 日志
+### 4.1.5. 日志
 
 
 > 参考：[Logger | GORM - The fantastic ORM library for Golang, aims to be developer friendly.](https://gorm.io/zh_CN/docs/logger.html)
 
-### 2.1.6. 生成sql语句
+### 4.1.6. 生成sql语句
 
 开启调试模式后，gorm会打印执行的sql语句，但这个语句不一定是实际执行的sql，特别是在参数经过预处理之后，比如
 
@@ -3193,7 +3375,7 @@ SELECT * FROM "td_osloginfo"  WHERE ((logtype LIKE '%''%' or items LIKE '%''%'))
 - 预处理时不需要对单引号转义，数据库会自动转义；sprintf拼接的则需要转义。
 - gorm的ToSQL生成的sql不安全，官方不建议用于生产环境
 
-## 2.2. grpc-gateway
+## 4.2. grpc-gateway
 
 [grpc-gateway](https://link.segmentfault.com/?enc=IiOARw%2FsDGNqscUzUzwHcw%3D%3D.rS7Vg97osGOKT4igbY52nEs7DaK4M2QHhyaxkrfkoYZgHMBU7tgWk3gR4PDkgVJi)是protoc的一个插件。它读取gRPC服务定义，并生成一个反向代理服务器，将RESTful JSON API转换为gRPC
 
@@ -3203,7 +3385,7 @@ go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
 > 参考：[go - Grpc+Grpc Gateway实践一 介绍与环境安装](https://segmentfault.com/a/1190000013339403)
 
-## 2.3. fvbock/endless
+## 4.3. fvbock/endless
 
 http服务的平滑重启
 
@@ -3211,19 +3393,19 @@ http服务的平滑重启
 go get -u github.com/fvbock/endless
 ```
 
-## 2.4. cron定时任务
+## 4.4. cron定时任务
 
 ```bash
 go get github.com/robfig/cron/v3@v3.0.0
 ```
 
-## 2.5. pkg/errors
+## 4.5. pkg/errors
 
 使用 `github.com/pkg/errors` 包装 `errors`
 
 > 参考：[GitHub - llitfkitfk/go-best-practice: Go语言实战: 编写可维护Go语言代码建议](https://github.com/llitfkitfk/go-best-practice#72-错误只处理一次)
 
-## 2.6. trylock
+## 4.6. trylock
 
 非阻塞拿锁，非阻塞获取锁状态
 
@@ -3277,7 +3459,7 @@ func (m *Mutex) IsLocked() bool {
 
 > 参考：[扩展golang的sync mutex的trylock及islocked](https://xiaorui.cc/archives/5084)
 
-## 2.7. 获取系统信息
+## 4.7. 获取系统信息
 
 ```bash
 go get github.com/shirou/gopsutil
@@ -3285,26 +3467,59 @@ go get github.com/shirou/gopsutil
 
 github.com/prometheus/procfs
 
-## 2.8. 日志组件
+## 4.8. 日志组件
 
-### 2.8.1. logrus
+### 4.8.1. logrus
 
-### 2.8.2. zap
+### 4.8.2. zap
 
-### 2.8.3. seelog
+### 4.8.3. seelog
 
-## 2.9. 基础助手
+## 4.9. 基础助手
 
-### 2.9.1. go实现集合
+### 4.9.1. go实现集合
 
 集合的特点是元素不重复
 
 [sets package - k8s.io/apimachinery/pkg/util/sets - Go Packages](https://pkg.go.dev/k8s.io/apimachinery/pkg/util/sets)
-# 3. 开发环境
 
-## 3.1. vscode
+## 4.10. golang.org/x/time/rate 限流
 
-### 3.1.1. 配置调试当前go文件
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"golang.org/x/time/rate"
+)
+
+func main() {
+	// 每1毫秒放1个令牌，桶容量大小为10
+	r := rate.Every(1 * time.Millisecond)
+	limiter := rate.NewLimiter(r, 10)
+
+	for i := 0; i < 10; i++ {
+		// 尝试获取一个令牌，如果获取不到，则阻塞等待
+		if limiter.Allow() {
+			fmt.Println("Received token")
+		} else {
+			fmt.Println("No token available")
+		}
+		time.Sleep(200 * time.Millisecond) // 限制请求速率
+	}
+}
+
+```
+
+
+
+# 5. 开发环境
+
+## 5.1. vscode
+
+### 5.1.1. 配置调试当前go文件
 
 ```json
 {

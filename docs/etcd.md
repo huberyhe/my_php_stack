@@ -69,10 +69,14 @@ etcdctl --endpoints=$ENDPOINTS get sample
 ### 锁
 
 ```bash
+# 终端1，获取锁。10s有效期，返回一个序号
+LOCK_ID=$(etcdctl --endpoints=$ENDPOINTS lock mutex1 --ttl=10)
+
+# 终端2，尝试获取锁，但阻塞直到上面的锁操作主动退出
 etcdctl --endpoints=$ENDPOINTS lock mutex1
 
-# 另外一个终端尝试获取锁，但阻塞直到上面的锁操作主动退出
-etcdctl --endpoints=$ENDPOINTS lock mutex1
+# 终端1，释放锁
+etcdctl --endpoints=$ENDPOINTS unlock mutex1 $LOCK_ID
 ```
 
 ### 选举
@@ -80,7 +84,7 @@ etcdctl --endpoints=$ENDPOINTS lock mutex1
 ```bash
 etcdctl --endpoints=$ENDPOINTS elect one p1
 
-# 另外一个终端竞选同一个block，但知道上面的操作退出才能竞选成功
+# 另外一个终端竞选同一个block，但直到上面的操作退出才能竞选成功
 etcdctl --endpoints=$ENDPOINTS elect one p2
 ```
 

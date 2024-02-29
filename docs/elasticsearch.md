@@ -2,17 +2,31 @@
 
 [TOC]
 
-官方中文文档v2.x：[Elasticsearch: 权威指南 | Elastic]([序言 | Elasticsearch: 权威指南 | Elastic](https://www.elastic.co/guide/cn/elasticsearch/guide/current/foreword_id.html))
+官方中文文档v2.x：[Elasticsearch: 权威指南 | Elastic](https://www.elastic.co/guide/cn/elasticsearch/guide/current/foreword_id.html)
 
 官方最新版本文档：[Elasticsearch Guide [8.9] | Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 
-# 1. 基本使用
+# 1. 使用场景
 
-## 1.1. 文档元数据
+虽然mongodb也可以存储和查询大量的日志数据，但es在日志分析方面具有更多的优势和特性
+
+1、全文搜索和复杂查询
+
+2、实时性能和聚合分析
+
+3、灵活的数据模型
+
+4、可视化和监控
+
+
+
+# 2. 基本使用
+
+## 2.1. 文档元数据
 
 三个元数据唯一标识一个文档：`_index`索引，`_type`类型，`_id`唯一标识
 
-## 1.2. 查询方法
+## 2.2. 查询方法
 
 ```
 curl -i -X GET "url?args" -H "Content-Type: application/json" --data ""
@@ -22,7 +36,7 @@ curl -i -X GET "url?args" -H "Content-Type: application/json" --data ""
 
 不常见的是，es的GET请求可以接受请求体，此时请求体与url参数同时生效。
 
-## 1.3. CRUD
+## 2.3. CRUD
 
 ```
 # 查询一个文档
@@ -164,7 +178,7 @@ GET index_name/_search
 > 1、[Elasticsearch range query on number in string format - Stack Overflow](https://stackoverflow.com/questions/55374426/elasticsearch-range-query-on-number-in-string-format)
 > 2、[Range aggregation | Elasticsearch Guide [8.8] | Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-range-aggregation.html#_script)
 
-## 1.4. 并发控制
+## 2.4. 并发控制
 
 es通过版本号来实现乐观并发控制，每次更新文档后文档的版本号加1，再修改或删除时带上版本号则es会校验当前文档版本号是否与请求的版本号匹配，匹配才能修改和删除，否则返回409
 
@@ -176,13 +190,13 @@ PUT /website/blog/1?version=1
 }
 ```
 
-## 1.5. 映射
+## 2.5. 映射
 
 索引中每个文档都有 _类型_ 。每种类型都有它自己的 _映射_ ，或者 _模式定义_
 
 当你索引一个包含新域的文档—​之前未曾出现-- Elasticsearch 会使用 _动态映射_ ，通过JSON中基本数据类型，尝试猜测域类型。
 
-### 1.5.1. 查看映射
+### 2.5.1. 查看映射
 
 取得索引 `gb` 中类型 `tweet` 的映射
 
@@ -190,7 +204,7 @@ PUT /website/blog/1?version=1
 GET /gb/_mapping/tweet
 ```
 
-### 1.5.2. 自定义域映射
+### 2.5.2. 自定义域映射
 
 定义索引gb中类型tweet的映射，字段有tweet、date、name、user_id。
 
@@ -242,14 +256,14 @@ GET /gb/_analyze
 }
 ```
 
-### 1.5.3. 索引模板
+### 2.5.3. 索引模板
 
 [Index templates | Elasticsearch Guide [7.17] | Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/index-templates.html)
 
-## 1.5. 聚合查询
+## 2.6. 聚合查询
 
 
-## 1.6. 其他
+## 2.7. 其他
 
 在分布式系统中，对结果排序的成本随分页的深度成指数上升。这就是 web 搜索引擎对任何查询都不要返回超过 1000 个结果的原因。
 
@@ -276,3 +290,11 @@ curl -X GET "132.131.0.21:9200?pretty" -H ''
 ```
 curl -X GET 'localhost:9200/*,-dlp-*/_search?pretty'
 ```
+
+# 3. 部署与集群
+
+1、单节点
+
+2、副本：主节点和副本节点都有全部分片数据。所有新近被索引的文档都将会保存在主分片上，然后被并行的复制到对应的副本分片上
+
+3、水平扩容：至少需要三个节点，每个节点包含部分主分片和部分副本分片。一个节点发生故障时，另外2个节点仍然有全部分片数据
