@@ -141,19 +141,22 @@ fmt.Println(b) // 2,3,6
 如果在创建切片时设置切片的容量和长度一样，就可以强制让新切片的第一个append操作创建一个新的底层数组，与原有的底层数组分离。分离后，可以安全地进行后续修改。
 
 ```go
+// 部分复制，指定容量，append会分离底层数组
 a := []int{1, 2, 3, 4, 5}
-
-// 部分复制
 b := a[1:3:3]
 b = append(b, 6)
 fmt.Println(a) // 1,2,3,4,5
 fmt.Println(b) // 2,3,6
 
-// 整个复制
-c := a[:]
-c = append(c, 6)
-fmt.Println(a) // 1,2,3,4,5
-fmt.Println(c) // 1,2,3,4,5,6
+
+// 整个复制，没有指定容量，所以如果a本身容量有多余，则c与a的底层数组可能还是同一个
+a = make([]int, 0, 5)
+a = append(a, 2)
+a = append(a, 1)
+d := a[:]
+d = append(d, 6)
+sort.Ints(d) // 对d排序，改变了a的值
+fmt.Printf("%p %p %v %v\n", &a[0], &d[0], a, d) // 0xc00007a000 0xc00007a000 [1 2] [1 2 6]
 ```
 
 也可以使用copy来创建一个独立副本
@@ -335,9 +338,7 @@ Clean your house.
 Buy some wine.
 ```
 
-## 1.11. 并发，协程与管道
-
-### 1.11.1. 通道
+## 1.11. 通道
 
 1、 只有可写的通道才能close，close应该在发送方执行
 
@@ -366,9 +367,9 @@ b := <- a
 无缓冲通道必须有接收方准备好接收数据时数据才能发送进去，可以保证同步；有缓冲通道只要缓冲区没慢就可以发送消息
 
 
-### 1.11.2. 协程
+## 1.12. 协程
 
-#### 1.11.2.1. 协程池示例，用于计算数字各位的和
+### 1.12.1. 协程池示例，用于计算数字各位的和
 
 输入12345，输出15(=1+2+3+4+5)
 
@@ -464,7 +465,7 @@ func main() {
 }
 ```
 
-#### 1.11.2.2. 控制协程数量
+### 1.12.2. 控制协程数量
 
 ```go
 package main
@@ -542,7 +543,7 @@ func main() {
 
 
 
-#### 1.11.2.3. 面试题：交替输出
+### 1.12.3. 面试题：交替输出
 
 ```go
 package main
@@ -722,6 +723,34 @@ func main() {
     fmt.Println(st, s, m) // {1} [11 2 3] map[a:11 b:2 c:3]
 }
 ```
+
+```go
+// You can edit this code!
+// Click here and start typing.
+package main
+
+import "fmt"
+
+func test(nums []int) {
+	nums[0] = 11
+	nums = append(nums, 4)
+}
+
+func test2(nums *[]int) {
+	(*nums)[0] = 11
+	*nums = append(*nums, 4)
+}
+
+func main() {
+	nums1 := []int{1, 2, 3}
+	nums2 := []int{1, 2, 3}
+	test(nums1)
+	test2(&nums2)
+	fmt.Println(nums1, nums2) // [11 2 3] [11 2 3 4]
+}
+```
+
+
 
 ## 2.5. go中函数传参都是值传递
 
@@ -2006,6 +2035,10 @@ func main() {
 - 读写锁RWMutex
 
 基础数据类型整型、字符串、数组、切片、map等都**不是**线程安全的
+
+
+
+> 参考：[Golang中，有哪些常见的数据结构是线程安全的？](https://juejin.cn/post/7184308263276511293)
 
 #### 2.16.2.2. sync/atomic
 
