@@ -433,7 +433,7 @@ redis-trib.rb add-node 127.0.0.1:8007 127.0.0.1:8008
 
 当redis内存使用超过物理内存限制时，内存的数据开始和磁盘产生频繁的交换。生产环境应避免这种情况，配置`maxmemory`来限制内存使用限制，配置`maxmemory-policy`来腾出内存空间
 
-- noeviction: 停止写服务，默认
+- noeviction: 停止写服务，**默认**
 - valatile-lru: 设置了过期时间的key中最少使用的key
 - volatile-ttl: 最早过期时间
 - volatile-random: 随机

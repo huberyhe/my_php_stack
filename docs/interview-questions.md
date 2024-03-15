@@ -45,7 +45,7 @@
 
 >  参考：
 >
-> 1、[电脑上打开浏览器，输入 www.baidu.com，回车，到百度页面出现。中间发生了什么？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/437193010/answer/2065582348)
+>  1、[电脑上打开浏览器，输入 www.baidu.com，回车，到百度页面出现。中间发生了什么？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/437193010/answer/2065582348)
 
 ## 1.3. 七层OSI网络模型与TCP/IP网络模型、五层网络模型
 
@@ -130,11 +130,11 @@ varchar与text区别：
 
 >  参考：
 >
-> 1、[MySQL之char、varchar和text的设计 - billy鹏 - 博客园 (cnblogs.com)](https://www.cnblogs.com/billyxp/p/3548540.html)
+>  1、[MySQL之char、varchar和text的设计 - billy鹏 - 博客园 (cnblogs.com)](https://www.cnblogs.com/billyxp/p/3548540.html)
 >
-> 2、[MySQL InnoDB存储引擎的行结构 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/419496579)
+>  2、[MySQL InnoDB存储引擎的行结构 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/419496579)
 >
-> 3、[InnoDB存储引擎之 行结构-王者之路-青山依舊 (xiangerfer.com)](http://www.xiangerfer.com/?thread-119.htm)
+>  3、[InnoDB存储引擎之 行结构-王者之路-青山依舊 (xiangerfer.com)](http://www.xiangerfer.com/?thread-119.htm)
 
 ## 1.10. 实际项目中应用到的设计模式
 
@@ -274,12 +274,127 @@ SELECT * FROM user a JOIN (select id from user limit 200000, 20) b ON a.id = b.i
 ## 1.22. 进程间通信有哪些方式
 
 - 管道
+
 - 消息队列
+
 - 共享内存
+
 - 信号量
+
 - socket
 
+  
+
 ## 1.23. 面试经验
+
+1. 代码题注意防御性编程，参数校验，考虑参数的特殊情况
+
+
+
+  
+
+## 1.24. 常见web身份认证方式
+
+  - Cookie + Session 登录
+  - Token 登录，常用[JWT](https://www.ruanyifeng.com/blog/2018/07/json_web_token-tutorial.html)，可用于分布式认证，也可解决跨域的问题
+
+  形式如：Header.Payload.Signature
+
+  header和payload是base64url加密后的json字符串
+
+  header包含签名算法，默认算法是HMAC SHA256（写成 HS256）
+
+  - SSO 单点登录
+  - OAuth 第三方登录
+  - HMAC
+
+  > 参考：[前端登录，这一篇就够了](https://juejin.cn/post/6845166891393089544)
+
+  SSO整体陈述
+
+  1. 单点登录涉及SSO认证中心与多个子系统，子系统与SSO认证中心需要通信（交换令牌、校验令牌及发起注销请求等），子系统中包含SSO的客户端，SSO认证中心是服务端
+  2. 认证中心与客户端通信可通过 httpClient、web service、rpc、restful api（url是其中一种） 等实现
+  3. 客户端与服务器端的功能
+     1. 客户端：
+        1. 拦截子系统未登录用户请求，跳转至sso认证中心
+        2. 接收并存储sso认证中心发送的令牌
+        3. 与服务器端通信，校验令牌的有效性
+        4. 建立局部会话
+        5. 拦截用户注销请求，向sso认证中心发送注销请求
+        6. 接收sso认证中心发出的注销请求，销毁局部会话
+     2. 服务器端：
+        1. 验证用户的登录信息
+        2. 创建全局会话
+        3. 创建授权令牌
+        4. 与客户端通信发送令牌
+        5. 校验客户端令牌有效性
+        6. 系统注册
+        7. 接收客户端注销请求，注销所有会话
+
+  ## 1.25. 系统回答MySQL优化
+
+  见[mysql.md - 4.1](./mysql.md)
+
+  > 参考：[MySQL优化/面试，看这一篇就够了](https://juejin.cn/post/6844903750839058446)
+
+  ## 1.26. poll、epoll、select、reactor的IO多路复用
+
+  ## 1.27. HTTP2的改进之处
+
+  1、对于常见的HTTP头部通过静态表和哈夫曼编码的方式，将体积缩小了近一半，而且针对后续的请求头部，还可以建立动态表，将体积压缩近90%
+
+  2、HTTP2实现了Stream并发，多个Stream只复用1个TCP连接
+
+  3、服务器支持主动推送资源
+
+  ## 1.28. 如何判断一个二叉树是平衡二叉树
+
+  树中每个节点都满⾜左右两个⼦树的⾼度差 <= 1
+
+  见[leetcode题目](https://leetcode-cn.com/problems/balanced-binary-tree/)
+
+  ## 1.29. 谈谈对进程、线程和协程的理解
+
+  [进程、线程、协程常见面试题汇总](https://www.nowcoder.com/discuss/600292?type=1)
+
+  ## 1.30. 微服务的理解，微服务有哪些缺点
+
+  https://segmentfault.com/a/1190000020092884
+
+  每个敏捷团队都使用可用的框架和所选的技术堆栈构建单独的服务组件，每个服务组件形成一个强大的微服务架构，以提供更好的可扩展性。
+
+  敏捷团队可以单独处理每个服务组件的问题，而对整个应用程序没有影响或影响最小。
+
+  优点：
+
+  - 独立开发
+  - 独立部署
+  - 故障隔离
+  - 混合技术栈
+  - 粒度缩放，组件易扩展
+
+  缺点：
+
+  - 故障排查困难
+  - 远程调用延迟
+  - 增加了配置部署的工作量
+
+  ## 1.31. 如何写出高质量的代码
+
+  ## 1.32. MySQL连表查询的原理是什么
+
+  **MySQL的多表查询(笛卡尔积原理)**
+
+  1. 先确定数据要用到哪些表。
+  2. 将多个表先通过笛卡尔积变成一个表。
+  3. 然后去除不符合逻辑的数据（根据两个表的关系去掉）。
+  4. 最后当做是一个虚拟表一样来加上条件即可。
+
+  注意：列名最好使用表别名来区别。
+
+  
+
+\## 1.23. 面试经验
 
 1、hr要代码截图：直接不要给了，面试官总能挑出毛病，很可能因为代码风格认为不合适
 

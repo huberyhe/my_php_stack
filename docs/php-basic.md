@@ -223,7 +223,7 @@ preg_match、preg_match_all、preg_replace、preg_filter、preg_split
 
 ## 1.6. php.ini常见配置
 
-ignore_user_abort：
+ignore_user_abort：当客户端断开连接时是否应该中止脚本的执行
 
 safe_mode：是否启用安全模式
 
