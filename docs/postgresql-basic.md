@@ -8,6 +8,8 @@
 
 ## 1.1. 应用场景
 
+PostgreSQL 更适合需要复杂查询、数据完整性、JSON 支持、并发控制和地理空间数据处理等高级功能的应用场景
+
 ## 1.2. 基本概念
 
 1.1、权限控制：角色与用户
@@ -306,16 +308,16 @@ kill -INT $main_pid
 > [PostgreSQL: Documentation: 16: 19.3. Starting the Database Server](https://www.postgresql.org/docs/current/server-start.html)
 
 ## 1.14. 统计服务连接数
-  
+
 连接postgresql时指定连接名，用于在运行时从pg统计进程的连接数量  
-  
+
 ```go  
 connStr := "user=myuser dbname=mydb sslmode=disable application_name=myapp"   
 db, err := sql.Open("postgres", connStr)  
-```  
-  
+```
+
 统计连接数量  
-  
+
 ```sql  
 select count(*),application_name from pg_stat_activity group by application_name;  
 ```

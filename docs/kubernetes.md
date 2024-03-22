@@ -6,6 +6,55 @@
 
 [TOC]
 
+## 1.1. 基本概念
+
+![image-20240315110210368](../imgs/image-20240315110210368.png)
+
+![Kubernetes 组件](../imgs/kubernetes-cluster-architecture.svg)
+
+### 组件
+
+Kubernetes主要由以下几个核心组件组成：
+
+- etcd保存了整个集群的状态；
+- apiserver提供了资源操作的唯一入口，并提供认证、授权、访问控制、API注册和发现等机制；
+- controller manager负责维护集群的状态，比如故障检测、自动扩展、滚动更新等；
+- scheduler负责资源的调度，按照预定的调度策略将Pod调度到相应的机器上；
+- kubelet负责维护容器的生命周期，同时也负责Volume（CVI）和网络（CNI）的管理；
+- Container runtime负责镜像管理以及Pod和容器的真正运行（CRI）；
+- kube-proxy负责为Service提供cluster内部的服务发现和负载均衡；
+
+除了核心组件，还有一些推荐的Add-ons：
+
+- kube-dns负责为整个集群提供DNS服务
+- Ingress Controller为服务提供外网入口
+- Heapster提供资源监控
+- Dashboard提供GUI
+- Federation提供跨可用区的集群
+- Fluentd-elasticsearch提供集群日志采集、存储与查询
+
+
+
+- 控制面调度整个集群
+
+- 节点负责运行应用，是一个虚拟机或物理机。一个节点至少运行：1、Kubelet，负责Kubernetes 控制面和节点之间通信的进程；管理机器上运行的 Pod 和容器；2、容器运行时（如 Docker）负责从镜像仓库中提取容器镜像、解压缩容器以及运行应用
+
+- 部署Deployment
+- 代理proxy：可以通过代理访问代理访问Deployment
+- 服务Service：定义了 Pod 的逻辑集和访问 Pod 的协议
+- Pod：表示一组一个或多个应用容器（如 Docker），以及这些容器的一些共享资源
+- ConfigMap 是一种 API 对象，用来将非机密性的数据保存到键值对中
+- Secret 是一种包含少量敏感信息例如密码、令牌或密钥的对象
+- ReplicaSet 的目的是维护一组在任何时候都处于运行状态的 Pod 副本的稳定集合
+- StatefulSet用于管理有状态应用程序的工作负载 API 对象。pods不可相互替换，存在顺序，如数据库的主从
+- **DaemonSet** 确保全部（或者某些）节点上运行一个 Pod 的副本
+- Job 会创建一个或者多个 Pod，并将继续重试 Pod 的执行，直到指定数量的 Pod 成功终止
+- Ingress 是对集群中服务的外部访问进行管理的 API 对象，典型的访问方式是 HTTP
+- init容器
+- sidecar容器
+
+> 参考：[Kubernetes设计架构](https://www.kubernetes.org.cn/kubernetes设计架构)
+
 ## 1.1. 基本使用
 
 ### 1.1.1. 部署应用
@@ -149,6 +198,10 @@ kubectl apply -f https://k8s.io/examples/application/guestbook/frontend-service.
 
 # 转发开放端口，访问 http://localhost:8080
 kubectl port-forward svc/frontend 8080:80
+
+# 伸缩服务
+kubectl scale deployment frontend --replicas=5
+kubectl scale deployment frontend --replicas=2
 ```
 
 
@@ -158,6 +211,8 @@ kubectl port-forward svc/frontend 8080:80
 ## 1.3. 有状态应用
 
 有状态应用依赖持久化的状态，这些状态需要在应用迁移、扩展和故障恢复时得到保留。
+
+有状态应用通过持久卷或者StatefulSet来部署。
 
 
 
@@ -199,7 +254,7 @@ minikube service wordpress --url
 
 > 参考：[示例：使用持久卷部署 WordPress 和 MySQL | Kubernetes](https://kubernetes.io/zh-cn/docs/tutorials/stateful-application/mysql-wordpress-persistent-volume/)
 
-# Istio
+# Istio服务网格
 
 ## 2.1. 功能
 

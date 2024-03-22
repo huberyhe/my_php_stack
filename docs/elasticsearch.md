@@ -291,7 +291,9 @@ curl -X GET "132.131.0.21:9200?pretty" -H ''
 curl -X GET 'localhost:9200/*,-dlp-*/_search?pretty'
 ```
 
-# 3. 部署与集群
+# 3. 底层原理
+
+# 4. 部署与集群
 
 1、单节点
 

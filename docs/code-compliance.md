@@ -14,7 +14,7 @@ CI4开始[遵守了这些规范](https://codeigniter4.github.io/userguide/intro/
 
 ## 1.3. PSR-3: Logger Interface
 
-## 1.4. PSR-4: Autoloading Standard
+## 1.4. *PSR-4: Autoloading Standard
 
 ## 1.5. PSR-6: Caching Interface
 

@@ -148,60 +148,95 @@ f(n)=
 \end{equation}
 $$
 
-
 ### 1.3.1. 凑硬币 -- 最少硬币数
+
+[题322](https://leetcode.cn/problems/coin-change/description/)
+
+给你一个整数数组 `coins` ，表示不同面额的硬币；以及一个整数 `amount` ，表示总金额。
+
+计算并返回可以凑成总金额所需的 **最少的硬币个数** 。如果没有任何一种硬币组合能组成总金额，返回 `-1` 。
 
 ### 1.3.2. 凑硬币 -- 有多少种组合
 
+[题518](https://leetcode.cn/problems/coin-change-ii/description/)
+
+给你一个整数数组 `coins` 表示不同面额的硬币，另给一个整数 `amount` 表示总金额。
+
+请你计算并返回可以凑成总金额的硬币组合数。如果任何硬币组合都无法凑出总金额，返回 `0` 。
+
 ### 1.3.3. 斐波那契数列
+
+[题509](https://leetcode.cn/problems/fibonacci-number/description/)
+
+求第n项的值。
 
 ### 1.3.4. 背包问题
 
-## 1.4. 滑动窗口类问题
+## 1.4. 回溯算法
 
-### 1.4.1. 最长回文子串
-
-### 1.4.2. 最长无重复子串
-
-## 1.5. 回溯算法
-
-### 1.5.1. 全排列问题
+### 1.4.1. 全排列问题
 
 [题46](https://leetcode.cn/problems/permutations/description/)
 
 给定一个不含重复数字的数组 `nums` ，返回其 *所有可能的全排列* 。
 
-### 1.5.2. N皇后问题
+### 1.4.2. N皇后问题
 
 [题51](https://leetcode.cn/problems/n-queens/description/)
 
 **n 皇后问题** 研究的是如何将 `n` 个皇后放置在 `n×n` 的棋盘上，并且使皇后彼此之间不能相互攻击。
 
-### 1.5.3. 括号生成
+### 1.4.3. 括号生成
 
 [题22](https://leetcode.cn/problems/generate-parentheses/description/)
 
 数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。
 
-## 1.6. 双指针常用算法
+## 1.5. 双指针常用算法
 
-### 1.6.1. 快慢指针
+### 1.5.1. 快慢指针
 
-### 1.6.2. 左右指针
+[题19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/description/)
 
-## 1.7. 二分搜索算法
+寻找无环单链表的中点
 
-## 1.8. 滑动窗口算法
+### 1.5.2. 左右指针
 
-### 1.8.1. 最小覆盖子串
+[题1. 两数之和](https://leetcode.cn/problems/two-sum/description/)
 
-### 1.8.2. 最长无重复子串
+## 1.6. 二分搜索算法
+
+## 1.7. 滑动窗口算法
+
+### 1.7.1. 最长回文子串
+
+[题5](https://leetcode.cn/problems/longest-palindromic-substring/description/)
+
+给你一个字符串 `s`，找到 `s` 中最长的回文子串。
+
+如果字符串的反序与原始字符串相同，则该字符串称为回文字符串。
+
+### 1.7.2. 最长无重复子串
+
+[题3](https://leetcode.cn/problems/longest-substring-without-repeating-characters/description/)
+
+给定一个字符串 `s` ，请你找出其中不含有重复字符的 **最长子串** 的长度。
+
+## 1.8. 回溯算法
 
 ## 1.9. BFS广度优先算法
 
 ### 1.9.1. 二叉树的最小高度
 
+[题111](https://leetcode.cn/problems/minimum-depth-of-binary-tree/description/)
+
+给定一个二叉树，找出其最小深度。
+
+最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+
 ### 1.9.2. 解开密码的最少次数
+
+[题752](https://leetcode.cn/problems/open-the-lock/description/)
 
 
 
