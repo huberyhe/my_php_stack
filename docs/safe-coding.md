@@ -65,3 +65,26 @@ http://www.securityfocus.com/archive (安全焦点)
 > 3、[Content-Security-Policy - HTTP | MDN (mozilla.org)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)
 >
 > 4、[个人总结的漏洞管理流程分享 - FreeBuf网络安全行业门户](https://www.freebuf.com/articles/es/198324.html)
+
+## 1.6. 反爬虫技术
+
+### 1.6.1. User-Agent 检测
+
+### 1.6.2. IP 黑名单
+
+### 1.6.3. 验证码
+
+### 1.6.4. Cookie 检测
+
+### 1.6.5. 动态页面渲染
+
+网站可能会使用 JavaScript 动态生成页面内容，爬虫程序无法直接解析 JavaScript，因此无法获取页面内容
+
+### 1.6.6. 频率限制
+
+### 1.6.7. 内容隐藏
+
+网站可能会使用图片、加密算法或者隐藏链接等技术手段，使得爬虫程序难以识别和解析页面内容
+
+### 1.6.8. 机器学习检测
+

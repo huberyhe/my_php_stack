@@ -366,8 +366,9 @@ b := <- a
 
 无缓冲通道必须有接收方准备好接收数据时数据才能发送进去，可以保证同步；有缓冲通道只要缓冲区没满就可以发送消息
 
-
 ## 1.12. 协程
+
+
 
 ### 1.12.1. 协程池示例，用于计算数字各位的和
 
@@ -551,29 +552,39 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
-var wg = sync.WaitGroup{}
-var ch = make(chan bool)
-
-func echo(ch chan bool, s string) {
+func echo(name string, c chan int) {
 	for {
-		<-ch
-		fmt.Println(s)
-		ch <- true
+		num := <-c
+		time.Sleep(time.Second)
+		fmt.Println(name, num)
+		c <- num + 1
 	}
-	wg.Done()
 }
 
 func main() {
-	go echo(ch, "11111")
-	wg.Add(1)
-	go echo(ch, "22222")
-	wg.Add(1)
+	c := make(chan int, 1) // 不带缓冲，或带一个缓冲
+	wg := sync.WaitGroup{}
 
-	ch <- true
+	wg.Add(1)
+	go func(idx string, c chan int) {
+		echo(idx, c)
+		wg.Done()
+	}("routine1", c)
+
+	wg.Add(1)
+	go func(idx string, c chan int) {
+		echo(idx, c)
+		wg.Done()
+	}("routine2", c)
+
+	c <- 1
 	wg.Wait()
+	close(c)
 }
+
 ```
 
 # 2. 高级
@@ -3358,19 +3369,212 @@ func main() {
 go build -ldflags "-s -w -X 'pkg/gconfig.gitHash=5bfd92b6b23beee0c94969926cdac8ce71aff23a" -o ./bin/test ./cmd/main.go
 ```
 
-# 3. 内部包
+# 3. 底层知识
 
-# 4. 第三方包
+## 3.1. 切片
 
-## 4.1. Gorm
+## 3.2. map
 
-### 4.1.1. 相对更新：
+## 3.3. 锁
+
+## 3.4. 通道
+
+# 4. 内部包
+
+## 4.1. `golang.org/x/sync/errgroup`
+
+```golang
+package main
+
+import (
+	"context"
+	"fmt"
+	"golang.org/x/sync/errgroup"
+	"time"
+)
+
+func main() {
+	// 创建一个带有取消机制的上下文
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// 创建 errgroup.Group
+	var g errgroup.Group
+
+	// 启动第一个 goroutine
+	g.Go(func() error {
+		fmt.Println("Goroutine 1: Started")
+		// 模拟一些工作
+		time.Sleep(time.Second)
+		fmt.Println("Goroutine 1: Completed")
+		return nil
+	})
+
+	// 启动第二个 goroutine
+	g.Go(func() error {
+		fmt.Println("Goroutine 2: Started")
+		// 模拟一个错误
+		time.Sleep(time.Second)
+		fmt.Println("Goroutine 2: Simulating an error")
+		return fmt.Errorf("Goroutine 2: An error occurred")
+	})
+
+	// 启动第三个 goroutine
+	g.Go(func() error {
+		fmt.Println("Goroutine 3: Started")
+		// 模拟一些工作
+		time.Sleep(time.Second)
+		fmt.Println("Goroutine 3: Completed")
+		return nil
+	})
+
+	// 等待所有 goroutine 完成
+	if err := g.Wait(); err == nil {
+		fmt.Println("All goroutines completed successfully")
+	} else {
+		fmt.Printf("At least one goroutine encountered an error: %v\n", err)
+	}
+
+	// 手动取消上下文
+	cancel()
+}
+```
+
+
+
+## 4.2. `golang.org/x/sync/singleflight`
+
+```golang
+package main
+
+import (
+	"fmt"
+	"golang.org/x/sync/singleflight"
+	"sync"
+	"time"
+)
+
+func main() {
+	var g singleflight.Group
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+
+			// 使用 singleflight.Do 保证只有一个 goroutine 执行某个函数
+			val, err, _ := g.Do("key", func() (interface{}, error) {
+				fmt.Printf("goroutine %d: Executing\n", id)
+				time.Sleep(time.Second)
+				return "result", nil
+			})
+
+			if err != nil {
+				fmt.Printf("goroutine %d: %v\n", id, err)
+				return
+			}
+
+			// 所有 goroutine 都会打印相同的结果，而只有一个执行了真正的函数
+			fmt.Printf("goroutine %d: Result: %v\n", id, val)
+		}(i)
+	}
+
+	wg.Wait()
+}
+
+```
+
+
+
+## 4.3. `golang.org/x/sync/semaphore`信号量
+
+```golang
+package main
+
+import (
+	"context"
+	"fmt"
+	"golang.org/x/sync/semaphore"
+	"sync"
+	"time"
+)
+
+func main() {
+	ctx := context.TODO()
+
+	// 创建一个信号量，最多允许两个并发
+	sem := semaphore.NewWeighted(2)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			// 获取信号量
+			if err := sem.Acquire(ctx, 1); err != nil {
+				fmt.Printf("goroutine %d: %v\n", id, err)
+				return
+			}
+			defer sem.Release(1)
+
+			// 模拟一些工作
+			fmt.Printf("goroutine %d: Working\n", id)
+			time.Sleep(time.Second)
+
+		}(i)
+	}
+
+	wg.Wait()
+}
+```
+
+
+
+## 4.4. `golang.org/x/time/rate`令牌桶限流
+
+```golang
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"golang.org/x/time/rate"
+)
+
+func main() {
+	// 每1毫秒放1个令牌，桶容量大小为10
+	r := rate.Every(1 * time.Millisecond)
+	limiter := rate.NewLimiter(r, 10)
+
+	for i := 0; i < 10; i++ {
+		// 尝试获取一个令牌，如果获取不到，则阻塞等待
+		if limiter.Allow() {
+			fmt.Println("Received token")
+		} else {
+			fmt.Println("No token available")
+		}
+		time.Sleep(200 * time.Millisecond) // 限制请求速率
+	}
+}
+```
+
+
+
+# 5. 第三方包
+
+## 5.1. Gorm
+
+### 5.1.1. 相对更新：
 
 ```go
 Db.Model(xy).Where("id = ? ", id).Update("sign_up_num", gorm.Expr("sign_up_num+ ?", 1))
 ```
 
-### 4.1.2. 查询，不存在则创建
+### 5.1.2. 查询，不存在则创建
 
 ```go
 var licTmp model.CascadeLic
@@ -3378,7 +3582,7 @@ var licTmp model.CascadeLic
 txn.Where(model.CascadeLic{Type: "lower", LowerTAG: lic.LowerTAG, UUID: lic.UUID}).Attrs(lic).FirstOrCreate(&licTmp)
 ```
 
-### 4.1.3. 复用通用的逻辑
+### 5.1.3. 复用通用的逻辑
 
 ```go
 whereScopeFuncs := make([]func(db *gorm.DB) *gorm.DB, 0)
@@ -3399,18 +3603,18 @@ if len(whereScopeFuncs) > 0 {
 }
 ```
 
-### 4.1.4. 查询后判断错误为未找到
+### 5.1.4. 查询后判断错误为未找到
 
 ```go
 errors.Is(err, gorm.ErrRecordNotFound)
 ```
 
-### 4.1.5. 日志
+### 5.1.5. 日志
 
 
 > 参考：[Logger | GORM - The fantastic ORM library for Golang, aims to be developer friendly.](https://gorm.io/zh_CN/docs/logger.html)
 
-### 4.1.6. 生成sql语句
+### 5.1.6. 生成sql语句
 
 开启调试模式后，gorm会打印执行的sql语句，但这个语句不一定是实际执行的sql，特别是在参数经过预处理之后，比如
 
@@ -3442,7 +3646,7 @@ SELECT * FROM "td_osloginfo"  WHERE ((logtype LIKE '%''%' or items LIKE '%''%'))
 - 预处理时不需要对单引号转义，数据库会自动转义；sprintf拼接的则需要转义。
 - gorm的ToSQL生成的sql不安全，官方不建议用于生产环境
 
-## 4.2. grpc-gateway
+## 5.2. grpc-gateway
 
 [grpc-gateway](https://link.segmentfault.com/?enc=IiOARw%2FsDGNqscUzUzwHcw%3D%3D.rS7Vg97osGOKT4igbY52nEs7DaK4M2QHhyaxkrfkoYZgHMBU7tgWk3gR4PDkgVJi)是protoc的一个插件。它读取gRPC服务定义，并生成一个反向代理服务器，将RESTful JSON API转换为gRPC
 
@@ -3452,7 +3656,7 @@ go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
 > 参考：[go - Grpc+Grpc Gateway实践一 介绍与环境安装](https://segmentfault.com/a/1190000013339403)
 
-## 4.3. fvbock/endless
+## 5.3. fvbock/endless
 
 http服务的平滑重启
 
@@ -3460,19 +3664,19 @@ http服务的平滑重启
 go get -u github.com/fvbock/endless
 ```
 
-## 4.4. cron定时任务
+## 5.4. cron定时任务
 
 ```bash
 go get github.com/robfig/cron/v3@v3.0.0
 ```
 
-## 4.5. pkg/errors
+## 5.5. pkg/errors
 
 使用 `github.com/pkg/errors` 包装 `errors`
 
 > 参考：[GitHub - llitfkitfk/go-best-practice: Go语言实战: 编写可维护Go语言代码建议](https://github.com/llitfkitfk/go-best-practice#72-错误只处理一次)
 
-## 4.6. trylock
+## 5.6. trylock
 
 非阻塞拿锁，非阻塞获取锁状态
 
@@ -3526,7 +3730,7 @@ func (m *Mutex) IsLocked() bool {
 
 > 参考：[扩展golang的sync mutex的trylock及islocked](https://xiaorui.cc/archives/5084)
 
-## 4.7. 获取系统信息
+## 5.7. 获取系统信息
 
 ```bash
 go get github.com/shirou/gopsutil
@@ -3534,59 +3738,64 @@ go get github.com/shirou/gopsutil
 
 github.com/prometheus/procfs
 
-## 4.8. 日志组件
+## 5.8. 日志组件
 
-### 4.8.1. logrus
+### 5.8.1. logrus
 
-### 4.8.2. zap
+### 5.8.2. zap
 
-### 4.8.3. seelog
+### 5.8.3. seelog
 
-## 4.9. 基础助手
+## 5.9. 基础助手
 
-### 4.9.1. go实现集合
+### 5.9.1. go实现集合
 
 集合的特点是元素不重复
 
 [sets package - k8s.io/apimachinery/pkg/util/sets - Go Packages](https://pkg.go.dev/k8s.io/apimachinery/pkg/util/sets)
 
-## 4.10. golang.org/x/time/rate 限流
+## 5.10. `go.uber.org/ratelimit` 限流
 
 ```go
-package main
-
 import (
 	"fmt"
 	"time"
 
-	"golang.org/x/time/rate"
+	"go.uber.org/ratelimit"
 )
 
 func main() {
-	// 每1毫秒放1个令牌，桶容量大小为10
-	r := rate.Every(1 * time.Millisecond)
-	limiter := rate.NewLimiter(r, 10)
+    rl := ratelimit.New(100) // 每秒最多100次操作
 
-	for i := 0; i < 10; i++ {
-		// 尝试获取一个令牌，如果获取不到，则阻塞等待
-		if limiter.Allow() {
-			fmt.Println("Received token")
-		} else {
-			fmt.Println("No token available")
-		}
-		time.Sleep(200 * time.Millisecond) // 限制请求速率
-	}
+    prev := time.Now()
+    for i := 0; i < 10; i++ {
+        now := rl.Take()
+        fmt.Println(i, now.Sub(prev))
+        prev = now
+    }
+
+    // 输出：
+    // 0 0
+    // 1 10ms
+    // 2 10ms
+    // 3 10ms
+    // 4 10ms
+    // 5 10ms
+    // 6 10ms
+    // 7 10ms
+    // 8 10ms
+    // 9 10ms
 }
 
 ```
 
 
 
-# 5. 开发环境
+# 6. 开发环境
 
-## 5.1. vscode
+## 6.1. vscode
 
-### 5.1.1. 配置调试当前go文件
+### 6.1.1. 配置调试当前go文件
 
 ```json
 {
