@@ -167,6 +167,44 @@ copiedSlice := make([]int, len(originalSlice))
 copy(copiedSlice, originalSlice)
 ```
 
+### 1.5.4. 传参，修改切片
+
+切片是引用类型，作为参数传递时函数内部修改值会生效到外部，但如果需要添加元素，则需要传地址
+
+```golang
+package main
+
+import "fmt"
+
+func addElement(slice *[]int, element int) {
+	// 在切片末尾添加元素
+	*slice = append(*slice, element)
+}
+
+func modifyElement(slice []int, key, element int) {
+	// 在切片末尾添加元素
+	if key < len(slice)-1 {
+		slice[key] = element
+	}
+}
+
+func main() {
+	// 定义一个切片
+	slice := []int{1, 2, 3, 4, 5}
+
+	// 在函数内部修改元素
+	modifyElement(slice, 0, 11)
+
+	// 在函数内部添加元素
+	addElement(&slice, 6)
+
+	// 打印修改后的切片内容
+	fmt.Println(slice) // 输出: [11 2 3 4 5 6]
+}
+```
+
+
+
 ## 1.6. 接口
 
 在接口上调用方法时，必须有和方法定义时相同的接收者类型或者是可以从具体类型 P 直接可以辨识的：
@@ -1322,11 +1360,7 @@ Mutex是单读写模型，一旦被锁，其他goruntine只能阻塞不能读写
 
 RWMutext是单写多读模型，读锁（RLock）占用时会阻止写，不会阻止读；写锁（Lock）占用时会阻止读和写。经常用于读次数远远多于写次数的场景
 
-### 2.11.2. 锁的实现原理
-
-原子的比较交换操作：`atomic.CompareAndSwapInt32`
-
-### 2.11.3. channel实现互斥锁
+### 2.11.2. channel实现互斥锁
 
 使用缓冲长度为1的channel，加锁为读，解锁为写。
 
@@ -1403,7 +1437,7 @@ func main() {
 }
 ```
 
-### 2.11.4. 文件锁
+### 2.11.3. 文件锁
 
 ```go
 func main() {
@@ -2470,13 +2504,15 @@ func main() {
 }
 ```
 
-## 2.21. go build参数
+## 2.21. go build
 
 ```
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l" -mod=vendor -o runtime/bin/license-srv cmd/main.go
 ```
 
-1、gcflags编译参数：`go tool compile --help`查看可用参数
+### 2.21.1. gcflags编译参数
+
+`go tool compile --help`查看可用参数
 
 - `-N`：禁用优化。使用 `-N` 标志可以禁用大部分编译器的优化，适用于调试代码时。
 
@@ -2487,12 +2523,18 @@ GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s" -gcflags "-N -l"
 - `-m=2`：打印内存分配和回收详细信息。使用 `-m=2` 标志可以让编译器输出更详细的内存分配和回收信息，包括每次内存分配和回收的位置和大小。
 - `-S`： 输出汇编代码。使用 `-S` 标志可以让编译器输出编译后的汇编代码，用于分析程序的性能和效率。
 
-2、ldflags链接参数：`go tool link –help`查看可用参数
+### 2.21.2. ldflags链接参数
+
+`go tool link –help`查看可用参数
 
 - `-s`： 禁止符号表。使用 `-s` 标志可以在生成的可执行文件中移除符号表和调试信息，减小可执行文件的大小。
 - `-w`： 禁止调试信息。使用 `-w` 标志可以在生成的可执行文件中移除调试信息，减小可执行文件的大小。
 
-### 2.21.1. cgo交叉编译
+### 2.21.3. go build缓存目录
+
+缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
+
+### 2.21.4. cgo交叉编译
 
 在[Index of /x86_64-linux-musl/](https://more.musl.cc/x86_64-linux-musl/)下载对应平台的`*-linux-musl-cross.tgz / `，解压后添加到PATH。
 
@@ -2504,13 +2546,13 @@ CGO_ENABLED=1 CC=aarch64-linux-musl-gcc CXX=aarch64-linux-musl-g++ GOOS=linux GO
 
 > 参考：[CGO 交叉静态编译 · Issue #27 · eyasliu/blog (github.com)](https://github.com/eyasliu/blog/issues/27)
 
-### 2.21.2. 查看初始化过程
+### 2.21.5. 查看初始化过程
 
 ```bash
 go build --ldflags=--dumpdep main.go 2>&1 | grep inittask
 ```
 
-### 2.21.3. 编译时为变量赋值
+### 2.21.6. 编译时为变量赋值
 
 用于编译时为程序注入git等信息，类似dgraph
 
@@ -2541,7 +2583,7 @@ func main() {
 go build -ldflags "-X 'main.goVersion=$(go version)' -X 'main.gitHash=$(git show -s --format=%H)' -X 'main.buildTime=$(git show -s --format=%cd)'" -o main.exe version.go
 ```
 
-### 2.21.4. 指定包时使用通配符
+### 2.21.7. 指定包时使用通配符
 
 3个点表示匹配所有的字符串。下面命令会编译chapter3目录下的所有包：
 
@@ -2549,17 +2591,25 @@ go build -ldflags "-X 'main.goVersion=$(go version)' -X 'main.gitHash=$(git show
 go build github.com/goinaction/code/chapter3/...
 ```
 
+### 2.21.8. 查看汇编指令的优化过程
+
+```bash
+# 执行后会在当前目录下生成一个ssa.html文件，包含汇编代码优化的每一个步骤
+GOSSAFUNC=main go build main.go
+```
+
+### 2.21.9. 其他环境变量
+
+`GODEBUG=madvdontneed=1` ：程序运行时，指定**madvise**系统调用的内存管理策略
+
+`GODEBUG=gctrace=1`：程序运行时，打印GC信息
 
 
 
-## 2.22. go build缓存目录
 
-缓存目录：`~/.cache/go-build`，使用docker容器编译打包时将这个目录做个卷映射可加速编译
+## 2.22. init函数
 
-
-## 2.23. init函数
-
-### 2.23.1. 执行顺序
+### 2.22.1. 执行顺序
 
 `import --> const --> var --> init()`
 
@@ -2570,7 +2620,7 @@ go build github.com/goinaction/code/chapter3/...
 
 > 参考：[一张图了解 Go 语言中的 init () 执行顺序](https://learnku.com/go/t/47135)
 
-### 2.23.2. 使用原则
+### 2.22.2. 使用原则
 
 init 函数通常用于：
 
@@ -2588,11 +2638,11 @@ init 函数通常用于：
 
 > 参考：[答应我，别在go项目中用init()了](https://studygolang.com/articles/34488)
 
-## 2.24. context的使用
+## 2.23. context的使用
 
 context 用来解决 goroutine 之间*退出通知*、*元数据传递*的功能。
 
-### 2.24.1. 停止协程
+### 2.23.1. 停止协程
 
 ```go
 package main
@@ -2646,7 +2696,7 @@ func main() {
 
 > 参考：[go - how to call cancel() when using exec.CommandContext in a goroutine](https://stackoverflow.com/questions/52346262/how-to-call-cancel-when-using-exec-commandcontext-in-a-goroutine)
 
-### 2.24.2. 协程超时
+### 2.23.2. 协程超时
 
 `context.WithTimeout`返回上下文和一个取消方法。`ctx.Done`会在超时时间到达，或执行取消方法时收到消息。
 
@@ -2668,7 +2718,7 @@ time.Sleep(5*time.Second)
 cancel()
 ```
 
-### 2.24.3. 元数据传递
+### 2.23.3. 元数据传递
 
 ```go
 package main
@@ -2696,9 +2746,9 @@ func process(ctx context.Context) {
 }
 ```
 
-## 2.25. 编码规范
+## 2.24. 编码规范
 
-### 2.25.1. 命名规范
+### 2.24.1. 命名规范
 
 - 文件名全部小写，除单元测试外避免使用下划线
 - 变量名、常量、函数名使用驼峰式命名，不建议使用下划线和数字
@@ -2706,9 +2756,9 @@ func process(ctx context.Context) {
 
 > 参考：[命名规范 | go-zero](https://go-zero.dev/cn/docs/develop/naming-spec/)
 
-## 2.26. 错误处理，error与panic
+## 2.25. 错误处理，error与panic
 
-### 2.26.1. 自定义error
+### 2.25.1. 自定义error
 
 error接口定义：
 ```go
@@ -2766,7 +2816,7 @@ switch err.(type)
 }
 ```
 
-### 2.26.2. panic恢复
+### 2.25.2. panic恢复
 
 1. 程序中非致命的问题应避免使用panic，除非目的就是要中断程序（当前协程）
 2. 守护型协程应该使用recover捕获panic并恢复，避免协程由于异常退出
@@ -2820,7 +2870,7 @@ func main() {
 }
 
 ```
-## 2.27. 内置排序方法
+## 2.26. 内置排序方法
 
 使用内置排序需要实现`sort.Interface`接口
 ```go
@@ -2885,15 +2935,15 @@ func main() {
 }
 ```
 
-## 2.28. GMP模型与调度流程
+## 2.27. GMP模型与调度流程
 
-### 2.28.1. GMP模型
+### 2.27.1. GMP模型
 
 - G（Goroutine）：协程
 - M（Machine）：对内核级线程的封装
 - P（Processor）：即为G和M的调度对象，用来调度G和M之间的关联关系，其数量可通过GoMAXPROCS()来设置，默认为核心数
 
-### 2.28.2. 调度流程
+### 2.27.2. 调度流程
 
 1. 存在一个全局G队列
 2. 每个P有一个局部G队列，
@@ -2903,11 +2953,11 @@ func main() {
 
 > 参考：[用 GODEBUG 看调度跟踪](https://golang2.eddycjy.com/posts/ch6/04-godebug-sched/)
 
-## 2.29. GC垃圾回收
+## 2.28. GC垃圾回收
 
-### 2.29.1. 三色标记法
+### 2.28.1. 三色标记法
 
-### 2.29.2. GC触发时机
+### 2.28.2. GC触发时机
 
 自动GC
 
@@ -2915,7 +2965,7 @@ func main() {
 
 手动GC：`runtime.GC`
 
-### 2.29.3. GC流程
+### 2.28.3. GC流程
 
 1. **标记（Mark）阶段**：
    - 在这个阶段，垃圾回收器会从根对象出发，标记所有能够访问到的对象。根对象通常是全局变量、栈上的变量以及正在执行的 goroutine 的栈上的变量。垃圾回收器会追踪所有与根对象直接或间接相关的对象，并对它们进行标记。标记过程通常使用的是三色标记法（Tri-color Marking），将对象分为白色（未标记）、灰色（已标记但子对象未标记）和黑色（已标记且子对象已标记）三种状态。
@@ -2929,9 +2979,9 @@ func main() {
 
 > 参考：[用 GODEBUG 看 GC](https://golang2.eddycjy.com/posts/ch6/05-godebug-gc/)
 
-## 2.30. 变量分配在堆上还是栈上，内存逃逸分析
+## 2.29. 变量分配在堆上还是栈上，内存逃逸分析
 
-### 2.30.1. 哪些情况会分配到堆上
+### 2.29.1. 哪些情况会分配到堆上
 
 1. Go 中声明一个函数内局部变量时，当编译器发现变量的作用域没有逃出函数范围时，就会在栈上分配内存，反之则分配在堆上，逃逸分析由编译器完成，作用于编译阶段
 2. 指针类型的变量
@@ -2939,12 +2989,14 @@ func main() {
 4. 动态类型：返回返回一个interface{}类型
 5. 闭包引用对象
 
-### 2.30.2. 检查该变量是在栈上分配还是堆上分配
+### 2.29.2. 检查该变量是在栈上分配还是堆上分配
 
 有两种方式可以确定变量是在堆还是在栈上分配内存:
 -   通过编译后生成的汇编函数来确认，在堆上分配内存的变量都会调用 runtime 包的 `newobject` 函数；
 ```bash
 	go tool compile -S main.go
+	# 或者
+	go run --gcflags='-S' main.go
 ```
 -   编译时通过指定选项显示编译优化信息，编译器会输出逃逸的变量；
 ```bash
@@ -2957,7 +3009,7 @@ go build -gcflags "-m -l" main.go
 > 1. [Frequently Asked Questions (FAQ) - The Go Programming Language](https://go.dev/doc/faq#stack_or_heap)
 > 2. [golang 中函数使用值返回与指针返回的区别，底层原理分析](https://cloud.tencent.com/developer/article/1890639)
 
-## 2.31. 内部包internal
+## 2.30. 内部包internal
 
 内部包的规范约定：导出路径包含`internal`关键字的包，只允许`internal`的父级目录及父级目录的子包导入，其它包无法导入。
 
@@ -2982,7 +3034,7 @@ go build -gcflags "-m -l" main.go
 
 如上包结构的程序，`resources/internal/cpu`和`resources/internal/mem`只能被`resources`包及其子包`resources/input`中的代码导入，不能被`prototype`包里的代码导入。
 
-## 2.32. json struct tag
+## 2.31. json struct tag
 
 1）不指定tag
 
@@ -3046,7 +3098,7 @@ Int64String int64 json:",string" // “Int64String”:“0”
 
 “string” opt的使用可以在Marshal/Unmarshal时自动进行数据类型的转换，减少了手动数据转换的麻烦，但是一定要注意使用的范围，对不满足的类型使用，是会报错的。
 
-## 2.33. 反射reflect的使用
+## 2.32. 反射reflect的使用
 
 一个ORM的例子，传入对象，生成一个插入sql：
 
@@ -3109,7 +3161,7 @@ func TestMakeCreateSql(t *testing.T) {
 	}
 }
 ```
-## 2.34. unsafe的使用
+## 2.33. unsafe的使用
 
 `unsafe.Pointer`表示任意类型且可寻址的指针值，可以在不同的指针类型之间进行转换（类似 C 语言的 void * 的用途）。其包含四种核心操作：
 
@@ -3138,17 +3190,17 @@ func main(){
 }
 ```
 
-## 2.35. runtime包的使用
+## 2.34. runtime包的使用
 
-### 2.35.1. 打印堆栈
+### 2.34.1. 打印堆栈
 
 ```go
 debug.PrintStack()
 ```
 
-## 2.36. http包的使用
+## 2.35. http包的使用
 
-### 2.36.1. 转发请求
+### 2.35.1. 转发请求
 
 ```go
 func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
@@ -3179,7 +3231,7 @@ func ForwardHandler(writer http.ResponseWriter, request *http.Request) {
 }
 ```
 
-## 2.37. embed文件嵌入
+## 2.36. embed文件嵌入
 
 1.16版本引入
 
@@ -3193,7 +3245,7 @@ import (
 //go:embed preset_regex.json
 var presetRegex []byte
 ```
-## 2.38. 程序平滑退出
+## 2.37. 程序平滑退出
 
 linux下可以使用`man 7 signal`查看POSIX系统信号，常用的2是`ctrl+c`，15是`kill`，9是`kill -9`,9是无条件结束程序，不能被捕获。
 
@@ -3270,7 +3322,7 @@ func cleanup(cancel context.CancelFunc) {
 
 ```
 
-## 2.39. 定时器
+## 2.38. 定时器
 
 定时器方法：
 
@@ -3311,7 +3363,7 @@ func testTicker() {
 30.0111594 tick n3
 ```
 
-## 2.40. cgo
+## 2.39. cgo
 
 ```go
 package main
@@ -3334,7 +3386,7 @@ func main() {
 }
 ```
 
-## 2.41. 项目目录结构
+## 2.40. 项目目录结构
 ```
 /myproject
  /api
@@ -3361,7 +3413,7 @@ func main() {
 - /pkg: 此目录包含库代码，这些代码可以被其他应用程序使用。
 - /web: 此目录包含Web服务器的代码。
 
-## 2.42. 编译时注入编译信息
+## 2.41. 编译时注入编译信息
 
 类似dgraph做的，编译时写入版本、编译日期等信息到进程
 
@@ -3377,7 +3429,13 @@ go build -ldflags "-s -w -X 'pkg/gconfig.gitHash=5bfd92b6b23beee0c94969926cdac8c
 
 ## 3.3. 锁
 
+原子的比较交换操作：`atomic.CompareAndSwapInt32`
+
 ## 3.4. 通道
+
+区分有缓冲通道和无缓冲通道
+
+有缓冲通道内部实现了一个环形队列作为buffer，环形队列有5个字段（容量、长度、buf地址，发送偏移量、接收偏移量）；另外还包含发送goroutine等待队列和接收goroutine等待队列；一个mutex锁来保证并发安全。
 
 # 4. 内部包
 
@@ -3823,3 +3881,147 @@ func main() {
 
 
 
+# 7. 易错题
+
+## 7.1. 题
+
+```golang
+package main
+
+import (
+	"fmt"
+)
+
+type student struct {
+	Name string
+}
+
+func main() {
+	m1 := map[string]student{"people": {"zhoujielun"}}
+	//m1["people"].Name = "liudehua" // 编译报错：cannot assign to struct field m["people"].Name in map
+	a := m1["people"]
+	a.Name = "wuyanzu"
+
+	fmt.Println(m1, m1["people"].Name) // 输出 zhoujielun
+
+	m2 := map[string]*student{"people": {"zhoujielun"}}
+	m2["people"].Name = "liudehua"
+	b := m2["people"]
+	b.Name = "wuyanzu"
+
+	fmt.Println(m2, m2["people"].Name) // 输出 wuyanzu
+}
+```
+
+解析：
+map的value本身是不可寻址的，因为map中的值会在内存中移动，并且旧的指针地址在map改变时会变得⽆效。故如果需要修map值，可以将 map 中的⾮指针类型value ，修改为指针类型，⽐如使⽤ map[string]*student .
+
+
+
+## 7.2. 题
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+)
+
+type student struct {
+	Name string
+}
+
+func test3() {
+	m := make(map[string]*student)
+	stus := []student{
+		{Name: "jack"},
+		{Name: "rose"},
+		{Name: "mark"},
+	}
+
+	for _, stu := range stus {
+		m[stu.Name] = &stu
+	}
+
+	for k, v := range m {
+		fmt.Println(k, *v) // 都打印mark
+	}
+}
+
+func main() {
+	test3()
+}
+
+```
+
+解析：
+golang 的 for ... range 语法中， stu 变量会被复⽤，每次循环会将集合中的值复制给这个变量，因此，会导致最后 m 中的 map 中储存的都是 stus 最后⼀个 student的值
+
+## 7.3. 题
+
+```golang
+func calc(index string, a, b int) int {
+	ret := a + b
+	fmt.Println(index, a, b, ret)
+	return ret
+}
+
+func test5() {
+	a := 1
+	b := 2
+	defer calc("1", a, calc("10", a, b))
+	a = 0
+	defer calc("2", a, calc("20", a, b))
+	b = 1
+
+	// 10 1 2 3
+	// 20 0 2 2
+	// 2 0 2 2
+	// 1 1 3 4
+}
+
+func main() {
+	test5()
+}
+```
+
+解析：
+
+defer 在定义的时候会计算好调⽤函数的参数，所以会优先输出 10 、 20 两个参数。然后根据定义的顺序倒序执⾏。
+
+
+
+## 7.4. 题
+
+```golang
+type People interface {
+	Speak(string) string
+}
+
+type Teacher struct {
+}
+
+func (t *Teacher) Speak(think string) (talk string) {
+	if think == "bitch" {
+		talk = "You are a good boy"
+	} else {
+		talk = "hi"
+	}
+	return
+}
+
+func test6() {
+	var peo People = Teacher{} // 必须取地址
+	think := "bitch"
+	fmt.Println(peo.Speak(think))
+}
+
+func main() {
+	test6()
+}
+```
+
+解析：
+
+编译失败，值类型 Student{} 未实现接⼝ People 的⽅法，不能定义为 People 类型。在 golang 语⾔中， Student 和 *Student 是两种类型，第⼀个是表示 Student 本身，第⼆个是指向 Student 的指针。
